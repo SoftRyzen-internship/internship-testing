@@ -9,11 +9,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('Contacts API')
+    .setTitle('Internship Testing API')
     .setDescription('Documentation REST API')
     .setVersion('1.0.0')
     .addBearerAuth()
-    .addTag('Contacts test')
+    .addTag('Internship Testing')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
