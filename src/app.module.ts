@@ -5,6 +5,7 @@ import { AuthModule } from '@entities/auth/auth.module';
 import { UserModule } from '@entities/users/users.module';
 import { MailModule } from '@entities/mail/mail.module';
 import { QuestionsModule } from '@entities/questions/questions.module';
+import { PhoneModule } from './entities/phone/phone.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { QuestionsModule } from '@entities/questions/questions.module';
     UserModule,
     MailModule,
     QuestionsModule,
+    PhoneModule,
   ],
   controllers: [],
   providers: [],
