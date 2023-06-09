@@ -47,7 +47,7 @@ export class RegisterUserDto {
   direction: Direction;
 
   @ApiProperty({
-    example: 'Group 47',
+    example: 'Group A',
     description: 'Group in which the user studied',
     enum: Group,
   })
@@ -58,9 +58,6 @@ export class RegisterUserDto {
   @Column({ name: 'currentCity', type: 'varchar' })
   currentCity: string
 
-  @ApiProperty({example: 'URL', description: " User Avatar"})
-    @Column({ name: 'avatar', type: 'varchar' })
-    avatar: string
 }
 
 

@@ -9,7 +9,6 @@ import createToken from "@utils/createToken";
 @Injectable()
 export class AuthService {
   
-  
   private readonly userService: any;
   constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {}
 
@@ -29,11 +28,12 @@ export class AuthService {
         throw new ConflictException('User is already exists');
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    const avatar = "Avatar URL";
+    const avatar = "'/avatars/avatar_pokemon.png'";
+    // Логику добавления к потоку реализуем когда появятся сами потоки
     const currentThread = "Current Thread";
 
     const newUser =  this.userRepository.create({
-        ...registerUserDto, avatar,currentThread,  password: hashedPassword
+        ...registerUserDto, password: hashedPassword,avatar: avatar, currentThread: currentThread
     })
     const { accessToken , refreshToken} = createToken(newUser.id)
     newUser.accessToken = accessToken;
