@@ -1,3 +1,4 @@
+
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
@@ -13,4 +14,5 @@ export class AuthController {
   async checkPhone(@Body() body: PhoneDto) {
     return this.authService.checkPhone(body.phone);
   }
+
 }
