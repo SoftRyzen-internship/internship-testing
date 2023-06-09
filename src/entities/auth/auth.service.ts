@@ -4,6 +4,7 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt'
 import { User } from '@entities/users/users.entity';
 import { RegisterUserDto } from "./dto/create-user.dto";
+import createToken from "@utils/createToken";
 
 @Injectable()
 export class AuthService {
