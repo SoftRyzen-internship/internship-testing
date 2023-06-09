@@ -5,7 +5,7 @@ import { QuestionsModule } from '@entities/questions/questions.module';
 import { UserModule } from '@entities/users/users.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from './config.module';
-import { RedisCacheModule } from './entities/redis/redis.module';
+import { RedisCacheModule } from '@entities/redis/redis.module';
 
 @Module({
   imports: [
