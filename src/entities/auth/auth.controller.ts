@@ -1,5 +1,14 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Post, Req } from '@nestjs/common';
+import {
+  ApiConflictResponse,
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
+  ApiResponse,
+  ApiTags,
+  ApiTooManyRequestsResponse,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { MyRequest } from '@src/types/request.interface';
 import { AuthService } from './auth.service';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { LoginDto } from './dto/login.dto';
@@ -11,12 +20,26 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @ApiResponse({ status: 200, type: LoginResponseDto })
+  @ApiUnauthorizedResponse({
+    description: 'Email is wrong, or password is wrong, or not verified',
+  })
+  @ApiTooManyRequestsResponse({
+    description:
+      'Too many failed login attempts. Please try again after 15 minutes.',
+  })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
   @Post('login')
-  login(@Body() loginDto: LoginDto) {
-    // return this.authService.login(loginDto);
-    return this.authService.get('user');
+  async login(@Body() loginDto: LoginDto, @Req() req: MyRequest) {
+    const data = await this.authService.login(loginDto, req.ip);
+    return { user: data.user };
   }
-  @ApiResponse({ status: 200, type: String, description: 'OK' })
+
+  @ApiOkResponse({ description: 'OK' })
+  @ApiConflictResponse({ description: 'Phone number already exists' })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @ApiConflictResponse({
+    description: 'Phone number already exists',
+  })
   @Post('check-phone')
   async checkPhone(@Body() body: PhoneDto) {
     return this.authService.checkPhone(body.phone);

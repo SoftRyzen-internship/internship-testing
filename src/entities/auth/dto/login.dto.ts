@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, MinLength } from 'class-validator';
+import { IsString, Matches, MinLength } from 'class-validator';
 
 export class LoginDto {
   @ApiProperty({
@@ -7,6 +7,9 @@ export class LoginDto {
     description: 'User login',
   })
   @IsString()
+  @Matches(/^(?:[\w.-]+@[\w-]+\.[\w]{2,4})|(?:\+\d{1,3}\d{3,14})$/, {
+    message: 'Invalid username format',
+  })
   username: string;
 
   @ApiProperty({ example: 'password', description: 'User password' })

@@ -5,7 +5,8 @@ import { QuestionsModule } from '@entities/questions/questions.module';
 import { UserModule } from '@entities/users/users.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from './config.module';
-import { RedisCacheModule } from '@entities/redis/redis.module';
+import { RedisModule } from './entities/redis/redis.module';
+import { GoogleModule } from './entities/google/google.module';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { RedisCacheModule } from '@entities/redis/redis.module';
     UserModule,
     MailModule,
     QuestionsModule,
-    RedisCacheModule,
+    RedisModule,
+    GoogleModule,
   ],
   controllers: [],
   providers: [],
