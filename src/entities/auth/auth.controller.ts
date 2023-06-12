@@ -1,3 +1,4 @@
+import { User } from '@entities/users/users.entity';
 import { JwtGuardsModule } from '@guards/jwtGuard/jwt-guard.module';
 import {
   Body,
@@ -8,6 +9,7 @@ import {
   Req,
   Res,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -15,6 +17,7 @@ import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiResponse,
   ApiTags,
   ApiTooManyRequestsResponse,
@@ -24,6 +27,7 @@ import { MyRequest } from '@src/types/request.interface';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { RegisterUserDto } from './dto/create-user.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { LoginDto, UsernameDto } from './dto/login.dto';
 import { PhoneDto } from './dto/phone.dto';
@@ -67,6 +71,15 @@ export class AuthController {
   @Post('check-phone')
   async checkPhone(@Body() body: PhoneDto) {
     return this.authService.checkPhone(body.phone);
+  }
+
+  @Post('register')
+  @ApiOperation({ summary: 'Register a new user' })
+  @ApiResponse({ status: 201, type: RegisterUserDto })
+  async registerUser(
+    @Body(ValidationPipe) registerUserDto: RegisterUserDto,
+  ): Promise<User> {
+    return this.authService.registerUser(registerUserDto);
   }
 
   // Request change password

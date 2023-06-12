@@ -1,8 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { MyBaseEntity } from '@utils/base.entity';
-import { Matches, MinLength } from 'class-validator';
-import { Column, Entity, Unique } from 'typeorm';
-import { Direction, Group } from './enums/group.enum';
+import { ApiProperty } from '@nestjs/swagger'
+import { MyBaseEntity } from '@utils/base.entity'
+import { Matches, MinLength } from 'class-validator'
+import { Column, Entity, Unique } from 'typeorm'
+import { Direction, Group } from './enums/group.enum'
 
 @Entity('users')
 export class User extends MyBaseEntity {
