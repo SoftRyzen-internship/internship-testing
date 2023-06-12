@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Matches, MinLength } from 'class-validator'
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm'
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, Unique,CreateDateColumn, UpdateDateColumn } from 'typeorm'
+import { Direction, Group } from './enums/group.enum'
 
 
 
@@ -32,6 +33,60 @@ export class User extends BaseEntity {
   })
   password: string
 
+  @ApiProperty({example: 'contactPhone', description: "User contact phone"})
+  @Column({ name: 'contactPhone', type: 'varchar' })
+  @Unique(['contactPhone'])
+@Matches(/^\+380\d{9}$/, { message: 'Contact phone must be in the format "+380XXXXXXXXX"' })
+  contactPhone: string
+
+  @ApiProperty({example: 'Telegram contact', description: "User Telegram contact"})
+  @Column({ name: 'telegramContact', type: 'varchar' })
+@Matches(/^t.me\/\w+$/, { message: 'Telegram contact must be in the format "t.me/name"' })
+  telegramContact: string
+
+@ApiProperty({
+    example: 'Full Stack',
+    description: 'Direction in which the user was trained',
+    enum: Direction,
+  })
+  @Column({ type: 'enum', enum: Direction })
+  direction: Direction;
+
+  @ApiProperty({
+    example: 'Group 47',
+    description: 'Group in which the user studied',
+    enum: Group,
+  })
+  @Column({ type: 'enum', enum: Group })
+  group: Group;
+
+  @ApiProperty({example: 'Current city', description: "User current city"})
+  @Column({ name: 'currentCity', type: 'varchar' })
+  currentCity: string
+
+  @ApiProperty({example: 'URL', description: " User Avatar"})
+    @Column({ name: 'avatar', type: 'varchar' })
+    avatar: string
+
+    @ApiProperty({example: 'Full Stack', description: " User Avatar"})
+    @Column({ name: 'currentThread', type: 'varchar' })
+    currentThread: string
+
+    @ApiProperty({ example: 'Access token', description: 'User access token' })
+  @Column({ name: 'accessToken', type: 'varchar', nullable: true }) 
+  accessToken: string;
+
+  @ApiProperty({ example: 'Refresh token', description: 'User access token' })
+  @Column({ name: 'refreshToken', type: 'varchar', nullable: true })
+  refreshToken: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }
+
+
 
 
