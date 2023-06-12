@@ -57,6 +57,7 @@
     "@types/passport-google-oauth2": "^0.1.5",
     "@types/pg": "^8.10.1",
     "@types/supertest": "^2.0.11",
+    "@types/uuid": "^9.0.2",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "eslint": "^8.0.1",
