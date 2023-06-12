@@ -1,3 +1,4 @@
+import { RedisModule } from '@entities/redis/redis.module';
 import { User } from '@entities/users/users.entity';
 import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -14,6 +15,7 @@ import { LoginAttemptsService } from './login-attempts.service';
       rootPath: join(__dirname, '..', 'public'),
       serveRoot: '/avatars',
     }),
+    RedisModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, LoginAttemptsService],
