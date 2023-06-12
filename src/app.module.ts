@@ -5,6 +5,8 @@ import { QuestionsModule } from '@entities/questions/questions.module';
 import { UserModule } from '@entities/users/users.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from './config.module';
+import { RedisModule } from './entities/redis/redis.module';
+import { GoogleModule } from './entities/google/google.module';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { ConfigModule } from './config.module';
     UserModule,
     MailModule,
     QuestionsModule,
+    RedisModule,
+    GoogleModule,
   ],
   controllers: [],
   providers: [],

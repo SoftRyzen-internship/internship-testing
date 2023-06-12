@@ -14,8 +14,8 @@
       "@db/*": ["src/db/*"],
       "@entities/*": ["src/entities/*"],
       "@guards/*": ["src/guards/*"],
-      "@types/*": ["src/types/*"],
-      "@utils/*": ["src/utils/*"]
+      "@utils/*": ["src/utils/*"],
+      "@src/*": ["src/*"]
     },
     "incremental": true,
     "skipLibCheck": true,
