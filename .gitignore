@@ -2,6 +2,7 @@
 /dist
 /node_modules
 .vscode/
+docker-compose.yml
 
 # Logs
 logs
