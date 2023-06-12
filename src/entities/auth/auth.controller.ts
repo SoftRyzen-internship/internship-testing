@@ -40,6 +40,15 @@ export class AuthController {
     this.expirationDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   }
 
+  @Post('register')
+  @ApiOperation({ summary: 'Register a new user' })
+  @ApiResponse({ status: 201, type: RegisterUserDto })
+  async registerUser(
+    @Body(ValidationPipe) registerUserDto: RegisterUserDto,
+  ): Promise<User> {
+    return this.authService.registerUser(registerUserDto);
+  }
+
   // Login
   @ApiResponse({ status: 200, type: LoginResponseDto })
   @ApiUnauthorizedResponse({
@@ -71,15 +80,6 @@ export class AuthController {
   @Post('check-phone')
   async checkPhone(@Body() body: PhoneDto) {
     return this.authService.checkPhone(body.phone);
-  }
-
-  @Post('register')
-  @ApiOperation({ summary: 'Register a new user' })
-  @ApiResponse({ status: 201, type: RegisterUserDto })
-  async registerUser(
-    @Body(ValidationPipe) registerUserDto: RegisterUserDto,
-  ): Promise<User> {
-    return this.authService.registerUser(registerUserDto);
   }
 
   // Request change password
