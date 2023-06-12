@@ -1,18 +1,20 @@
-import { Body, Controller, Post, Req } from '@nestjs/common';
+import { User } from '@entities/users/users.entity'
+import { Body, Controller, Post, Req, ValidationPipe } from '@nestjs/common'
 import {
   ApiConflictResponse,
   ApiInternalServerErrorResponse,
   ApiOkResponse,
-  ApiResponse,
+  ApiOperation, ApiResponse,
   ApiTags,
   ApiTooManyRequestsResponse,
   ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
-import { MyRequest } from '@src/types/request.interface';
-import { AuthService } from './auth.service';
-import { LoginResponseDto } from './dto/login-response.dto';
-import { LoginDto } from './dto/login.dto';
-import { PhoneDto } from './dto/phone.dto';
+} from '@nestjs/swagger'
+import { MyRequest } from '@src/types/request.interface'
+import { AuthService } from './auth.service'
+import { RegisterUserDto } from './dto/create-user.dto'
+import { LoginResponseDto } from './dto/login-response.dto'
+import { LoginDto } from './dto/login.dto'
+import { PhoneDto } from './dto/phone.dto'
 
 @ApiTags('Authentication')
 @Controller('api/auth')
@@ -44,4 +46,14 @@ export class AuthController {
   async checkPhone(@Body() body: PhoneDto) {
     return this.authService.checkPhone(body.phone);
   }
+
+  @Post('register')
+   @ApiOperation({ summary: 'Register a new user' })
+   @ApiResponse({status: 201, type: RegisterUserDto})
+   async registerUser(
+    @Body(ValidationPipe) registerUserDto: RegisterUserDto
+) :Promise<User> {
+    return this.authService.registerUser(registerUserDto)
+}
+
 }
