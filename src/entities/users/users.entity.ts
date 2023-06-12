@@ -77,6 +77,10 @@ export class User extends MyBaseEntity {
   @Column({ name: 'verified', type: 'varchar', default: false })
   verified: boolean;
 
+  @ApiProperty({ example: 'Verify token', description: 'Verify token' })
+  @Column({ name: 'verify_token', type: 'varchar', default: null })
+  verifyToken: string;
+
   @ApiProperty({ example: 'Access token', description: 'User access token' })
   @Column({ name: 'access_token', type: 'varchar', nullable: true })
   accessToken: string;
