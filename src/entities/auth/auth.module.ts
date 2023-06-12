@@ -8,6 +8,8 @@ import { join } from 'path';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { LoginAttemptsService } from './login-attempts.service';
+import { MailService } from '@entities/mail/mail.service';
+import { MailModule } from '@entities/mail/mail.module';
 
 @Module({
   imports: [
@@ -18,9 +20,10 @@ import { LoginAttemptsService } from './login-attempts.service';
     }),
     RedisModule,
     JwtGuardsModule,
+    MailModule
   ],
   controllers: [AuthController],
-  providers: [AuthService, LoginAttemptsService],
+  providers: [AuthService, LoginAttemptsService, MailService],
   exports: [AuthService],
 })
 export class AuthModule {}
