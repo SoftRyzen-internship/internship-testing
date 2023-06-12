@@ -49,7 +49,7 @@ export class MailService {
                   Content: `Hi ${firstName}!`,
                 },
               ],
-              From: 'example@gmail.com',
+              From: 'test@gmail.com',
               Subject: 'Example verify email',
             },
           };
