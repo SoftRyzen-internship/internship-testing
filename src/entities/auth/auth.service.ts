@@ -70,7 +70,6 @@ export class AuthService {
     );
 
     const tokens = await this.generateTokens(user);
-    console.log('tokens', tokens);
 
     const userData: LoginResponseDto = {
       id: user.id,
@@ -109,10 +108,6 @@ export class AuthService {
   public async verifyChangePassword(verifyToken: string) {
     const user = await this.getUser('verifyToken', verifyToken);
 
-    if (user.verifyToken !== verifyToken) {
-      throw new BadRequestException();
-    }
-
     await this.userRepository.update(user.id, { verifyToken: null });
     const { refreshToken } = await this.generateTokens(user);
     return refreshToken;
@@ -137,12 +132,11 @@ export class AuthService {
     password: string,
     userIp: string,
   ) {
-    const user = await this.userRepository.findOne({
-      where: { [field]: value },
-    });
-    if (!user || !bcrypt.compare(password, user.password)) {
+    const user = await this.getUser(field, value);
+    const passwordCompare = await bcrypt.compare(password, user.password);
+    if (!passwordCompare) {
       await this.loginAttemptsService.attempts(userIp);
-      throw new UnauthorizedException('Email is wrong, or password is wrong');
+      throw new UnauthorizedException('Password is wrong');
     }
     if (!user.verified) {
       throw new UnauthorizedException('Email not verified');
@@ -157,7 +151,7 @@ export class AuthService {
     if (user) {
       return user;
     }
-    throw new NotFoundException();
+    throw new NotFoundException('No such user');
   }
 
   private checkEmailOrPhone(value: string) {

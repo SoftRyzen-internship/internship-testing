@@ -1,5 +1,5 @@
 import { User } from '@entities/users/users.entity';
-import { JwtGuardsModule } from '@guards/jwtGuard/jwt-guard.module';
+import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
 import {
   Body,
   Controller,
@@ -115,7 +115,7 @@ export class AuthController {
   @ApiBadRequestResponse({ description: 'Passwords do not match' })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtGuardsModule)
+  @UseGuards(JwtAuthGuard)
   @Post('change-password')
   async changePassword(
     @Body() changePasswordDto: ChangePasswordDto,
