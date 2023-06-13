@@ -1,5 +1,5 @@
 import { User } from '@entities/users/users.entity';
-import { JwtGuardsModule } from '@guards/jwtGuard/jwt-guard.module';
+import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
 import {
   Body,
   Controller,
@@ -39,7 +39,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {
     this.expirationDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   }
-
+  // Register
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({ status: 201, type: RegisterUserDto })
@@ -115,7 +115,7 @@ export class AuthController {
   @ApiBadRequestResponse({ description: 'Passwords do not match' })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtGuardsModule)
+  @UseGuards(JwtAuthGuard)
   @Post('change-password')
   async changePassword(
     @Body() changePasswordDto: ChangePasswordDto,
@@ -123,4 +123,11 @@ export class AuthController {
   ) {
     return this.authService.changePassword(changePasswordDto, req.user.id);
   }
+
+  // Verify email
+  @Get('verify/:verificationToken')
+@ApiOperation({ summary: 'User email verification' })
+async verifyEmail(@Param('verificationToken') verifyToken: string):Promise<{message: string}>{
+  return this.authService.verifyEmail(verifyToken)
+}
 }
