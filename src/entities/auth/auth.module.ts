@@ -10,7 +10,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { LoginAttemptsService } from './login-attempts.service';
+import { SetRedisService } from './set-redis.service';
 
 @Module({
   imports: [
@@ -24,7 +24,7 @@ import { LoginAttemptsService } from './login-attempts.service';
     MailModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, LoginAttemptsService, MailService, ConfigService],
+  providers: [AuthService, SetRedisService, MailService, ConfigService],
   exports: [AuthService],
 })
 export class AuthModule {}
