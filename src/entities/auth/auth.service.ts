@@ -5,19 +5,21 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  Param,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt/dist';
 import { InjectRepository } from '@nestjs/typeorm';
 import createToken from '@utils/createToken';
 import * as bcrypt from 'bcrypt';
+import { v4  } from "uuid";
 import { Repository } from 'typeorm';
-import { v4 } from 'uuid';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { RegisterUserDto } from './dto/create-user.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { LoginDto } from './dto/login.dto';
 import { LoginAttemptsService } from './login-attempts.service';
+import { MailService } from '@entities/mail/mail.service';
 
 @Injectable()
 export class AuthService {
@@ -25,30 +27,36 @@ export class AuthService {
     private readonly loginAttemptsService: LoginAttemptsService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
+    private readonly mailService: MailService
   ) {}
 
   async registerUser(registerUserDto: RegisterUserDto): Promise<User> {
-    const { email, password } = registerUserDto;
+    const { email, password, firstName } = registerUserDto;
     const user = await this.userRepository.findOne({ where: { email } });
 
     if (user) {
       throw new ConflictException('User is already exists');
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    const avatar = "'/avatars/avatar_pokemon.png'";
+    const avatar = '/avatars/avatar_pokemon.png';
+    const verifyToken = v4();
+    const verifyLink = `<a target ="_blank" href="http://localhost:3000/api/auth/verify/${verifyToken}">  Hi ${firstName}! Verify email </a>`;
     // Логику добавления к потоку реализуем когда появятся сами потоки
-    const currentThread = 'Current Thread';
+    const nameInternshipStream = 'Current Thread';
 
     const newUser = this.userRepository.create({
       ...registerUserDto,
       password: hashedPassword,
-      avatar: avatar,
-      currentThread: currentThread,
+      avatar,
+      nameInternshipStream, 
+      verifyToken,
+      verified: false
     });
     const { accessToken, refreshToken } = createToken(newUser.id);
     newUser.accessToken = accessToken;
     newUser.refreshToken = refreshToken;
     await this.userRepository.save(newUser);
+    await this.mailService.sendEmail(email, firstName, verifyLink)
     return newUser;
   }
 
@@ -62,7 +70,6 @@ export class AuthService {
     );
 
     const tokens = await this.generateTokens(user);
-    console.log('tokens', tokens);
 
     const userData: LoginResponseDto = {
       id: user.id,
@@ -101,10 +108,6 @@ export class AuthService {
   public async verifyChangePassword(verifyToken: string) {
     const user = await this.getUser('verifyToken', verifyToken);
 
-    if (user.verifyToken !== verifyToken) {
-      throw new BadRequestException();
-    }
-
     await this.userRepository.update(user.id, { verifyToken: null });
     const { refreshToken } = await this.generateTokens(user);
     return refreshToken;
@@ -129,12 +132,11 @@ export class AuthService {
     password: string,
     userIp: string,
   ) {
-    const user = await this.userRepository.findOne({
-      where: { [field]: value },
-    });
-    if (!user || !bcrypt.compare(password, user.password)) {
+    const user = await this.getUser(field, value);
+    const passwordCompare = await bcrypt.compare(password, user.password);
+    if (!passwordCompare) {
       await this.loginAttemptsService.attempts(userIp);
-      throw new UnauthorizedException('Email is wrong, or password is wrong');
+      throw new UnauthorizedException('Password is wrong');
     }
     if (!user.verified) {
       throw new UnauthorizedException('Email not verified');
@@ -149,7 +151,7 @@ export class AuthService {
     if (user) {
       return user;
     }
-    throw new NotFoundException();
+    throw new NotFoundException('No such user');
   }
 
   private checkEmailOrPhone(value: string) {
@@ -171,5 +173,18 @@ export class AuthService {
       successToken,
       refreshToken,
     };
+  }
+
+  async verifyEmail(@Param('verificationToken') verifyToken: string):Promise<{message: string}>{
+    const user = await this.userRepository.findOne({ where: { verifyToken } })
+    if(!user){
+    throw new NotFoundException('User not found')
+    }
+    await this.userRepository.update(user.id, {
+      verified: true,
+      verifyToken: ''
+    })
+  
+    return { message: 'Verification successful' };
   }
 }

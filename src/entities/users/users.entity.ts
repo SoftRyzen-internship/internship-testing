@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import { MyBaseEntity } from '@utils/base.entity'
 import { Matches, MinLength } from 'class-validator'
 import { Column, Entity, Unique } from 'typeorm'
-import { Direction, Group } from './enums/group.enum'
+import { Direction, Group, GroupIntern } from './enums/group.enum'
 
 @Entity('users')
 export class User extends MyBaseEntity {
@@ -39,7 +39,7 @@ export class User extends MyBaseEntity {
     example: 'Telegram contact',
     description: 'User Telegram contact',
   })
-  @Column({ name: 'telegramContact', type: 'varchar' })
+  @Column({ name: 'telegram-contact', type: 'varchar' })
   @Matches(/^t.me\/\w+$/, {
     message: 'Telegram contact must be in the format "t.me/name"',
   })
@@ -70,8 +70,12 @@ export class User extends MyBaseEntity {
   avatar: string;
 
   @ApiProperty({ example: 'Full Stack', description: ' User Avatar' })
-  @Column({ name: 'current_thread', type: 'varchar' })
-  currentThread: string;
+  @Column({ name: 'field_internship', type: 'enum', enum: GroupIntern  })
+  fieldOfInternship: string;
+
+  @ApiProperty({ example: 'Full Stack', description: ' User Avatar' })
+  @Column({ name: 'internship_stream', type: 'varchar'})
+  nameInternshipStream: string;
 
   @ApiProperty({ example: 'false', description: 'Is verified user' })
   @Column({ name: 'verified', type: 'varchar', default: false })

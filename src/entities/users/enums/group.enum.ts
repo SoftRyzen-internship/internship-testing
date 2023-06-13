@@ -14,3 +14,11 @@ export enum Group {
   GROUP_D = 'Group D',
   OTHER = 'Other',
 }
+export enum GroupIntern {
+  GROUP_T = 'Group T',
+  GROUP_U = 'Group U',
+  GROUP_R = 'Group R',
+  GROUP_N = 'Group N',
+  OTHER = 'Other',
+}
+
