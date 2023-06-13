@@ -21,4 +21,3 @@ export enum GroupIntern {
   GROUP_N = 'Group N',
   OTHER = 'Other',
 }
-
