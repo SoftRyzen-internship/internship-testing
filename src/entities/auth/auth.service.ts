@@ -40,14 +40,15 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(password, 10);
     const avatar = '/avatars/avatar_pokemon.png';
     const verifyToken = v4();
+    const verifyLink = `<a target ="_blank" href="http://localhost:3000/api/auth/verify/${verifyToken}">  Hi ${firstName}! Verify email </a>`;
     // Логику добавления к потоку реализуем когда появятся сами потоки
-    const currentThread = 'Current Thread';
+    const nameInternshipStream = 'Current Thread';
 
     const newUser = this.userRepository.create({
       ...registerUserDto,
       password: hashedPassword,
       avatar,
-      currentThread, 
+      nameInternshipStream, 
       verifyToken,
       verified: false
     });
@@ -55,7 +56,7 @@ export class AuthService {
     newUser.accessToken = accessToken;
     newUser.refreshToken = refreshToken;
     await this.userRepository.save(newUser);
-    await this.mailService.sendEmail(email, firstName, verifyToken)
+    await this.mailService.sendEmail(email, firstName, verifyLink)
     return newUser;
   }
 

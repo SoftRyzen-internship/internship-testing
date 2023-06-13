@@ -24,7 +24,7 @@ export class MailService {
         return !isUnique;
       }
 
-      async sendEmail(emailTo: string, firstName: string, verificationToken:string): Promise<any> {
+      async sendEmail(emailTo: string, firstName: string, verifyLink:string): Promise<any> {
         
         try {
           const emailMessageData: EmailMessageData = {
@@ -41,7 +41,7 @@ export class MailService {
                 {
                   ContentType: 'HTML',
                   Charset: 'utf-8',
-                  Content: `<a target ="_blank" href="http://localhost:3000/api/auth/verify/${verificationToken}">  Hi ${firstName}! Verify email </a>`,
+                  Content: verifyLink,
                 },
                 {
                   ContentType: 'PlainText',
@@ -49,7 +49,7 @@ export class MailService {
                   Content: `Hi ${firstName}!`,
                 },
               ],
-              From: 'test@gmail.com',
+              From: 'internship@softryzen.com',
               Subject: 'Example verify email',
             },
           };
