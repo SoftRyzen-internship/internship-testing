@@ -1,25 +1,25 @@
-import { ApiProperty } from '@nestjs/swagger'
-import { MyBaseEntity } from '@utils/base.entity'
-import { Matches, MinLength } from 'class-validator'
-import { Column, Entity, Unique } from 'typeorm'
-import { Direction, Group, GroupIntern } from './enums/group.enum'
+import { ApiProperty } from '@nestjs/swagger';
+import { MyBaseEntity } from '@utils/base.entity';
+import { Matches, MinLength } from 'class-validator';
+import { Column, Entity, Unique } from 'typeorm';
+import { Direction, Group, GroupIntern } from './enums/group.enum';
 
 @Entity('users')
 export class User extends MyBaseEntity {
-  @ApiProperty({ example: 'Mark', description: ' User First name' })
+  @ApiProperty({ example: 'Mark', description: 'User First name' })
   @Column({ name: 'first_name', type: 'varchar' })
   firstName: string;
 
-  @ApiProperty({ example: 'Spencer', description: ' User Last name' })
+  @ApiProperty({ example: 'Spencer', description: 'User Last name' })
   @Column({ name: 'last_name', type: 'varchar' })
   lastName: string;
 
-  @ApiProperty({ example: 'email', description: ' User  email' })
+  @ApiProperty({ example: 'email', description: 'User  email' })
   @Column({ name: 'email', type: 'varchar' })
   @Unique(['email'])
   email: string;
 
-  @ApiProperty({ example: 'User password', description: ' User  password' })
+  @ApiProperty({ example: 'User password', description: 'User  password' })
   @Column({ name: 'password', type: 'varchar' })
   @MinLength(6, { message: 'Password must be at least 6 characters long' })
   @Matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/, {
@@ -29,7 +29,7 @@ export class User extends MyBaseEntity {
 
   @ApiProperty({ example: 'contactPhone', description: 'User contact phone' })
   @Column({ name: 'phone', type: 'varchar' })
-  @Unique(['contactPhone'])
+  @Unique(['phone'])
   @Matches(/^\+380\d{9}$/, {
     message: 'Contact phone must be in the format "+380XXXXXXXXX"',
   })
@@ -39,7 +39,7 @@ export class User extends MyBaseEntity {
     example: 'Telegram contact',
     description: 'User Telegram contact',
   })
-  @Column({ name: 'telegram-contact', type: 'varchar' })
+  @Column({ name: 'telegram_contact', type: 'varchar' })
   @Matches(/^t.me\/\w+$/, {
     message: 'Telegram contact must be in the format "t.me/name"',
   })
@@ -50,7 +50,7 @@ export class User extends MyBaseEntity {
     description: 'Direction in which the user was trained',
     enum: Direction,
   })
-  @Column({ type: 'enum', enum: Direction })
+  @Column({ name: 'direction', type: 'enum', enum: Direction })
   direction: Direction;
 
   @ApiProperty({
@@ -58,7 +58,7 @@ export class User extends MyBaseEntity {
     description: 'Group in which the user studied',
     enum: Group,
   })
-  @Column({ type: 'enum', enum: Group })
+  @Column({ name: 'group', type: 'enum', enum: Group })
   group: Group;
 
   @ApiProperty({ example: 'Current city', description: 'User current city' })
@@ -69,12 +69,12 @@ export class User extends MyBaseEntity {
   @Column({ name: 'avatar', type: 'varchar' })
   avatar: string;
 
-  @ApiProperty({ example: 'Full Stack', description: ' User Avatar' })
-  @Column({ name: 'field_internship', type: 'enum', enum: GroupIntern  })
-  fieldOfInternship: string;
+  @ApiProperty({ example: 'Full Stack', description: 'Field of internship' })
+  @Column({ name: 'field_internship', type: 'enum', enum: GroupIntern })
+  fieldOfInternship: GroupIntern;
 
   @ApiProperty({ example: 'Full Stack', description: ' User Avatar' })
-  @Column({ name: 'internship_stream', type: 'varchar'})
+  @Column({ name: 'internship_stream', type: 'varchar' })
   nameInternshipStream: string;
 
   @ApiProperty({ example: 'false', description: 'Is verified user' })

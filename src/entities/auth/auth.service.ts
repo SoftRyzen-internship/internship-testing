@@ -1,3 +1,4 @@
+import { MailService } from '@entities/mail/mail.service';
 import { User } from '@entities/users/users.entity';
 import {
   BadRequestException,
@@ -12,24 +13,24 @@ import { JwtService } from '@nestjs/jwt/dist';
 import { InjectRepository } from '@nestjs/typeorm';
 import createToken from '@utils/createToken';
 import * as bcrypt from 'bcrypt';
-import { v4  } from "uuid";
 import { Repository } from 'typeorm';
+import { v4 } from 'uuid';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { RegisterUserDto } from './dto/create-user.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { LoginDto } from './dto/login.dto';
-import { LoginAttemptsService } from './login-attempts.service';
-import { MailService } from '@entities/mail/mail.service';
+import { SetRedisService } from './set-redis.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly loginAttemptsService: LoginAttemptsService,
+    private readonly setRedisService: SetRedisService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
-    private readonly mailService: MailService
+    private readonly mailService: MailService,
   ) {}
 
+  // Register
   async registerUser(registerUserDto: RegisterUserDto): Promise<User> {
     const { email, password, firstName } = registerUserDto;
     const user = await this.userRepository.findOne({ where: { email } });
@@ -48,18 +49,35 @@ export class AuthService {
       ...registerUserDto,
       password: hashedPassword,
       avatar,
-      nameInternshipStream, 
+      nameInternshipStream,
       verifyToken,
-      verified: false
+      verified: false,
     });
     const { accessToken, refreshToken } = createToken(newUser.id);
     newUser.accessToken = accessToken;
     newUser.refreshToken = refreshToken;
     await this.userRepository.save(newUser);
-    await this.mailService.sendEmail(email, firstName, verifyLink)
+    await this.mailService.sendEmail(email, firstName, verifyLink);
     return newUser;
   }
 
+  // Verify email
+  async verifyEmail(
+    @Param('verificationToken') verifyToken: string,
+  ): Promise<{ message: string }> {
+    const user = await this.userRepository.findOne({ where: { verifyToken } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    await this.userRepository.update(user.id, {
+      verified: true,
+      verifyToken: '',
+    });
+
+    return { message: 'Verification successful' };
+  }
+
+  // Login
   public async login(loginDto: LoginDto, userIp: string) {
     const field = this.checkEmailOrPhone(loginDto.username);
     const user = await this.userValidate(
@@ -74,9 +92,10 @@ export class AuthService {
     const userData: LoginResponseDto = {
       id: user.id,
       username: user.firstName,
-      fieldOfInternship: '', // !
-      nameInternshipStream: '', // !
+      fieldOfInternship: user.fieldOfInternship,
+      nameInternshipStream: user.nameInternshipStream,
     };
+    await this.setRedisService.setRefreshToken(user.email, tokens.refreshToken);
     return {
       successToken: tokens.successToken,
       refreshToken: tokens.refreshToken,
@@ -84,6 +103,7 @@ export class AuthService {
     };
   }
 
+  // Check phone
   public async checkPhone(phone: string) {
     const user = await this.userRepository.findOne({ where: { phone } });
     if (user) {
@@ -92,11 +112,21 @@ export class AuthService {
     return 'OK';
   }
 
+  // Request change password
   public async requestChangePassword(value: string) {
     const field = this.checkEmailOrPhone(value);
     const user = await this.getUser(field, value);
     const verifyToken = v4();
-    const isSendEmail = true; // ! add method for send email
+    const verifyLink = this.generateUrlForEmailSend(
+      user.firstName,
+      'verify-change-password',
+      verifyToken,
+    );
+    const isSendEmail = await this.mailService.sendEmail(
+      user.email,
+      user.firstName,
+      verifyLink,
+    );
     if (!isSendEmail) {
       throw new InternalServerErrorException();
     }
@@ -105,11 +135,13 @@ export class AuthService {
     return 'ok';
   }
 
+  // Verify change password
   public async verifyChangePassword(verifyToken: string) {
     const user = await this.getUser('verifyToken', verifyToken);
 
     await this.userRepository.update(user.id, { verifyToken: null });
     const { refreshToken } = await this.generateTokens(user);
+    await this.setRedisService.setRefreshToken(user.email, refreshToken);
     return refreshToken;
   }
 
@@ -126,6 +158,7 @@ export class AuthService {
     return { message: 'Password changed' };
   }
 
+  // User validate
   private async userValidate(
     field: string,
     value: string,
@@ -135,7 +168,7 @@ export class AuthService {
     const user = await this.getUser(field, value);
     const passwordCompare = await bcrypt.compare(password, user.password);
     if (!passwordCompare) {
-      await this.loginAttemptsService.attempts(userIp);
+      await this.setRedisService.attempts(userIp);
       throw new UnauthorizedException('Password is wrong');
     }
     if (!user.verified) {
@@ -144,6 +177,7 @@ export class AuthService {
     return user;
   }
 
+  // Get user
   private async getUser(field: string, value: string) {
     const user = await this.userRepository.findOne({
       where: { [field]: value },
@@ -158,6 +192,7 @@ export class AuthService {
     return value.includes('@') ? 'email' : 'phone';
   }
 
+  // Generate tokens
   private async generateTokens(user: User) {
     const payload = { email: user.email, id: user.id };
 
@@ -175,16 +210,12 @@ export class AuthService {
     };
   }
 
-  async verifyEmail(@Param('verificationToken') verifyToken: string):Promise<{message: string}>{
-    const user = await this.userRepository.findOne({ where: { verifyToken } })
-    if(!user){
-    throw new NotFoundException('User not found')
-    }
-    await this.userRepository.update(user.id, {
-      verified: true,
-      verifyToken: ''
-    })
-  
-    return { message: 'Verification successful' };
+  // Generate url for email send
+  private generateUrlForEmailSend(
+    name: string,
+    path: string,
+    verifyToken: string,
+  ) {
+    return `<p>Hi ${name}, please confirm that this is your email address</p><a href="http://${process.env.BASE_URL}/api/auth/${path}/${verifyToken}">Confirm email</a>`;
   }
 }
