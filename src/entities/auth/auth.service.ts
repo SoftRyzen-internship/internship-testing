@@ -92,8 +92,8 @@ export class AuthService {
     const userData: LoginResponseDto = {
       id: user.id,
       username: user.firstName,
-      fieldOfInternship: '', // !
-      nameInternshipStream: '', // !
+      fieldOfInternship: user.fieldOfInternship,
+      nameInternshipStream: user.nameInternshipStream,
     };
     await this.setRedisService.setRefreshToken(user.email, tokens.refreshToken);
     return {
