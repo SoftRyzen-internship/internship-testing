@@ -41,7 +41,7 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(password, 10);
     const avatar = '/avatars/avatar_pokemon.png';
     const verifyToken = v4();
-    const verifyLink = `<a target ="_blank" href="http://localhost:3000/api/auth/verify/${verifyToken}">  Hi ${firstName}! Verify email </a>`;
+    const verifyLink = `<a target ="_blank" href="http://localhost:8080/api/auth/verify/${verifyToken}">  Hi ${firstName}! Verify email </a>`;
     // Логику добавления к потоку реализуем когда появятся сами потоки
     const nameInternshipStream = 'Current Thread';
 
