@@ -2,11 +2,11 @@ import { RedisCacheService } from '@entities/redis/redis.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
 @Injectable()
-export class LoginAttemptsService {
+export class SetRedisService {
   private readonly MAX_LOGIN_ATTEMPTS = 4;
   constructor(private readonly redisCacheService: RedisCacheService) {}
 
-  async attempts(key: string) {
+  public async attempts(key: string) {
     const currentAttempts = Number(
       await this.redisCacheService.get(`login-attempts:${key}`),
     );
@@ -25,6 +25,10 @@ export class LoginAttemptsService {
 
     await this.redisCacheService.incr(`login-attempts:${key}`);
     await this.redisCacheService.expire(`login-attempts:${key}`, 900);
+  }
+
+  public async setRefreshToken(key: string, value: string) {
+    await this.redisCacheService.set(`refreshToken:${key}`, value);
   }
 
   private timeFormat(seconds: number) {
