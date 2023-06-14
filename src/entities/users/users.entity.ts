@@ -2,7 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { MyBaseEntity } from '@utils/base.entity';
 import { Matches, MinLength } from 'class-validator';
 import { Column, Entity, Unique } from 'typeorm';
-import { Direction, Group, GroupIntern } from './enums/group.enum';
 
 @Entity('users')
 export class User extends MyBaseEntity {
@@ -48,18 +47,16 @@ export class User extends MyBaseEntity {
   @ApiProperty({
     example: 'Full Stack',
     description: 'Direction in which the user was trained',
-    enum: Direction,
   })
-  @Column({ name: 'direction', type: 'enum', enum: Direction })
-  direction: Direction;
+  @Column({ name: 'direction', type: 'varchar' })
+  direction: string;
 
   @ApiProperty({
     example: 'Group 47',
     description: 'Group in which the user studied',
-    enum: Group,
   })
-  @Column({ name: 'group', type: 'enum', enum: Group })
-  group: Group;
+  @Column({ name: 'group', type: 'varchar' })
+  group: string;
 
   @ApiProperty({ example: 'Current city', description: 'User current city' })
   @Column({ name: 'current_city', type: 'varchar' })
@@ -70,8 +67,8 @@ export class User extends MyBaseEntity {
   avatar: string;
 
   @ApiProperty({ example: 'Full Stack', description: 'Field of internship' })
-  @Column({ name: 'field_internship', type: 'enum', enum: GroupIntern })
-  fieldOfInternship: GroupIntern;
+  @Column({ name: 'field_internship', type: 'varchar' })
+  fieldOfInternship: string;
 
   @ApiProperty({ example: 'Full Stack', description: ' User Avatar' })
   @Column({ name: 'internship_stream', type: 'varchar' })

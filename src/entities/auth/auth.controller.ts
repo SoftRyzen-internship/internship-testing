@@ -13,7 +13,9 @@ import {
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiConflictResponse,
+  ApiHeader,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -60,6 +62,7 @@ export class AuthController {
   }
 
   // Login
+  @ApiOperation({ summary: 'Login' })
   @ApiResponse({ status: 200, type: LoginResponseDto })
   @ApiUnauthorizedResponse({
     description: 'Email is wrong, or password is wrong or email not verified',
@@ -84,6 +87,7 @@ export class AuthController {
   }
 
   // Check phone
+  @ApiOperation({ summary: 'Check phone' })
   @ApiOkResponse({ description: 'OK' })
   @ApiConflictResponse({ description: 'Phone number already exists' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
@@ -93,6 +97,7 @@ export class AuthController {
   }
 
   // Request change password
+  @ApiOperation({ summary: 'Request change password' })
   @ApiOkResponse({ description: 'OK' })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
@@ -102,6 +107,7 @@ export class AuthController {
   }
 
   // Verify change password
+  @ApiOperation({ summary: 'Verify change password' })
   @ApiOkResponse({ description: 'OK' })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
@@ -121,6 +127,13 @@ export class AuthController {
   }
 
   // Change password
+  @ApiOperation({ summary: 'Password change' })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Refresh token from cookie',
+    required: true,
+  })
   @ApiOkResponse({ description: 'Password changed' })
   @ApiBadRequestResponse({ description: 'Passwords do not match' })
   @ApiNotFoundResponse({ description: 'Not found' })
