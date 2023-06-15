@@ -3,6 +3,7 @@ import { Roles } from '@guards/roleGuard/decorators/role.decorator';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -93,7 +94,7 @@ export class DirectionController {
   }
 
   // Update direction by id
-  @ApiOperation({ summary: 'Update direction' })
+  @ApiOperation({ summary: 'Delete direction by id' })
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
@@ -105,7 +106,7 @@ export class DirectionController {
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
   @Roles(ERole.ADMIN)
-  @Put(':id')
+  @Delete(':id')
   async deleteDirection(@Param('id', ParseIntPipe) id: number) {
     return { message: `Direction with ${id}, removed ` };
   }
