@@ -91,4 +91,22 @@ export class DirectionController {
   ) {
     return await this.directionService.updateDirection(id, body);
   }
+
+  // Update direction by id
+  @ApiOperation({ summary: 'Update direction' })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access token',
+    required: true,
+  })
+  @ApiOkResponse({ description: 'OK' })
+  @ApiForbiddenResponse({ description: 'Forbidden' })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @UseGuards(JwtAuthGuard)
+  @Roles(ERole.ADMIN)
+  @Put(':id')
+  async deleteDirection(@Param('id', ParseIntPipe) id: number) {
+    return { message: `Direction with ${id}, removed ` };
+  }
 }

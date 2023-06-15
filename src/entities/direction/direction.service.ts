@@ -42,6 +42,10 @@ export class DirectionService {
     return this.directionRepository.findOne({ where: { id } });
   }
 
+  public async deleteDirection(id: number) {
+    await this.directionRepository.delete(id);
+  }
+
   private async getDirection(field: string, value: string | number) {
     return await this.directionRepository.findOne({
       where: { [field]: value },
