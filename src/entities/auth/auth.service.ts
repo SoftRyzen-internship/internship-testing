@@ -21,6 +21,7 @@ import { LoginResponseDto } from './dto/login-response.dto';
 import { LoginDto } from './dto/login.dto';
 import { SetRedisService } from './set-redis.service';
 
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -41,8 +42,7 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(password, 10);
     const avatar = '/avatars/avatar_pokemon.png';
     const verifyToken = v4();
-    const verifyLink = `<a target ="_blank" href="http://localhost:8080/api/auth/verify/${verifyToken}">  Hi ${firstName}! Verify email </a>`;
-    // Логику добавления к потоку реализуем когда появятся сами потоки
+    const verifyLink = this.generateUrlForEmailSend(firstName,`verify` ,verifyToken)
     const nameInternshipStream = 'Current Thread';
 
     const newUser = this.userRepository.create({
@@ -58,6 +58,7 @@ export class AuthService {
     newUser.refreshToken = refreshToken;
     await this.userRepository.save(newUser);
     await this.mailService.sendEmail(email, firstName, verifyLink);
+   
     return newUser;
   }
 
