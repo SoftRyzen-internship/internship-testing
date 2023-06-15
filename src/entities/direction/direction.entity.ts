@@ -9,10 +9,6 @@ export class Direction extends MyBaseEntity {
   @Unique(['direction'])
   direction: string;
 
-  @ApiProperty({ example: 'Front end', description: 'Will it be on stream' })
-  @Column({ name: 'is_active', type: 'boolean', default: true })
-  isActive: boolean;
-
   @ApiProperty({ example: 1, description: 'Admin id' })
   @Column({ name: 'owner_id', type: 'integer' })
   ownerId: number;

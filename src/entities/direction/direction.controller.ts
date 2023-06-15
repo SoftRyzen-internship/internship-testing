@@ -27,8 +27,7 @@ import {
 import { ERole } from '@src/enums/role.enum';
 import { MyRequest } from '@src/types/request.interface';
 import { DirectionService } from './direction.service';
-import { AddDirection } from './dto/add-direction.dto';
-import { UpdateDirection } from './dto/update-direction.dto';
+import { AddDirectionDto } from './dto/add-direction.dto';
 
 @ApiTags('Internship direction')
 @Controller('api/direction')
@@ -50,7 +49,7 @@ export class DirectionController {
   @UseGuards(JwtAuthGuard)
   @Roles(ERole.ADMIN)
   @Post()
-  async addDirection(@Body() body: AddDirection, @Req() req: MyRequest) {
+  async addDirection(@Body() body: AddDirectionDto, @Req() req: MyRequest) {
     return this.directionService.addDirection(req.user.id, body.direction);
   }
 
@@ -88,26 +87,8 @@ export class DirectionController {
   @Put(':id')
   async updateDirection(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: UpdateDirection,
+    @Body() body: AddDirectionDto,
   ) {
-    return await this.directionService.updateDirection(id, body);
-  }
-
-  // Update direction by id
-  @ApiOperation({ summary: 'Delete direction by id' })
-  @ApiBearerAuth()
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Access token',
-    required: true,
-  })
-  @ApiOkResponse({ description: 'OK' })
-  @ApiForbiddenResponse({ description: 'Forbidden' })
-  @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtAuthGuard)
-  @Roles(ERole.ADMIN)
-  @Delete(':id')
-  async deleteDirection(@Param('id', ParseIntPipe) id: number) {
-    return { message: `Direction with ${id}, removed ` };
+    return await this.directionService.updateDirection(id, body.direction);
   }
 }

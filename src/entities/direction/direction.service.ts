@@ -4,10 +4,9 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ERole } from '@src/enums/role.enum';
 import { Repository } from 'typeorm';
 import { Direction } from './direction.entity';
-import { UpdateDirection } from './dto/update-direction.dto';
-import { ERole } from '@src/enums/role.enum';
 
 @Injectable()
 export class DirectionService {
@@ -34,16 +33,12 @@ export class DirectionService {
     return this.directionRepository.find();
   }
 
-  public async updateDirection(id: number, body: UpdateDirection) {
-    const update = await this.directionRepository.update(id, body);
+  public async updateDirection(id: number, direction: string) {
+    const update = await this.directionRepository.update(id, { direction });
     if (update.affected === 0) {
       throw new BadRequestException();
     }
     return this.directionRepository.findOne({ where: { id } });
-  }
-
-  public async deleteDirection(id: number) {
-    await this.directionRepository.delete(id);
   }
 
   private async getDirection(field: string, value: string | number) {
