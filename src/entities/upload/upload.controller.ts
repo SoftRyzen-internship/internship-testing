@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Get,
   Param,
@@ -45,12 +46,6 @@ export class UploadController {
     description: 'Access token',
     required: true,
   })
-  @ApiParam({
-    name: 'path',
-    description: 'Upload path',
-    example: 'avatar',
-    required: true,
-  })
   @ApiOkResponse({ description: 'File uploaded successfully' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -60,13 +55,12 @@ export class UploadController {
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
-  @Post(':path')
+  @Post('avatars')
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
         destination: (req, file, callback) => {
-          const path = req.params.path;
-          const directory = `./temp/${path}`;
+          const directory = `./temp`;
           if (!fs.existsSync(directory)) {
             fs.mkdirSync(directory, { recursive: true });
           }
@@ -76,6 +70,17 @@ export class UploadController {
           callback(null, file.originalname);
         },
       }),
+      fileFilter: (req, file, callback) => {
+        const allowedMimeType = ['image/png', 'image/jpg', 'image/jpeg'];
+        if (allowedMimeType.includes(file.mimetype)) {
+          callback(null, true);
+        } else {
+          callback(new BadRequestException('Invalid file type'), false);
+        }
+      },
+      limits: {
+        fileSize: 1024 * 1024, // 1MB
+      },
     }),
   )
   async uploadFile(
@@ -84,7 +89,7 @@ export class UploadController {
     @Req() req: MyRequest,
   ) {
     const { email } = req.user;
-    return await this.uploadService.uploadFile(email, path, file);
+    return await this.uploadService.uploadFile(email, file);
   }
 
   @ApiOperation({ summary: 'Get file' })
