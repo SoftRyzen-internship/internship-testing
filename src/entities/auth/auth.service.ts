@@ -1,4 +1,5 @@
 import { MailService } from '@entities/mail/mail.service';
+import { Role } from '@entities/users/role.entity';
 import { User } from '@entities/users/users.entity';
 import {
   BadRequestException,
@@ -11,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt/dist';
 import { InjectRepository } from '@nestjs/typeorm';
-import createToken from '@utils/createToken';
+import { ERole } from '@src/enums/role.enum';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
@@ -26,6 +27,8 @@ export class AuthService {
   constructor(
     private readonly setRedisService: SetRedisService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(Role)
+    private readonly roleRepository: Repository<Role>,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
   ) {}
@@ -45,6 +48,10 @@ export class AuthService {
     // Логику добавления к потоку реализуем когда появятся сами потоки
     const nameInternshipStream = 'Current Thread';
 
+    const role = this.roleRepository.create({
+      role: ERole.USER,
+    });
+
     const newUser = this.userRepository.create({
       ...registerUserDto,
       password: hashedPassword,
@@ -53,28 +60,28 @@ export class AuthService {
       verifyToken,
       verified: false,
     });
-    const { accessToken, refreshToken } = createToken(newUser.id);
-    newUser.accessToken = accessToken;
-    newUser.refreshToken = refreshToken;
+
+    newUser.roles = [role];
+
+    await this.roleRepository.save(role);
     await this.userRepository.save(newUser);
     await this.mailService.sendEmail(email, firstName, verifyLink);
     return newUser;
   }
 
   // Verify email
-  async verifyEmail(
-    @Param('verificationToken') verifyToken: string,
-  ): Promise<{ message: string }> {
+  async verifyEmail(@Param('verificationToken') verifyToken: string) {
     const user = await this.userRepository.findOne({ where: { verifyToken } });
     if (!user) {
       throw new NotFoundException('User not found');
     }
     await this.userRepository.update(user.id, {
       verified: true,
-      verifyToken: '',
+      verifyToken: null,
     });
+    const tokens = await this.generateTokens(user);
 
-    return { message: 'Verification successful' };
+    return tokens.refreshToken;
   }
 
   // Login
@@ -182,6 +189,7 @@ export class AuthService {
   private async getUser(field: string, value: string) {
     const user = await this.userRepository.findOne({
       where: { [field]: value },
+      relations: ['roles'],
     });
     if (user) {
       return user;
@@ -195,7 +203,8 @@ export class AuthService {
 
   // Generate tokens
   private async generateTokens(user: User) {
-    const payload = { email: user.email, id: user.id };
+    const roles = user.roles?.map((role) => role.role);
+    const payload = { email: user.email, id: user.id, roles };
 
     const successToken = this.jwtService.sign(payload, {
       expiresIn: '5m',

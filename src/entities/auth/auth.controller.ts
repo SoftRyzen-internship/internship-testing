@@ -56,9 +56,15 @@ export class AuthController {
   @Get('verify/:verificationToken')
   @ApiOperation({ summary: 'User email verification' })
   async verifyEmail(
-    @Param('verificationToken') verifyToken: string,
-  ): Promise<{ message: string }> {
-    return this.authService.verifyEmail(verifyToken);
+    @Param('verificationToken') verificationToken: string,
+    @Res() res: Response,
+  ) {
+    const refreshToken = await this.authService.verifyEmail(verificationToken);
+    res.cookie('refreshToken', refreshToken, {
+      expires: this.expirationDate,
+      httpOnly: true,
+    });
+    res.redirect(process.env.REDIRECT_TO_SITE_INTERNSHIP);
   }
 
   // Login
