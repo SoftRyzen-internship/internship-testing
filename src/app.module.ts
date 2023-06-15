@@ -7,6 +7,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from './config.module';
 import { RedisModule } from './entities/redis/redis.module';
 import { GoogleModule } from './entities/google/google.module';
+import { UploadModule } from './entities/upload/upload.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { GoogleModule } from './entities/google/google.module';
     QuestionsModule,
     RedisModule,
     GoogleModule,
+    UploadModule,
   ],
   controllers: [],
   providers: [],

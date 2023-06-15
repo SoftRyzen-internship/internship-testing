@@ -145,6 +145,7 @@ export class AuthService {
     return refreshToken;
   }
 
+  // Change password
   public async changePassword(
     changePasswordDto: ChangePasswordDto,
     userId: number,

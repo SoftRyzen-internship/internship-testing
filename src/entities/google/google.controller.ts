@@ -4,6 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
+  ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -16,12 +17,14 @@ import { GoogleService } from './google.service';
 export class GoogleController {
   constructor(private readonly googleService: GoogleService) {}
 
+  @ApiOperation({ summary: 'Google login' })
   @ApiResponse({ status: 200, description: 'OK' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @Get()
   @UseGuards(AuthGuard('google'))
   async googleAuth() {}
 
+  @ApiOperation({ summary: 'Google callback' })
   @ApiResponse({ status: 200, type: LoginResponseDto })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })

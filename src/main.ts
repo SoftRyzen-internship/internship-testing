@@ -1,3 +1,4 @@
+import { UploadDto } from '@entities/upload/dto/upload.dto';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -16,7 +17,9 @@ async function bootstrap() {
     .addTag('Internship Testing')
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, config, {
+    extraModels: [UploadDto],
+  });
   SwaggerModule.setup('/api/docs', app, document);
 
   app.use(cookieParser());
