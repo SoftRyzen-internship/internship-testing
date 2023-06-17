@@ -8,6 +8,7 @@ import { ConfigModule } from './config.module';
 import { RedisModule } from './entities/redis/redis.module';
 import { GoogleModule } from './entities/google/google.module';
 import { UploadModule } from './entities/upload/upload.module';
+import { QuestionsBlockModule } from './entities/questions-block/questions-block.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { UploadModule } from './entities/upload/upload.module';
     RedisModule,
     GoogleModule,
     UploadModule,
+    QuestionsBlockModule,
   ],
   controllers: [],
   providers: [],
