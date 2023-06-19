@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsString } from 'class-validator';
 
-export class AddMaterialsDto {
+export class MaterialsDto {
   @ApiProperty({ example: 'NextJS', description: 'Name material' })
   @IsString()
   materialName: string;
@@ -22,7 +22,7 @@ export class AddMaterialsDto {
   materialsUrl: string[];
 }
 
-export class ResponseMaterialsDto extends AddMaterialsDto {
+export class ResponseMaterialsDto extends MaterialsDto {
   @ApiProperty({ example: '2023-06-19T11:56:30.734Z', description: 'CreateAt' })
   @IsString()
   createAt: string;
