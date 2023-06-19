@@ -101,6 +101,7 @@ export class MaterialsController {
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
+  // ! @Role(ERole.ADMIN)
   @Delete(':id')
   async deleteMaterials(@Param('id', ParseIntPipe) id: number) {
     return await this.materialService.deleteMaterials(id);
