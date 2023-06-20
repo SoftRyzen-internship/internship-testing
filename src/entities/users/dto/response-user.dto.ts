@@ -73,6 +73,12 @@ export class ResponseUserDto {
   })
   verified: boolean;
 
+  @ApiProperty({
+    example: 'user',
+    description: 'Role user`s',
+  })
+  role: string;
+
   @ApiProperty({ example: false, description: 'Is passed test' })
   isPassedTest: boolean;
 }

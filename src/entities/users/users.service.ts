@@ -5,6 +5,7 @@ import {
   IStudentsByDirection,
   ResponseDashboardDto,
 } from './dto/response-dashboard.dto';
+import { UpdateDirectionDto } from './dto/update-direction.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './users.entity';
 
@@ -34,7 +35,13 @@ export class UserService {
     if (user) {
       await this.userRepository.update(user.id, body);
     }
-    return user;
+    return await this.userRepository.findOne({ where: { email } });
+  }
+
+  public async updateUserDirection(email: string, body: UpdateDirectionDto) {
+    const user = await this.getUser(email);
+    await this.userRepository.update(user.id, { direction: body.direction });
+    return this.userRepository.findOne({ where: { id: user.id } });
   }
 
   // Dashboard
