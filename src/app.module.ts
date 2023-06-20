@@ -10,6 +10,7 @@ import { GoogleModule } from './entities/google/google.module';
 import { QuestionsBlockModule } from './entities/questions-block/questions-block.module';
 import { RedisModule } from './entities/redis/redis.module';
 import { UploadModule } from './entities/upload/upload.module';
+import { MaterialsModule } from './entities/materials/materials.module';
 import { QuestionsBlockModule } from './entities/questions-block/questions-block.module';
 import { DirectionModule } from './entities/direction/direction.module';
 import { TestsModule } from './entities/tests/tests.module';
@@ -25,6 +26,7 @@ import { TestsModule } from './entities/tests/tests.module';
     RedisModule,
     GoogleModule,
     UploadModule,
+    MaterialsModule,
     QuestionsBlockModule,
     DirectionModule,
     TestsModule
