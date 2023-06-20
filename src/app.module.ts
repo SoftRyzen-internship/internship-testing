@@ -26,6 +26,7 @@ import { TestsModule } from './entities/tests/tests.module';
 
     QuestionsBlockModule,
     DirectionModule,
+    TestsModule
 
   ],
   controllers: [],
