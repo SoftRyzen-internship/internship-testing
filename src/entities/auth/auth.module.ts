@@ -11,10 +11,11 @@ import { join } from 'path';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { SetRedisService } from './set-redis.service';
+import { Role } from '@entities/users/role.entity'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Role]),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
       serveRoot: '/avatars',

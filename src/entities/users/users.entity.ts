@@ -1,7 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { MyBaseEntity } from '@utils/base.entity';
 import { Matches, MinLength } from 'class-validator';
-import { Column, Entity, Unique } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, Unique } from 'typeorm';
+import { Role } from './role.entity';
 
 @Entity('users')
 export class User extends MyBaseEntity {
@@ -74,19 +75,23 @@ export class User extends MyBaseEntity {
   @Column({ name: 'internship_stream', type: 'varchar' })
   nameInternshipStream: string;
 
-  @ApiProperty({ example: 'false', description: 'Is verified user' })
-  @Column({ name: 'verified', type: 'varchar', default: false })
+  @ApiProperty({ example: false, description: 'Is verified user' })
+  @Column({ name: 'verified', type: 'boolean', default: false })
   verified: boolean;
+
+  @ApiProperty({ example: false, description: 'Is passed test' })
+  @Column({ name: 'is_passed_test', type: 'boolean', default: false })
+  isPassedTest: boolean;
+
+  @ApiProperty({ example: false, description: 'Is passed technical task' })
+  @Column({ name: 'is_passed_technical_task', type: 'boolean', default: false })
+  isPassedTechnicalTask: boolean;
 
   @ApiProperty({ example: 'Verify token', description: 'Verify token' })
   @Column({ name: 'verify_token', type: 'varchar', default: null })
   verifyToken: string;
 
-  @ApiProperty({ example: 'Access token', description: 'User access token' })
-  @Column({ name: 'access_token', type: 'varchar', nullable: true })
-  accessToken: string;
-
-  @ApiProperty({ example: 'Refresh token', description: 'User access token' })
-  @Column({ name: 'refresh_token', type: 'varchar', nullable: true })
-  refreshToken: string;
+  @ManyToMany(() => Role, (roles) => roles.users, { cascade: true })
+  @JoinTable()
+  roles: Role[];
 }
