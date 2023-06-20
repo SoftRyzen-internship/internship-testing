@@ -1,5 +1,14 @@
 import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiHeader,
@@ -33,5 +42,25 @@ export class QuestionsBlockController {
   @Post()
   async addBlock(@Body() body: QuestionBlockDto, @Req() req: MyRequest) {
     return await this.questionBlockService.addBlock(req.user.id, body);
+  }
+
+  @ApiOperation({ summary: 'Update block question' })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access token',
+    required: true,
+  })
+  @ApiOkResponse({ description: 'OK' })
+  @ApiNotFoundResponse({ description: 'Not found' })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @UseGuards(JwtAuthGuard)
+  // ! add check admin
+  @Put(':id')
+  async updateBlock(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: QuestionBlockDto,
+  ) {
+    return await this.questionBlockService.updateBlock(id, body);
   }
 }
