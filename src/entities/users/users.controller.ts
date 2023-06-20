@@ -16,8 +16,10 @@ import {
   ApiOperation,
   ApiResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { MyRequest } from '@src/types/request.interface';
+import { ResponseDashboardDto } from './dto/response-dashboard.dto';
 import { ResponseUserDto } from './dto/response-user.dto';
 import { UpdateDirectionDto } from './dto/update-direction.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -83,5 +85,23 @@ export class UserController {
     @Req() req: MyRequest,
   ) {
     return await this.userService.updateUserDirection(req.user.email, body);
+  }
+
+  // Dashboard
+  @ApiOperation({ summary: 'Dashboard' })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access token',
+    required: true,
+  })
+  @ApiResponse({ status: 200, type: ResponseDashboardDto })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiNotFoundResponse({ description: 'Not found' })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @UseGuards(JwtAuthGuard)
+  @Get('dashboard')
+  public async dashboard() {
+    return await this.userService.dashboard();
   }
 }
