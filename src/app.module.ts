@@ -5,8 +5,10 @@ import { QuestionsModule } from '@entities/questions/questions.module';
 import { UserModule } from '@entities/users/users.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from './config.module';
-import { RedisModule } from './entities/redis/redis.module';
+import { DirectionModule } from './entities/direction/direction.module';
 import { GoogleModule } from './entities/google/google.module';
+import { QuestionsBlockModule } from './entities/questions-block/questions-block.module';
+import { RedisModule } from './entities/redis/redis.module';
 import { UploadModule } from './entities/upload/upload.module';
 import { InternshipStreamModule } from '@entities/internship-stream/internship-stream.module';
 
@@ -22,6 +24,8 @@ import { InternshipStreamModule } from '@entities/internship-stream/internship-s
     GoogleModule,
     UploadModule,
     InternshipStreamModule
+    QuestionsBlockModule,
+    DirectionModule,
   ],
   controllers: [],
   providers: [],
