@@ -78,4 +78,7 @@ export class ResponseUserDto {
     description: 'Role user`s',
   })
   role: string;
+
+  @ApiProperty({ example: false, description: 'Is passed test' })
+  isPassedTest: boolean;
 }
