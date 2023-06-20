@@ -10,6 +10,7 @@ import { GoogleModule } from './entities/google/google.module';
 import { QuestionsBlockModule } from './entities/questions-block/questions-block.module';
 import { RedisModule } from './entities/redis/redis.module';
 import { UploadModule } from './entities/upload/upload.module';
+import { TestsModule } from './entities/tests/tests.module';
 
 @Module({
   imports: [
@@ -22,8 +23,11 @@ import { UploadModule } from './entities/upload/upload.module';
     RedisModule,
     GoogleModule,
     UploadModule,
+
     QuestionsBlockModule,
     DirectionModule,
+    TestsModule
+
   ],
   controllers: [],
   providers: [],
