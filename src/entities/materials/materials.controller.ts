@@ -2,6 +2,7 @@ import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -36,6 +37,7 @@ export class MaterialsController {
     required: true,
   })
   @ApiOkResponse({ description: 'OK', type: ResponseMaterialsDto })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiConflictResponse({
     description:
@@ -57,7 +59,7 @@ export class MaterialsController {
     required: true,
   })
   @ApiOkResponse({ description: 'OK', type: ResponseMaterialsDto })
-  @ApiNotFoundResponse({ description: 'Not found' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
@@ -85,5 +87,23 @@ export class MaterialsController {
   @Get()
   async getAllMaterials() {
     return await this.materialService.getAllMaterials();
+  }
+
+  @ApiOperation({ summary: 'Delete materials by id' })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access token',
+    required: true,
+  })
+  @ApiOkResponse({ description: 'OK', type: [ResponseMaterialsDto] })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiNotFoundResponse({ description: 'Not found' })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @UseGuards(JwtAuthGuard)
+  // ! @Role(ERole.ADMIN)
+  @Delete(':id')
+  async deleteMaterials(@Param('id', ParseIntPipe) id: number) {
+    return await this.materialService.deleteMaterials(id);
   }
 }

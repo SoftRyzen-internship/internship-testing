@@ -27,7 +27,7 @@ import { TestsModule } from './entities/tests/tests.module';
     RedisModule,
     GoogleModule,
     UploadModule,
-    InternshipStreamModule
+    InternshipStreamModule,
     MaterialsModule,
     QuestionsBlockModule,
     DirectionModule,
