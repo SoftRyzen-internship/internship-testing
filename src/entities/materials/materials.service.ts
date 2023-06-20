@@ -1,7 +1,11 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AddMaterialsDto } from './dto/materials.dto';
+import { MaterialsDto } from './dto/materials.dto';
 import { MaterialsEntity } from './materials.entity';
 
 @Injectable()
@@ -11,7 +15,7 @@ export class MaterialsService {
     private readonly materialRepository: Repository<MaterialsEntity>,
   ) {}
 
-  public async addMaterials(body: AddMaterialsDto) {
+  public async addMaterials(body: MaterialsDto) {
     const material = await this.materialRepository.findOne({
       where: {
         materialName: body.materialName,
@@ -25,5 +29,15 @@ export class MaterialsService {
     const newMaterials = this.materialRepository.create(body);
     await this.materialRepository.save(newMaterials);
     return newMaterials;
+  }
+
+  public async updateMaterials(id: number, body: MaterialsDto) {
+    const material = await this.materialRepository.findOne({ where: { id } });
+    if (!material) {
+      throw new NotFoundException();
+    }
+    this.materialRepository.merge(material, body);
+    const updateMaterial = await this.materialRepository.save(material);
+    return updateMaterial;
   }
 }
