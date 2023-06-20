@@ -40,4 +40,8 @@ export class MaterialsService {
     const updateMaterial = await this.materialRepository.save(material);
     return updateMaterial;
   }
+
+  public async getAllMaterials() {
+    return await this.materialRepository.find();
+  }
 }
