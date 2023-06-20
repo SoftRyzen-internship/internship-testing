@@ -12,6 +12,7 @@ import { RedisModule } from './entities/redis/redis.module';
 import { UploadModule } from './entities/upload/upload.module';
 import { MaterialsModule } from './entities/materials/materials.module';
 import { DirectionModule } from './entities/direction/direction.module';
+import { TestsModule } from './entities/tests/tests.module';
 
 @Module({
   imports: [
@@ -27,6 +28,8 @@ import { DirectionModule } from './entities/direction/direction.module';
     MaterialsModule,
     QuestionsBlockModule,
     DirectionModule,
+    TestsModule
+
   ],
   controllers: [],
   providers: [],
