@@ -9,6 +9,7 @@ import { RedisModule } from './entities/redis/redis.module';
 import { GoogleModule } from './entities/google/google.module';
 import { UploadModule } from './entities/upload/upload.module';
 import { MaterialsModule } from './entities/materials/materials.module';
+import { DirectionModule } from './entities/direction/direction.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { MaterialsModule } from './entities/materials/materials.module';
     GoogleModule,
     UploadModule,
     MaterialsModule,
+    DirectionModule,
   ],
   controllers: [],
   providers: [],
