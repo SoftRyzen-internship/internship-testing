@@ -76,11 +76,13 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
+   
     await this.userRepository.update(user.id, {
       verified: true,
       verifyToken: null,
     });
     const tokens = await this.generateTokens(user);
+
 
     return tokens.refreshToken;
   }
