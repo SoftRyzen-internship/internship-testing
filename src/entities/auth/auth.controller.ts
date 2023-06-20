@@ -30,8 +30,7 @@ import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { RegisterUserDto } from './dto/create-user.dto';
-import { LoginResponseDto } from './dto/login-response.dto';
-import { LoginDto, UsernameDto } from './dto/login.dto';
+import { LoginDto, LoginResponseDto, UsernameDto } from './dto/login.dto';
 import { PhoneDto } from './dto/phone.dto';
 
 @ApiTags('Authentication')
@@ -109,7 +108,7 @@ export class AuthController {
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @Post('request-change-password')
   async requestChangePassword(@Body() body: UsernameDto) {
-    return this.authService.requestChangePassword(body.username);
+    return this.authService.requestChangePassword(body.email);
   }
 
   // Verify change password

@@ -18,10 +18,8 @@ import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { RegisterUserDto } from './dto/create-user.dto';
-import { LoginResponseDto } from './dto/login-response.dto';
-import { LoginDto } from './dto/login.dto';
+import { LoginDto, LoginResponseDto } from './dto/login.dto';
 import { SetRedisService } from './set-redis.service';
-
 
 @Injectable()
 export class AuthService {
@@ -45,7 +43,11 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(password, 10);
     const avatar = '/avatars/avatar_pokemon.png';
     const verifyToken = v4();
-    const verifyLink = this.generateUrlForEmailSend(firstName,`verify` ,verifyToken)
+    const verifyLink = this.generateUrlForEmailSend(
+      firstName,
+      `verify`,
+      verifyToken,
+    );
     const nameInternshipStream = 'Current Thread';
 
     const role = this.roleRepository.create({
@@ -66,7 +68,7 @@ export class AuthService {
     await this.roleRepository.save(role);
     await this.userRepository.save(newUser);
     await this.mailService.sendEmail(email, firstName, verifyLink);
-   
+
     return newUser;
   }
 
@@ -87,10 +89,8 @@ export class AuthService {
 
   // Login
   public async login(loginDto: LoginDto, userIp: string) {
-    const field = this.checkEmailOrPhone(loginDto.username);
     const user = await this.userValidate(
-      field,
-      loginDto.username,
+      loginDto.email,
       loginDto.password,
       userIp,
     );
@@ -99,9 +99,9 @@ export class AuthService {
 
     const userData: LoginResponseDto = {
       id: user.id,
-      username: user.firstName,
-      fieldOfInternship: user.fieldOfInternship,
-      nameInternshipStream: user.nameInternshipStream,
+      username: '',
+      fieldOfInternship: '',
+      nameInternshipStream: '',
     };
     await this.setRedisService.setRefreshToken(user.email, tokens.refreshToken);
     return {
@@ -121,9 +121,8 @@ export class AuthService {
   }
 
   // Request change password
-  public async requestChangePassword(value: string) {
-    const field = this.checkEmailOrPhone(value);
-    const user = await this.getUser(field, value);
+  public async requestChangePassword(email: string) {
+    const user = await this.getUser('email', email);
     const verifyToken = v4();
     const verifyLink = this.generateUrlForEmailSend(
       user.firstName,
@@ -168,13 +167,8 @@ export class AuthService {
   }
 
   // User validate
-  private async userValidate(
-    field: string,
-    value: string,
-    password: string,
-    userIp: string,
-  ) {
-    const user = await this.getUser(field, value);
+  private async userValidate(email: string, password: string, userIp: string) {
+    const user = await this.getUser('email', email);
     const passwordCompare = await bcrypt.compare(password, user.password);
     if (!passwordCompare) {
       await this.setRedisService.attempts(userIp);
@@ -196,10 +190,6 @@ export class AuthService {
       return user;
     }
     throw new NotFoundException('No such user');
-  }
-
-  private checkEmailOrPhone(value: string) {
-    return value.includes('@') ? 'email' : 'phone';
   }
 
   // Generate tokens

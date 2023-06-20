@@ -1,4 +1,4 @@
-import { LoginResponseDto } from '@entities/auth/dto/login-response.dto';
+import { LoginResponseDto } from '@entities/auth/dto/login.dto';
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
