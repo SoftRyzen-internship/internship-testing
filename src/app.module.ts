@@ -10,8 +10,6 @@ import { GoogleModule } from './entities/google/google.module';
 import { QuestionsBlockModule } from './entities/questions-block/questions-block.module';
 import { RedisModule } from './entities/redis/redis.module';
 import { UploadModule } from './entities/upload/upload.module';
-import { QuestionsBlockModule } from './entities/questions-block/questions-block.module';
-import { DirectionModule } from './entities/direction/direction.module';
 import { TestsModule } from './entities/tests/tests.module';
 
 @Module({
