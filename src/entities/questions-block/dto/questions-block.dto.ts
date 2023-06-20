@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+
 
 export class QuestionBlockDto {
   @ApiProperty({ example: 'Full stack', description: 'Direction name' })
@@ -11,4 +12,40 @@ export class QuestionBlockDto {
   @IsNotEmpty()
   @IsString()
   blockName: string;
+}
+
+export class RequestQuestionBlockDto {
+  @ApiProperty({ example: 1, description: 'Questions block id' })
+  @IsNumber()
+  id: number;
+
+  @ApiProperty({
+    example: '2023-06-17T11:48:47.135Z',
+    description: 'Questions block createAt',
+  })
+  @IsString()
+  createAt: string;
+
+  @ApiProperty({
+    example: '2023-06-17T11:48:47.135Z',
+    description: 'Questions block updateAt',
+  })
+  @IsString()
+  updateAt: string;
+
+  @ApiProperty({ example: 'Full stack', description: 'Direction name' })
+  @IsString()
+  directionName: string;
+
+  @ApiProperty({ example: 'Full stack', description: 'Direction name' })
+  @IsString()
+  blockName: string;
+
+  @ApiProperty({ example: 1, description: 'User`s id' })
+  @IsNumber()
+  ownerId: number;
+
+  @ApiProperty({ example: 'admin', description: 'User`s role' })
+  @IsString()
+  owner: string;
 }
