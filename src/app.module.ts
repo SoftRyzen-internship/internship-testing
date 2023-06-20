@@ -5,11 +5,14 @@ import { QuestionsModule } from '@entities/questions/questions.module';
 import { UserModule } from '@entities/users/users.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from './config.module';
-import { RedisModule } from './entities/redis/redis.module';
+import { DirectionModule } from './entities/direction/direction.module';
 import { GoogleModule } from './entities/google/google.module';
+import { QuestionsBlockModule } from './entities/questions-block/questions-block.module';
+import { RedisModule } from './entities/redis/redis.module';
 import { UploadModule } from './entities/upload/upload.module';
 import { QuestionsBlockModule } from './entities/questions-block/questions-block.module';
 import { DirectionModule } from './entities/direction/direction.module';
+import { TestsModule } from './entities/tests/tests.module';
 
 @Module({
   imports: [
@@ -24,6 +27,8 @@ import { DirectionModule } from './entities/direction/direction.module';
     UploadModule,
     QuestionsBlockModule,
     DirectionModule,
+    TestsModule
+
   ],
   controllers: [],
   providers: [],

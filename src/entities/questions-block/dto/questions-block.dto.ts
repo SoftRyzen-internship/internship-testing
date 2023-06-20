@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
+
 export class QuestionBlockDto {
   @ApiProperty({ example: 'Full stack', description: 'Direction name' })
   @IsNotEmpty()

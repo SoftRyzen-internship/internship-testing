@@ -75,9 +75,17 @@ export class User extends MyBaseEntity {
   @Column({ name: 'internship_stream', type: 'varchar' })
   nameInternshipStream: string;
 
-  @ApiProperty({ example: 'false', description: 'Is verified user' })
-  @Column({ name: 'verified', type: 'varchar', default: false })
+  @ApiProperty({ example: false, description: 'Is verified user' })
+  @Column({ name: 'verified', type: 'boolean', default: false })
   verified: boolean;
+
+  @ApiProperty({ example: false, description: 'Is passed test' })
+  @Column({ name: 'is_passed_test', type: 'boolean', default: false })
+  isPassedTest: boolean;
+
+  @ApiProperty({ example: false, description: 'Is passed technical task' })
+  @Column({ name: 'is_passed_technical_task', type: 'boolean', default: false })
+  isPassedTechnicalTask: boolean;
 
   @ApiProperty({ example: 'Verify token', description: 'Verify token' })
   @Column({ name: 'verify_token', type: 'varchar', default: null })
