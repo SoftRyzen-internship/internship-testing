@@ -31,4 +31,10 @@ export class QuestionsBlockService {
     }
     return null;
   }
+
+  public async getBlock(directionName: string) {
+    return await this.questionBlockRepository.find({
+      where: { directionName },
+    });
+  }
 }
