@@ -11,6 +11,7 @@ import { join } from 'path';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { SetRedisService } from './set-redis.service';
+import { GoogleDriveService } from '@entities/googleDrive/googleDrive.service';
 import { Role } from '@entities/users/role.entity'
 
 @Module({
@@ -25,7 +26,7 @@ import { Role } from '@entities/users/role.entity'
     MailModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, SetRedisService, MailService, ConfigService],
+  providers: [AuthService, SetRedisService, MailService, ConfigService, GoogleDriveService],
   exports: [AuthService],
 })
 export class AuthModule {}
