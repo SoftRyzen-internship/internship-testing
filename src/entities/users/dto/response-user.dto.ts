@@ -72,4 +72,10 @@ export class ResponseUserDto {
     description: 'Is confirm email',
   })
   verified: boolean;
+
+  @ApiProperty({
+    example: 'user',
+    description: 'Role user`s',
+  })
+  role: string;
 }
