@@ -10,6 +10,8 @@ import { GoogleModule } from './entities/google/google.module';
 import { UploadModule } from './entities/upload/upload.module';
 import { MaterialsModule } from './entities/materials/materials.module';
 
+import { DirectionModule } from './entities/direction/direction.module';
+
 @Module({
   imports: [
     ConfigModule,
@@ -22,6 +24,7 @@ import { MaterialsModule } from './entities/materials/materials.module';
     GoogleModule,
     UploadModule,
     MaterialsModule,
+    DirectionModule,
   ],
   controllers: [],
   providers: [],
