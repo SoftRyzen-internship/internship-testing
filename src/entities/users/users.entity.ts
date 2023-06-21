@@ -28,7 +28,7 @@ export class User extends MyBaseEntity {
   password: string;
 
   @ApiProperty({ example: 'contactPhone', description: 'User contact phone' })
-  @Column({ name: 'phone', type: 'varchar', nullable: true, nullable: true })
+  @Column({ name: 'phone', type: 'varchar', nullable: true })
   @Unique(['phone'])
   @Matches(/^\+380\d{9}$/, {
     message: 'Contact phone must be in the format "+380XXXXXXXXX"',
@@ -75,7 +75,6 @@ export class User extends MyBaseEntity {
   @Column({
     name: 'stream_id',
     type: 'integer',
-    nullable: true,
     nullable: true,
   })
   streamId: number;

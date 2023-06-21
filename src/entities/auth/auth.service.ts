@@ -68,7 +68,7 @@ export class AuthService {
 
     await this.roleRepository.save(role);
     await this.userRepository.save(newUser);
-    await this.mailService.sendEmail(email, firstName, verifyLink);
+    await this.mailService.sendEmail(email, verifyLink);
 
     return newUser;
   }
@@ -159,6 +159,7 @@ export class AuthService {
     const isSendEmail = await this.mailService.sendEmail(
       user.email,
       verifyLink,
+      user.firstName,
     );
     if (!isSendEmail) {
       throw new InternalServerErrorException();
@@ -204,6 +205,9 @@ export class AuthService {
   // User validate
   private async userValidate(email: string, password: string, userIp: string) {
     const user = await this.getUser('email', email);
+    if (!user.password) {
+      throw new BadRequestException('Update your password');
+    }
     const passwordCompare = await bcrypt.compare(password, user.password);
     if (!passwordCompare) {
       await this.setRedisService.attempts(userIp);

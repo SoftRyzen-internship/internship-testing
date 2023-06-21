@@ -13,66 +13,27 @@ export class GoogleService {
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
     private readonly authService: AuthService,
-    private readonly authService: AuthService,
   ) {}
 
   public async auth(email: string) {
-    return await this.authService.responseData(email);
-  }
-
-  public async registerWithGoogle(email: string) {
-    let user = await this.userRepository.findOne({ where: { email } });
-
-    if (!user) {
-      user = new User();
-      user.email = email;
-      user.avatar = '/avatars/avatar_pokemon.png';
-      user.verified = true;
-      const role = this.roleRepository.create({
-        role: ERole.USER,
-      });
-      user.roles = [role];
-
-      await this.userRepository.save(user);
+    const user = await this.userRepository.findOne({
+      where: { email },
+    });
+    if (user) {
+      return await this.authService.responseData(user.email);
     }
 
-    const tokens = await this.authService.generateTokens(user);
-    const userInfo = {
-      id: user.id,
-      email: user.email,
-    };
+    const role = this.roleRepository.create({
+      role: ERole.USER,
+    });
 
-    return {
-      tokens,
-      userInfo,
-    };
-  }
+    const newUser = this.userRepository.create({
+      email,
+      roles: [role],
+    });
+    await this.roleRepository.save(role);
+    await this.userRepository.save(newUser);
 
-  public async registerWithGoogle(email: string) {
-    let user = await this.userRepository.findOne({ where: { email } });
-
-    if (!user) {
-      user = new User();
-      user.email = email;
-      user.avatar = '/avatars/avatar_pokemon.png';
-      user.verified = true;
-      const role = this.roleRepository.create({
-        role: ERole.USER,
-      });
-      user.roles = [role];
-
-      await this.userRepository.save(user);
-    }
-
-    const tokens = await this.authService.generateTokens(user);
-    const userInfo = {
-      id: user.id,
-      email: user.email,
-    };
-
-    return {
-      tokens,
-      userInfo,
-    };
+    return await this.authService.responseData(newUser.email);
   }
 }

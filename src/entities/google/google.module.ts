@@ -1,6 +1,7 @@
 import { AuthModule } from '@entities/auth/auth.module';
 import { AuthService } from '@entities/auth/auth.service';
 import { SetRedisService } from '@entities/auth/set-redis.service';
+import { InternshipStream } from '@entities/internship-stream/internship-stream.entity';
 import { MailService } from '@entities/mail/mail.service';
 import { RedisCacheService } from '@entities/redis/redis.service';
 import { Role } from '@entities/users/role.entity';
@@ -17,7 +18,7 @@ import { GoogleService } from './google.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Role]),
+    TypeOrmModule.forFeature([User, Role, InternshipStream]),
     PassportModule,
     JwtGuardsModule,
     ServeStaticModule.forRoot({
