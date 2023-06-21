@@ -1,9 +1,9 @@
 import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
 import { Roles } from '@guards/roleGuard/decorators/role.decorator';
+import { RoleGuard } from '@guards/roleGuard/role.guard';
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -46,7 +46,7 @@ export class DirectionController {
   @ApiConflictResponse({ description: 'This direction has already been added' })
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(ERole.ADMIN)
   @Post()
   async addDirection(@Body() body: AddDirectionDto, @Req() req: MyRequest) {
@@ -82,7 +82,7 @@ export class DirectionController {
   @ApiOkResponse({ description: 'OK' })
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(ERole.ADMIN)
   @Put(':id')
   async updateDirection(

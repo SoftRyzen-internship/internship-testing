@@ -1,3 +1,4 @@
+import { InternshipStream } from '@entities/internship-stream/internship-stream.entity';
 import { MailService } from '@entities/mail/mail.service';
 import { Role } from '@entities/users/role.entity';
 import { User } from '@entities/users/users.entity';
@@ -18,10 +19,8 @@ import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { RegisterUserDto } from './dto/create-user.dto';
-import { LoginResponseDto } from './dto/login-response.dto';
-import { LoginDto } from './dto/login.dto';
+import { LoginDto, LoginResponseDto } from './dto/login.dto';
 import { SetRedisService } from './set-redis.service';
-
 
 @Injectable()
 export class AuthService {
@@ -30,6 +29,8 @@ export class AuthService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
+    @InjectRepository(InternshipStream)
+    private readonly streamRepository: Repository<InternshipStream>,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
   ) {}
@@ -45,7 +46,11 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(password, 10);
     const avatar = '/avatars/avatar_pokemon.png';
     const verifyToken = v4();
-    const verifyLink = this.generateUrlForEmailSend(email,`verify` ,verifyToken)
+    const verifyLink = this.generateUrlForEmailSend(
+      email,
+      `verify`,
+      verifyToken,
+    );
 
     const role = this.roleRepository.create({
       role: ERole.USER,
@@ -64,7 +69,7 @@ export class AuthService {
     await this.roleRepository.save(role);
     await this.userRepository.save(newUser);
     await this.mailService.sendEmail(email, verifyLink);
-   
+
     return newUser;
   }
 
@@ -74,41 +79,63 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-   
+
     await this.userRepository.update(user.id, {
       verified: true,
       verifyToken: null,
     });
     const tokens = await this.generateTokens(user);
 
-
     return tokens.refreshToken;
   }
 
   // Login
   public async login(loginDto: LoginDto, userIp: string) {
-    const field = this.checkEmailOrPhone(loginDto.username);
     const user = await this.userValidate(
-      field,
-      loginDto.username,
+      loginDto.email,
       loginDto.password,
       userIp,
     );
 
-    const tokens = await this.generateTokens(user);
+    return await this.responseData(user.email);
+  }
 
-    const userData: LoginResponseDto = {
-      id: user.id,
-      username: user.firstName,
-      fieldOfInternship: user.fieldOfInternship,
-      nameInternshipStream: user.nameInternshipStream,
+  // Response data
+  public async responseData(email: string) {
+    const user = await this.getUser('email', email);
+    const tokens = await this.generateTokens(user);
+    const roles: string[] = user.roles.map((role) => role.role);
+    const stream: InternshipStream = await this.streamRepository.findOne({
+      where: { id: user.streamId },
+    });
+    const streamData = {
+      id: stream?.id,
+      streamDirection: stream?.streamDirection,
+      isActive: stream?.isActive,
+      startDate: stream?.startDate,
     };
-    await this.setRedisService.setRefreshToken(user.email, tokens.refreshToken);
-    return {
+    const userData = {
+      id: user.id,
+      roles,
+      isLabelStream: user.isLabelStream,
+      stream: stream ? streamData : {},
+    };
+    const responseData: LoginResponseDto = {
       successToken: tokens.successToken,
       refreshToken: tokens.refreshToken,
       user: userData,
     };
+
+    if (!user.firstName || !user.phone) {
+      return responseData;
+    }
+
+    userData['firstName'] = user.firstName;
+    userData['avatar'] = user.avatar;
+    userData['direction'] = user.direction;
+
+    await this.setRedisService.setRefreshToken(user.email, tokens.refreshToken);
+    return responseData;
   }
 
   // Check phone
@@ -121,9 +148,8 @@ export class AuthService {
   }
 
   // Request change password
-  public async requestChangePassword(value: string) {
-    const field = this.checkEmailOrPhone(value);
-    const user = await this.getUser(field, value);
+  public async requestChangePassword(email: string) {
+    const user = await this.getUser('email', email);
     const verifyToken = v4();
     const verifyLink = this.generateUrlForEmailSend(
       user.firstName,
@@ -133,6 +159,7 @@ export class AuthService {
     const isSendEmail = await this.mailService.sendEmail(
       user.email,
       verifyLink,
+      user.firstName,
     );
     if (!isSendEmail) {
       throw new InternalServerErrorException();
@@ -166,14 +193,21 @@ export class AuthService {
     return { message: 'Password changed' };
   }
 
+  // Refresh token
+  public async refreshToken(user: User) {
+    const tokens = await this.generateTokens(user);
+    return {
+      successToken: tokens.successToken,
+      refreshToken: tokens.refreshToken,
+    };
+  }
+
   // User validate
-  private async userValidate(
-    field: string,
-    value: string,
-    password: string,
-    userIp: string,
-  ) {
-    const user = await this.getUser(field, value);
+  private async userValidate(email: string, password: string, userIp: string) {
+    const user = await this.getUser('email', email);
+    if (!user.password) {
+      throw new BadRequestException('Update your password');
+    }
     const passwordCompare = await bcrypt.compare(password, user.password);
     if (!passwordCompare) {
       await this.setRedisService.attempts(userIp);
@@ -194,15 +228,11 @@ export class AuthService {
     if (user) {
       return user;
     }
-    throw new NotFoundException('No such user');
-  }
-
-  private checkEmailOrPhone(value: string) {
-    return value.includes('@') ? 'email' : 'phone';
+    throw new NotFoundException('Not found');
   }
 
   // Generate tokens
-   async generateTokens(user: User) {
+  async generateTokens(user: User) {
     const roles = user.roles?.map((role) => role.role);
     const payload = { email: user.email, id: user.id, roles };
 

@@ -28,7 +28,7 @@ export class User extends MyBaseEntity {
   password: string;
 
   @ApiProperty({ example: 'contactPhone', description: 'User contact phone' })
-  @Column({ name: 'phone', type: 'varchar',nullable: true })
+  @Column({ name: 'phone', type: 'varchar', nullable: true })
   @Unique(['phone'])
   @Matches(/^\+380\d{9}$/, {
     message: 'Contact phone must be in the format "+380XXXXXXXXX"',
@@ -64,16 +64,20 @@ export class User extends MyBaseEntity {
   currentCity: string;
 
   @ApiProperty({ example: 'URL', description: ' User Avatar' })
-  @Column({ name: 'avatar', type: 'varchar' })
+  @Column({ name: 'avatar', type: 'varchar', nullable: true })
   avatar: string;
 
   @ApiProperty({ example: 'Full Stack', description: 'Field of internship' })
   @Column({ name: 'field_internship', type: 'varchar', nullable: true })
   fieldOfInternship: string;
 
-  @ApiProperty({ example: 'Full Stack', description: ' User Avatar' })
-  @Column({ name: 'internship_stream', type: 'varchar', nullable: true })
-  nameInternshipStream: string;
+  @ApiProperty({ example: 1, description: 'Stream internship id' })
+  @Column({
+    name: 'stream_id',
+    type: 'integer',
+    nullable: true,
+  })
+  streamId: number;
 
   @ApiProperty({ example: false, description: 'Is verified user' })
   @Column({ name: 'verified', type: 'boolean', default: false })
@@ -90,6 +94,10 @@ export class User extends MyBaseEntity {
   @ApiProperty({ example: 'Verify token', description: 'Verify token' })
   @Column({ name: 'verify_token', type: 'varchar', default: null })
   verifyToken: string;
+
+  @ApiProperty({ example: false, description: 'Is there a stream' })
+  @Column({ name: 'is_label_stream', type: 'boolean', default: false })
+  isLabelStream: boolean;
 
   @ManyToMany(() => Role, (roles) => roles.users, { cascade: true })
   @JoinTable()

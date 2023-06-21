@@ -1,4 +1,6 @@
 import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
+import { Roles } from '@guards/roleGuard/decorators/role.decorator';
+import { RoleGuard } from '@guards/roleGuard/role.guard';
 import {
   Body,
   Controller,
@@ -20,6 +22,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { ERole } from '@src/enums/role.enum';
 import { MyRequest } from '@src/types/request.interface';
 import {
   QuestionBlockDto,
@@ -42,8 +45,8 @@ export class QuestionsBlockController {
   @ApiOkResponse({ description: 'OK' })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtAuthGuard)
-  // ! @Role(ERole.ADMIN)
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(ERole.ADMIN)
   @Post()
   async addBlock(@Body() body: QuestionBlockDto, @Req() req: MyRequest) {
     return await this.questionBlockService.addBlock(req.user.id, body);
@@ -59,8 +62,8 @@ export class QuestionsBlockController {
   @ApiOkResponse({ description: 'OK' })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtAuthGuard)
-  // ! @Role(ERole.ADMIN)
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(ERole.ADMIN)
   @Put(':id')
   async updateBlock(
     @Param('id', ParseIntPipe) id: number,

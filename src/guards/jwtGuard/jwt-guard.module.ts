@@ -2,10 +2,11 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { JwtRefreshGuard } from './jwt-refresh.guard';
 
 @Module({
   imports: [JwtModule, ConfigModule],
-  providers: [JwtAuthGuard, ConfigService],
-  exports: [JwtAuthGuard, JwtModule],
+  providers: [JwtAuthGuard, JwtRefreshGuard, ConfigService],
+  exports: [JwtAuthGuard, JwtModule, JwtRefreshGuard],
 })
 export class JwtGuardsModule {}

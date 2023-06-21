@@ -1,11 +1,10 @@
+import { AuthService } from '@entities/auth/auth.service';
+import { Role } from '@entities/users/role.entity';
 import { User } from '@entities/users/users.entity';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ERole } from '@src/enums/role.enum';
 import { Repository } from 'typeorm';
-import { Role } from '@entities/users/role.entity';
-import { AuthService } from '@entities/auth/auth.service';
-
 
 @Injectable()
 export class GoogleService {
@@ -17,44 +16,24 @@ export class GoogleService {
   ) {}
 
   public async auth(email: string) {
-    const user = await this.userRepository.findOne({ where: { email } });
+    const user = await this.userRepository.findOne({
+      where: { email },
+    });
     if (user) {
-      return {
-        id: user.id,
-        username: user.firstName,
-        fieldOfInternship: '',
-        nameInternshipStream: '',
-      };
+      return await this.authService.responseData(user.email);
     }
-    throw new NotFoundException('Not found');
-  }
 
-  public async registerWithGoogle(email: string) {
-
-    let user = await this.userRepository.findOne({where:{ email }});
-
-    if (!user) {
-      user = new User();
-      user.email = email;
-      user.avatar = '/avatars/avatar_pokemon.png';
-       user.verified = true;
     const role = this.roleRepository.create({
       role: ERole.USER,
     });
-    user.roles = [role];
 
-      await this.userRepository.save(user);
-    }
-   
-    const tokens = await this.authService.generateTokens(user);
-  const userInfo = {
-    id: user.id,
-    email: user.email,
-  };
+    const newUser = this.userRepository.create({
+      email,
+      roles: [role],
+    });
+    await this.roleRepository.save(role);
+    await this.userRepository.save(newUser);
 
-  return {
-    tokens,
-    userInfo,
-  };
+    return await this.authService.responseData(newUser.email);
   }
 }

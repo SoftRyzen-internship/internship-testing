@@ -28,8 +28,8 @@ export class MailService {
 
   async sendEmail(
     emailTo: string,
-    // firstName: string,
     verifyLink: string,
+    firstName = 'Dear User',
   ): Promise<any> {
     try {
       const emailMessageData: EmailMessageData = {
@@ -37,7 +37,7 @@ export class MailService {
           {
             Email: emailTo,
             Fields: {
-              name: 'New User',
+              name: firstName,
             },
           },
         ],
@@ -51,7 +51,7 @@ export class MailService {
             {
               ContentType: 'PlainText',
               Charset: 'utf-8',
-              Content: `Hi Dear User!`,
+              Content: `Hi ${firstName}!`,
             },
           ],
           From: 'internship@softryzen.com',
