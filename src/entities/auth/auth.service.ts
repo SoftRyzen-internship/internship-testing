@@ -37,7 +37,7 @@ export class AuthService {
 
   // Register
   async registerUser(registerUserDto: RegisterUserDto): Promise<User> {
-    const { email, password, firstName } = registerUserDto;
+    const { email, password } = registerUserDto;
     const user = await this.userRepository.findOne({ where: { email } });
 
     if (user) {
@@ -47,11 +47,10 @@ export class AuthService {
     const avatar = '/avatars/avatar_pokemon.png';
     const verifyToken = v4();
     const verifyLink = this.generateUrlForEmailSend(
-      firstName,
+      email,
       `verify`,
       verifyToken,
     );
-    const nameInternshipStream = 'Current Thread';
 
     const role = this.roleRepository.create({
       role: ERole.USER,
@@ -61,6 +60,8 @@ export class AuthService {
       ...registerUserDto,
       password: hashedPassword,
       avatar,
+      verifyToken,
+      verified: false,
     });
 
     newUser.roles = [role];
@@ -78,6 +79,7 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
+
     await this.userRepository.update(user.id, {
       verified: true,
       verifyToken: null,
@@ -156,7 +158,6 @@ export class AuthService {
     );
     const isSendEmail = await this.mailService.sendEmail(
       user.email,
-      user.firstName,
       verifyLink,
     );
     if (!isSendEmail) {
@@ -227,7 +228,7 @@ export class AuthService {
   }
 
   // Generate tokens
-  private async generateTokens(user: User) {
+  async generateTokens(user: User) {
     const roles = user.roles?.map((role) => role.role);
     const payload = { email: user.email, id: user.id, roles };
 

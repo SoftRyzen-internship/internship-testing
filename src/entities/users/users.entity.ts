@@ -20,7 +20,7 @@ export class User extends MyBaseEntity {
   email: string;
 
   @ApiProperty({ example: 'User password', description: 'User  password' })
-  @Column({ name: 'password', type: 'varchar' })
+  @Column({ name: 'password', type: 'varchar', nullable: true })
   @MinLength(6, { message: 'Password must be at least 6 characters long' })
   @Matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/, {
     message: 'Password must contain letters and numbers',
@@ -28,7 +28,7 @@ export class User extends MyBaseEntity {
   password: string;
 
   @ApiProperty({ example: 'contactPhone', description: 'User contact phone' })
-  @Column({ name: 'phone', type: 'varchar', nullable: true })
+  @Column({ name: 'phone', type: 'varchar', nullable: true, nullable: true })
   @Unique(['phone'])
   @Matches(/^\+380\d{9}$/, {
     message: 'Contact phone must be in the format "+380XXXXXXXXX"',
@@ -72,7 +72,12 @@ export class User extends MyBaseEntity {
   fieldOfInternship: string;
 
   @ApiProperty({ example: 1, description: 'Stream internship id' })
-  @Column({ name: 'stream_id', type: 'integer', nullable: true })
+  @Column({
+    name: 'stream_id',
+    type: 'integer',
+    nullable: true,
+    nullable: true,
+  })
   streamId: number;
 
   @ApiProperty({ example: false, description: 'Is verified user' })

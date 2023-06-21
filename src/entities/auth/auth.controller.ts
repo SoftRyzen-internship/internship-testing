@@ -59,6 +59,8 @@ export class AuthController {
     @Param('verificationToken') verificationToken: string,
     @Res() res: Response,
   ) {
+    
+
     const refreshToken = await this.authService.verifyEmail(verificationToken);
     res.cookie('refreshToken', refreshToken, {
       expires: this.expirationDate,
