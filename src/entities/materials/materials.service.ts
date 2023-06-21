@@ -40,4 +40,17 @@ export class MaterialsService {
     const updateMaterial = await this.materialRepository.save(material);
     return updateMaterial;
   }
+
+  public async getAllMaterials() {
+    return await this.materialRepository.find();
+  }
+
+  public async deleteMaterials(id: number) {
+    const material = this.materialRepository.findOne({ where: { id } });
+    if (!material) {
+      throw new NotFoundException();
+    }
+    await this.materialRepository.delete(id);
+    return material;
+  }
 }

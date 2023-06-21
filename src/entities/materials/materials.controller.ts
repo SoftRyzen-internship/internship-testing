@@ -2,6 +2,8 @@ import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
 import {
   Body,
   Controller,
+  Delete,
+  Get,
   Param,
   ParseIntPipe,
   Post,
@@ -9,12 +11,15 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiConflictResponse,
+  ApiHeader,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { MaterialsDto, ResponseMaterialsDto } from './dto/materials.dto';
 import { MaterialsService } from './materials.service';
@@ -25,7 +30,14 @@ export class MaterialsController {
   constructor(private readonly materialService: MaterialsService) {}
 
   @ApiOperation({ summary: 'Add materials' })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access token',
+    required: true,
+  })
   @ApiOkResponse({ description: 'OK', type: ResponseMaterialsDto })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiConflictResponse({
     description:
@@ -40,8 +52,14 @@ export class MaterialsController {
   }
 
   @ApiOperation({ summary: 'Add materials' })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access token',
+    required: true,
+  })
   @ApiOkResponse({ description: 'OK', type: ResponseMaterialsDto })
-  @ApiNotFoundResponse({ description: 'Not found' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
@@ -52,5 +70,40 @@ export class MaterialsController {
     @Body() body: MaterialsDto,
   ) {
     return await this.materialService.updateMaterials(id, body);
+  }
+
+  @ApiOperation({ summary: 'Get all materials' })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access token',
+    required: true,
+  })
+  @ApiOkResponse({ description: 'OK', type: [ResponseMaterialsDto] })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiNotFoundResponse({ description: 'Not found' })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async getAllMaterials() {
+    return await this.materialService.getAllMaterials();
+  }
+
+  @ApiOperation({ summary: 'Delete materials by id' })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access token',
+    required: true,
+  })
+  @ApiOkResponse({ description: 'OK', type: [ResponseMaterialsDto] })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiNotFoundResponse({ description: 'Not found' })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @UseGuards(JwtAuthGuard)
+  // ! @Role(ERole.ADMIN)
+  @Delete(':id')
+  async deleteMaterials(@Param('id', ParseIntPipe) id: number) {
+    return await this.materialService.deleteMaterials(id);
   }
 }
