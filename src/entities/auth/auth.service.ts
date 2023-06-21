@@ -1,3 +1,4 @@
+import { InternshipStream } from '@entities/internship-stream/internship-stream.entity';
 import { MailService } from '@entities/mail/mail.service';
 import { Role } from '@entities/users/role.entity';
 import { User } from '@entities/users/users.entity';
@@ -28,6 +29,8 @@ export class AuthService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
+    @InjectRepository(InternshipStream)
+    private readonly streamRepository: Repository<InternshipStream>,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
   ) {}
@@ -58,9 +61,6 @@ export class AuthService {
       ...registerUserDto,
       password: hashedPassword,
       avatar,
-      nameInternshipStream,
-      verifyToken,
-      verified: false,
     });
 
     newUser.roles = [role];
@@ -95,20 +95,45 @@ export class AuthService {
       userIp,
     );
 
-    const tokens = await this.generateTokens(user);
+    return await this.responseData(user.email);
+  }
 
-    const userData: LoginResponseDto = {
-      id: user.id,
-      username: '',
-      fieldOfInternship: '',
-      nameInternshipStream: '',
+  // Response data
+  public async responseData(email: string) {
+    const user = await this.getUser('email', email);
+    const tokens = await this.generateTokens(user);
+    const roles: string[] = user.roles.map((role) => role.role);
+    const stream: InternshipStream = await this.streamRepository.findOne({
+      where: { id: user.streamId },
+    });
+    const streamData = {
+      id: stream?.id,
+      streamDirection: stream?.streamDirection,
+      isActive: stream?.isActive,
+      startDate: stream?.startDate,
     };
-    await this.setRedisService.setRefreshToken(user.email, tokens.refreshToken);
-    return {
+    const userData = {
+      id: user.id,
+      roles,
+      isLabelStream: user.isLabelStream,
+      stream: stream ? streamData : {},
+    };
+    const responseData: LoginResponseDto = {
       successToken: tokens.successToken,
       refreshToken: tokens.refreshToken,
       user: userData,
     };
+
+    if (!user.firstName || !user.phone) {
+      return responseData;
+    }
+
+    userData['firstName'] = user.firstName;
+    userData['avatar'] = user.avatar;
+    userData['direction'] = user.direction;
+
+    await this.setRedisService.setRefreshToken(user.email, tokens.refreshToken);
+    return responseData;
   }
 
   // Check phone
@@ -166,6 +191,15 @@ export class AuthService {
     return { message: 'Password changed' };
   }
 
+  // Refresh token
+  public async refreshToken(user: User) {
+    const tokens = await this.generateTokens(user);
+    return {
+      successToken: tokens.successToken,
+      refreshToken: tokens.refreshToken,
+    };
+  }
+
   // User validate
   private async userValidate(email: string, password: string, userIp: string) {
     const user = await this.getUser('email', email);
@@ -189,7 +223,7 @@ export class AuthService {
     if (user) {
       return user;
     }
-    throw new NotFoundException('No such user');
+    throw new NotFoundException('Not found');
   }
 
   // Generate tokens

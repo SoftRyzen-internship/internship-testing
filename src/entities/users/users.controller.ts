@@ -1,3 +1,4 @@
+import { LoginResponseDto } from '@entities/auth/dto/login.dto';
 import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
 import {
   Body,
@@ -6,6 +7,7 @@ import {
   Patch,
   Put,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -19,6 +21,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { MyRequest } from '@src/types/request.interface';
+import { Response } from 'express';
 import { ResponseDashboardDto } from './dto/response-dashboard.dto';
 import { ResponseUserDto } from './dto/response-user.dto';
 import { UpdateDirectionDto } from './dto/update-direction.dto';
@@ -33,21 +36,26 @@ export class UserController {
     this.expirationDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   }
 
-  // Get user by id
-  @ApiOperation({ summary: 'Get current user' })
+  // Current user
+  @ApiOperation({ summary: 'Current user' })
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
     description: 'Access token',
     required: true,
   })
-  @ApiResponse({ status: 200, type: ResponseUserDto })
+  @ApiResponse({ status: 200, type: LoginResponseDto })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
   @Get('current')
-  public async currentUser(@Req() req: MyRequest) {
-    return this.userService.getUser(req.user.email);
+  public async currentUser(@Req() req: MyRequest, @Res() res: Response) {
+    const data = await this.userService.currentUser(req.user.email);
+    res.cookie('refreshToken', data.refreshToken, {
+      expires: this.expirationDate,
+      httpOnly: true,
+    });
+    res.send({ token: data.successToken, user: data.user });
   }
 
   // Update user

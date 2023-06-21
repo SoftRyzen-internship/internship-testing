@@ -1,4 +1,5 @@
 import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
+import { Roles } from '@guards/roleGuard/decorators/role.decorator';
 import {
   Body,
   Controller,
@@ -21,8 +22,10 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { ERole } from '@src/enums/role.enum';
 import { MaterialsDto, ResponseMaterialsDto } from './dto/materials.dto';
 import { MaterialsService } from './materials.service';
+import { RoleGuard } from '@guards/roleGuard/role.guard';
 
 @ApiTags('Materials')
 @Controller('api/materials')
@@ -45,7 +48,7 @@ export class MaterialsController {
   })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
-  // ! @Role(ERole.ADMIN)
+  @Roles(ERole.ADMIN)
   @Post()
   async addMaterials(@Body() body: MaterialsDto) {
     return await this.materialService.addMaterials(body);
@@ -62,8 +65,8 @@ export class MaterialsController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtAuthGuard)
-  // ! @Role(ERole.ADMIN)
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(ERole.ADMIN)
   @Put(':id')
   async updateMaterials(
     @Param('id', ParseIntPipe) id: number,
@@ -100,8 +103,8 @@ export class MaterialsController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtAuthGuard)
-  // ! @Role(ERole.ADMIN)
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(ERole.ADMIN)
   @Delete(':id')
   async deleteMaterials(@Param('id', ParseIntPipe) id: number) {
     return await this.materialService.deleteMaterials(id);

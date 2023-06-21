@@ -1,5 +1,6 @@
+import { AuthService } from '@entities/auth/auth.service';
 import { User } from '@entities/users/users.entity';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -7,18 +8,10 @@ import { Repository } from 'typeorm';
 export class GoogleService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly authService: AuthService,
   ) {}
 
   public async auth(email: string) {
-    const user = await this.userRepository.findOne({ where: { email } });
-    if (user) {
-      return {
-        id: user.id,
-        username: user.firstName,
-        fieldOfInternship: '',
-        nameInternshipStream: '',
-      };
-    }
-    throw new NotFoundException('Not found');
+    return await this.authService.responseData(email);
   }
 }

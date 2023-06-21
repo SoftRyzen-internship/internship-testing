@@ -22,22 +22,60 @@ export class LoginDto extends UsernameDto {
   password: string;
 }
 
-export class LoginResponseDto {
-  @ApiProperty({ example: 'Id', description: 'User id' })
+export class StreamDto {
+  id?: number;
+  @ApiProperty({ example: '[1, 2, 3]', description: 'Ids streams' })
+  // streamDirection: number[];
+  streamDirection?: string;
+
+  @ApiProperty({ example: 'true', description: 'Status internship stream' })
+  isActive?: boolean;
+
+  @ApiProperty({
+    example: 'Start date',
+    description: 'Start date of internship stream',
+  })
+  startDate?: Date;
+}
+
+export class UserDto {
+  @ApiProperty({ example: 1, description: 'User id' })
   id: number;
 
   @ApiProperty({ example: 'Peter', description: 'User name' })
-  username: string;
+  firstName?: string;
+
+  @ApiProperty({ example: 'url avatar', description: 'User avatar' })
+  avatar?: string;
+
+  @ApiProperty({ example: 'FrontEnd', description: 'User direction' })
+  direction?: string;
 
   @ApiProperty({
-    example: 'BackEnd',
-    description: 'Choosing the direction of the internship',
+    example: false,
+    description: 'A label about the presence of active threads',
   })
-  fieldOfInternship: string;
+  isLabelStream: boolean;
 
   @ApiProperty({
-    example: '4',
-    description: 'The name of the internship stream',
+    example: '[user]',
+    description: 'User`s role',
   })
-  nameInternshipStream: string;
+  roles: string[];
+
+  @ApiProperty({ type: () => StreamDto })
+  stream?: StreamDto;
+}
+
+export class LoginResponseDto {
+  refreshToken: string;
+
+  @ApiProperty({
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    description: 'User success token',
+  })
+  successToken: string;
+
+  @ApiProperty({ type: () => UserDto })
+  user: UserDto;
 }

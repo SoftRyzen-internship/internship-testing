@@ -1,5 +1,7 @@
+import { AuthService } from '@entities/auth/auth.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ERole } from '@src/enums/role.enum';
 import { Repository } from 'typeorm';
 import {
   IStudentsByDirection,
@@ -13,7 +15,13 @@ import { User } from './users.entity';
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly authService: AuthService,
   ) {}
+
+  // Current user
+  public async currentUser(email: string) {
+    return await this.authService.responseData(email);
+  }
 
   // Get user
   public async getUser(email: string) {
@@ -48,7 +56,7 @@ export class UserService {
   public async dashboard() {
     const usersRegister: User[] = await this.userRepository.find();
     const users: User[] = [...usersRegister].filter(
-      (user) => user.direction !== 'admin', // ! сделать проверку на роль
+      (user) => user.direction !== ERole.ADMIN,
     );
     const direction = ['QA', 'PM', 'Full stack'];
     const studentsByDirection: IStudentsByDirection = this.userReduce(users);
@@ -64,7 +72,7 @@ export class UserService {
       how_many_candidates_registered: users.length,
       how_many_candidates_passed_the_test: countPassedTest,
       how_many_candidates_passed_the_technical_task: countPassedTechnicalTask,
-      how_many_technical_tasks_are_checked: 16,
+      how_many_technical_tasks_are_checked: 16, // !
     };
 
     return { data: data };
