@@ -1,12 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { MyBaseEntity } from '@utils/base.entity';
-import { Entity, Column, Unique} from 'typeorm'
+import { Entity, Column} from 'typeorm'
 
 @Entity('stream')
 export class InternshipStream extends MyBaseEntity {
     @ApiProperty({ example: 'Full Stack', description: 'Internship Stream' })
     @Column({ name: 'internship_stream', type: 'varchar' })
-    // @Unique(['stream'])
     streamDirection: string;
 
      @ApiProperty({ example: 1, description: 'Stream number' })
