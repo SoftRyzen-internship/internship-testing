@@ -32,7 +32,7 @@ import { AuthService } from './auth.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { RegisterUserDto } from './dto/create-user.dto';
 import { LoginDto, LoginResponseDto, UsernameDto } from './dto/login.dto';
-import { PhoneDto } from './dto/phone.dto';
+import { PhoneCodeDto, PhoneDto } from './dto/phone.dto';
 
 @ApiTags('Authentication')
 @Controller('api/auth')
@@ -59,8 +59,6 @@ export class AuthController {
     @Param('verificationToken') verificationToken: string,
     @Res() res: Response,
   ) {
-    
-
     const refreshToken = await this.authService.verifyEmail(verificationToken);
     res.cookie('refreshToken', refreshToken, {
       expires: this.expirationDate,
@@ -169,7 +167,7 @@ export class AuthController {
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtRefreshGuard)
-  @Post('refresh-token')
+  @Get('refresh-token')
   async refreshToken(@Req() req: MyRequest, @Res() res: Response) {
     const data = await this.authService.refreshToken(req.user);
     res.cookie('refreshToken', data.refreshToken, {
@@ -177,5 +175,23 @@ export class AuthController {
       httpOnly: true,
     });
     res.send({ successToken: data.successToken });
+  }
+
+  // Get phone code
+  @ApiOperation({ summary: 'Get phone code' })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'successToken',
+    required: true,
+  })
+  @ApiResponse({ status: 200, type: [PhoneCodeDto] })
+  @ApiResponse({ status: 401, description: 'Not authorized jwt expired' })
+  @ApiNotFoundResponse({ description: 'Not found' })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @UseGuards(JwtAuthGuard)
+  @Get('phone-code')
+  async getPhoneCode() {
+    return this.authService.getPhoneCode();
   }
 }
