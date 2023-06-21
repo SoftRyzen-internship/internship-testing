@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateTestDto } from './dto/create-test.dto';
@@ -49,5 +53,15 @@ export class TestsService {
     }
 
     return this.testRepository.find({ where: filters });
+  }
+
+  async updateTest(id: number, fieldsToUpdate: Partial<CreateTestDto>) {
+    const test = await this.testRepository.findOne({ where: { id } });
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+
+    Object.assign(test, fieldsToUpdate);
+    return this.testRepository.save(test);
   }
 }

@@ -1,4 +1,13 @@
-import { Controller, Post, Body, UseGuards, Get, Query } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Get,
+  Query,
+  Patch,
+  Param,
+} from '@nestjs/common';
 import { TestsService } from './tests.service';
 import { CreateTestDto } from './dto/create-test.dto';
 import {
@@ -7,6 +16,7 @@ import {
   ApiForbiddenResponse,
   ApiHeader,
   ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiQuery,
@@ -14,6 +24,7 @@ import {
 import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
 import { Roles } from '@guards/roleGuard/decorators/role.decorator';
 import { ERole } from '@src/enums/role.enum';
+import { Test } from './tests.entity';
 
 @Controller('api/tests')
 export class TestController {
@@ -58,5 +69,27 @@ export class TestController {
     @Query('startDate') startDate?: string,
   ) {
     return this.testService.getTests(internshipStream, startDate);
+  }
+
+  // Update test
+  @ApiOperation({ summary: 'Update test' })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access toten',
+    required: true,
+  })
+  @ApiOkResponse({ description: 'OK' })
+  @ApiNotFoundResponse({ description: 'Test not found' })
+  @ApiForbiddenResponse({ description: 'Forbidden' })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @UseGuards(JwtAuthGuard)
+  @Roles(ERole.ADMIN)
+  @Patch(':id')
+  async updateTest(
+    @Param('id') id: number,
+    @Body() createTestDto: CreateTestDto,
+  ): Promise<Test> {
+    return this.testService.updateTest(id, createTestDto);
   }
 }
