@@ -10,8 +10,8 @@ export class TestsService {
     @InjectRepository(Test)
     private readonly testRepository: Repository<Test>,
   ) {}
-// Add test
- async createTest(createTestDto: CreateTestDto): Promise<Test> {
+  // Add test
+  async createTest(createTestDto: CreateTestDto): Promise<Test> {
     const existingTest = await this.testRepository.findOne({
       where: {
         internshipStream: createTestDto.internshipStream,
@@ -23,11 +23,31 @@ export class TestsService {
     });
 
     if (existingTest) {
-      throw new ConflictException('Test with similar parameters already exists');
+      throw new ConflictException(
+        'Test with similar parameters already exists',
+      );
     }
 
     const test = this.testRepository.create(createTestDto);
     const createdTest = await this.testRepository.save(test);
     return createdTest;
+  }
+
+  // Get all tests
+  async getTests(
+    internshipStream?: string,
+    startDate?: string,
+  ): Promise<Test[]> {
+    const filters: Record<string, any> = {};
+
+    if (internshipStream !== undefined) {
+      filters.internshipStream = internshipStream;
+    }
+    if (startDate !== undefined) {
+      const formattedStartDate = new Date(startDate);
+      filters.startDate = formattedStartDate.toISOString();
+    }
+
+    return this.testRepository.find({ where: filters });
   }
 }
