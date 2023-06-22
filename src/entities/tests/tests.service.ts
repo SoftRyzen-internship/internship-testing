@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateTestDto } from './dto/create-test.dto';
@@ -10,8 +14,8 @@ export class TestsService {
     @InjectRepository(Test)
     private readonly testRepository: Repository<Test>,
   ) {}
-// Add test
- async createTest(createTestDto: CreateTestDto): Promise<Test> {
+  // Add test
+  async createTest(createTestDto: CreateTestDto): Promise<Test> {
     const existingTest = await this.testRepository.findOne({
       where: {
         internshipStream: createTestDto.internshipStream,
@@ -23,11 +27,41 @@ export class TestsService {
     });
 
     if (existingTest) {
-      throw new ConflictException('Test with similar parameters already exists');
+      throw new ConflictException(
+        'Test with similar parameters already exists',
+      );
     }
 
     const test = this.testRepository.create(createTestDto);
     const createdTest = await this.testRepository.save(test);
     return createdTest;
+  }
+
+  // Get all tests
+  async getTests(
+    internshipStream?: string,
+    startDate?: string,
+  ): Promise<Test[]> {
+    const filters: Record<string, any> = {};
+
+    if (internshipStream !== undefined) {
+      filters.internshipStream = internshipStream;
+    }
+    if (startDate !== undefined) {
+      const formattedStartDate = new Date(startDate);
+      filters.startDate = formattedStartDate.toISOString();
+    }
+
+    return this.testRepository.find({ where: filters });
+  }
+
+  async updateTest(id: number, fieldsToUpdate: Partial<CreateTestDto>) {
+    const test = await this.testRepository.findOne({ where: { id } });
+    if (!test) {
+      throw new NotFoundException('Test not found');
+    }
+
+    Object.assign(test, fieldsToUpdate);
+    return this.testRepository.save(test);
   }
 }
