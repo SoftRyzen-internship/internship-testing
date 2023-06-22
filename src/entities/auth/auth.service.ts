@@ -8,7 +8,6 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  Param,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt/dist';
@@ -49,7 +48,6 @@ export class AuthService {
       throw new ConflictException('User is already exists');
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    const avatar = '/avatars/avatar_pokemon.png';
     const verifyToken = v4();
     const verifyLink = this.generateUrlForEmailSend(
       email,
@@ -64,22 +62,19 @@ export class AuthService {
     const newUser = this.userRepository.create({
       ...registerUserDto,
       password: hashedPassword,
-      avatar,
       verifyToken,
-      verified: false,
     });
 
     newUser.roles = [role];
-
+    await this.mailService.sendEmail(email, verifyLink);
     await this.roleRepository.save(role);
     await this.userRepository.save(newUser);
-    await this.mailService.sendEmail(email, verifyLink);
 
     return newUser;
   }
 
   // Verify email
-  async verifyEmail(@Param('verificationToken') verifyToken: string) {
+  async verifyEmail(verifyToken: string) {
     const user = await this.userRepository.findOne({ where: { verifyToken } });
     if (!user) {
       throw new NotFoundException('User not found');
@@ -90,7 +85,6 @@ export class AuthService {
       verifyToken: null,
     });
     const tokens = await this.generateTokens(user);
-
     return tokens.refreshToken;
   }
 
@@ -139,7 +133,6 @@ export class AuthService {
     userData['avatar'] = user.avatar;
     userData['direction'] = user.direction;
 
-    await this.setRedisService.setRefreshToken(user.email, tokens.refreshToken);
     return responseData;
   }
 
@@ -180,7 +173,6 @@ export class AuthService {
 
     await this.userRepository.update(user.id, { verifyToken: null });
     const { refreshToken } = await this.generateTokens(user);
-    await this.setRedisService.setRefreshToken(user.email, refreshToken);
     return refreshToken;
   }
 
@@ -254,7 +246,10 @@ export class AuthService {
 
   // Generate tokens
   private async generateTokens(user: User) {
-    const roles = user.roles?.map((role) => role.role);
+    const roles = user.roles.map((role) =>
+      typeof role === 'string' ? role : role.role,
+    );
+
     const payload = { email: user.email, id: user.id, roles };
 
     const successToken = this.jwtService.sign(payload, {
@@ -265,6 +260,7 @@ export class AuthService {
       expiresIn: '7d',
       secret: process.env.REFRESH_TOKEN_PRIVATE_KEY || 'REFRESH_TOKEN',
     });
+    await this.setRedisService.setRefreshToken(user.email, refreshToken);
     return {
       successToken,
       refreshToken,
