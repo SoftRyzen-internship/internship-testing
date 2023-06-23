@@ -25,6 +25,7 @@ import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
 import { Roles } from '@guards/roleGuard/decorators/role.decorator';
 import { ERole } from '@src/enums/role.enum';
 import { Test } from './tests.entity';
+import { RoleGuard } from '@guards/roleGuard/role.guard';
 
 @Controller('api/tests')
 export class TestController {
@@ -42,7 +43,7 @@ export class TestController {
   @ApiConflictResponse({ description: 'This test has already been added' })
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(ERole.ADMIN)
   @Post()
   async createTest(@Body() createTestDto: CreateTestDto) {
@@ -61,7 +62,7 @@ export class TestController {
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @ApiQuery({ name: 'internshipStream', required: false })
   @ApiQuery({ name: 'startDate', required: false })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(ERole.ADMIN)
   @Get()
   async getTests(
@@ -83,7 +84,7 @@ export class TestController {
   @ApiNotFoundResponse({ description: 'Test not found' })
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(ERole.ADMIN)
   @Patch(':id')
   async updateTest(
