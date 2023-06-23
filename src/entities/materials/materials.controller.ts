@@ -1,5 +1,6 @@
 import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
 import { Roles } from '@guards/roleGuard/decorators/role.decorator';
+import { RoleGuard } from '@guards/roleGuard/role.guard';
 import {
   Body,
   Controller,
@@ -25,13 +26,13 @@ import {
 import { ERole } from '@src/enums/role.enum';
 import { MaterialsDto, ResponseMaterialsDto } from './dto/materials.dto';
 import { MaterialsService } from './materials.service';
-import { RoleGuard } from '@guards/roleGuard/role.guard';
 
 @ApiTags('Materials')
 @Controller('api/materials')
 export class MaterialsController {
   constructor(private readonly materialService: MaterialsService) {}
 
+  // Add materials
   @ApiOperation({ summary: 'Add materials' })
   @ApiBearerAuth()
   @ApiHeader({
@@ -54,6 +55,7 @@ export class MaterialsController {
     return await this.materialService.addMaterials(body);
   }
 
+  // Update materials by id
   @ApiOperation({ summary: 'Add materials' })
   @ApiBearerAuth()
   @ApiHeader({
@@ -75,6 +77,7 @@ export class MaterialsController {
     return await this.materialService.updateMaterials(id, body);
   }
 
+  // Get all materials
   @ApiOperation({ summary: 'Get all materials' })
   @ApiBearerAuth()
   @ApiHeader({
@@ -92,6 +95,7 @@ export class MaterialsController {
     return await this.materialService.getAllMaterials();
   }
 
+  // Delete materials by id
   @ApiOperation({ summary: 'Delete materials by id' })
   @ApiBearerAuth()
   @ApiHeader({

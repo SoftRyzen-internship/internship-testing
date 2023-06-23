@@ -28,6 +28,7 @@ import { UploadService } from './upload.service';
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
+  // Upload avatar
   @ApiOperation({ summary: 'Upload file' })
   @ApiBearerAuth()
   @ApiHeader({

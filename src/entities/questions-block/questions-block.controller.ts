@@ -35,6 +35,7 @@ import { QuestionsBlockService } from './questions-block.service';
 export class QuestionsBlockController {
   constructor(private readonly questionBlockService: QuestionsBlockService) {}
 
+  // Add block questions
   @ApiOperation({ summary: 'Add block question' })
   @ApiBearerAuth()
   @ApiHeader({
@@ -52,6 +53,7 @@ export class QuestionsBlockController {
     return await this.questionBlockService.addBlock(req.user.id, body);
   }
 
+  // Update block questions by id
   @ApiOperation({ summary: 'Update block question' })
   @ApiBearerAuth()
   @ApiHeader({
@@ -72,6 +74,7 @@ export class QuestionsBlockController {
     return await this.questionBlockService.updateBlock(id, body);
   }
 
+  // Get all blocks questions
   @ApiOperation({ summary: 'Get block question' })
   @ApiBearerAuth()
   @ApiHeader({

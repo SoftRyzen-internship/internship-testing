@@ -25,6 +25,7 @@ export class UploadService {
     });
   }
 
+  // Upload avatar
   async uploadFile(email: string, file: Express.Multer.File): Promise<string> {
     const user = await this.userRepository.findOne({ where: { email } });
     const fileId = user.fileId;

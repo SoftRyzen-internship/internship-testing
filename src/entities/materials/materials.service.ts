@@ -15,6 +15,7 @@ export class MaterialsService {
     private readonly materialRepository: Repository<MaterialsEntity>,
   ) {}
 
+  // Add materials
   public async addMaterials(body: MaterialsDto) {
     const material = await this.materialRepository.findOne({
       where: {
@@ -31,6 +32,7 @@ export class MaterialsService {
     return newMaterials;
   }
 
+  // Update materials by id
   public async updateMaterials(id: number, body: MaterialsDto) {
     const material = await this.materialRepository.findOne({ where: { id } });
     if (!material) {
@@ -41,10 +43,12 @@ export class MaterialsService {
     return updateMaterial;
   }
 
+  // Get all materials
   public async getAllMaterials() {
     return await this.materialRepository.find();
   }
 
+  // Delete materials by id
   public async deleteMaterials(id: number) {
     const material = this.materialRepository.findOne({ where: { id } });
     if (!material) {
