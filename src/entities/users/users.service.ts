@@ -8,7 +8,7 @@ import {
   ResponseDashboardDto,
 } from './dto/response-dashboard.dto';
 import { UpdateDirectionDto } from './dto/update-direction.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UserDto } from './dto/update-user.dto';
 import { User } from './users.entity';
 
 @Injectable()
@@ -28,22 +28,19 @@ export class UserService {
     const user = await this.userRepository.findOne({
       where: { email },
     });
-
     if (!user) {
       throw new NotFoundException();
     }
-    delete user.password;
-    delete user.verifyToken;
     return user;
   }
 
   // Update user
-  public async updateUser(email: string, body: UpdateUserDto) {
+  public async updateUser(email: string, body: UserDto) {
     const user = await this.getUser(email);
     if (user) {
       await this.userRepository.update(user.id, body);
     }
-    return await this.userRepository.findOne({ where: { email } });
+    return await this.authService.responseData(email);
   }
   // Update direction
   public async updateUserDirection(
