@@ -42,11 +42,13 @@ export class UserService {
     }
     return await this.authService.responseData(email);
   }
-
   // Update direction
-  public async updateUserDirection(email: string, body: UpdateDirectionDto) {
+  public async updateUserDirection(
+    email: string,
+    { direction }: UpdateDirectionDto,
+  ) {
     const user = await this.getUser(email);
-    await this.userRepository.update(user.id, { direction: body.direction });
+    await this.userRepository.update(user.id, { direction });
     return this.userRepository.findOne({ where: { id: user.id } });
   }
 
@@ -56,7 +58,7 @@ export class UserService {
     const users: User[] = [...usersRegister].filter(
       (user) => user.direction !== ERole.ADMIN,
     );
-    const direction = ['QA', 'PM', 'Full stack'];
+    const direction = ['QA', 'PM', 'FullStack'];
     const studentsByDirection: IStudentsByDirection = this.userReduce(users);
     const countPassedTest = this.filterUsers(users, 'isPassedTest');
     const countPassedTechnicalTask = this.filterUsers(
@@ -65,12 +67,12 @@ export class UserService {
     );
 
     const data: ResponseDashboardDto = {
-      total_number_of_directions: direction.length,
-      the_number_of_students_by_direction: studentsByDirection,
-      how_many_candidates_registered: users.length,
-      how_many_candidates_passed_the_test: countPassedTest,
-      how_many_candidates_passed_the_technical_task: countPassedTechnicalTask,
-      how_many_technical_tasks_are_checked: 16, // !
+      totalNumberOfDirections: direction.length,
+      theNumberOfStudentsByDirection: studentsByDirection,
+      howManyCandidatesRegistered: users.length,
+      howManyCandidatesPassedTheTest: countPassedTest,
+      howManyCandidatesPassedTheTechnicalTask: countPassedTechnicalTask,
+      howManyTechnicalTasksAreChecked: 16, // !
     };
 
     return { data: data };
@@ -86,11 +88,10 @@ export class UserService {
   private userReduce(users: User[]) {
     const studentsByDirection: IStudentsByDirection = users?.reduce(
       (acc, { direction }) => {
-        const directionJoin = direction.toLowerCase().split(' ').join('_');
-        if (acc.hasOwnProperty(directionJoin)) {
-          acc[directionJoin] = acc[directionJoin] + 1;
+        if (acc.hasOwnProperty(direction)) {
+          acc[direction] = acc[direction] + 1;
         } else {
-          acc[directionJoin] = 1;
+          acc[direction] = 1;
         }
         return acc;
       },

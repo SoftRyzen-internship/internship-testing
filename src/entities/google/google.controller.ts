@@ -21,7 +21,7 @@ export class GoogleController {
     this.expirationDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   }
 
-  @ApiOperation({ summary: 'Google login' })
+  @ApiOperation({ summary: 'Google authentication' })
   @ApiResponse({ status: 200, description: 'OK' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @Get()
