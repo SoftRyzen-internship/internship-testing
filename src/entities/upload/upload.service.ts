@@ -38,7 +38,7 @@ export class UploadService {
           mimeType: file.mimetype,
           body: fileStream,
         },
-        fields: 'id,name,webViewLink',
+        fields: 'id,thumbnailLink',
       });
     } else {
       response = await this.drive.files.create({
@@ -50,13 +50,13 @@ export class UploadService {
           mimeType: file.mimetype,
           body: fileStream,
         },
-        fields: 'id,name,webViewLink',
+        fields: 'id,thumbnailLink',
       });
     }
 
     if (response) {
       await this.userRepository.update(user.id, {
-        avatar: response.data.webViewLink,
+        avatar: response.data.thumbnailLink,
         fileId: response.data.id,
       });
     }
@@ -64,6 +64,6 @@ export class UploadService {
       console.log(err);
     });
 
-    return response.data.webViewLink;
+    return response.data.thumbnailLink;
   }
 }
