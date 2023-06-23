@@ -3,7 +3,7 @@ import { IsString } from 'class-validator';
 
 export class AddDirectionDto {
   @ApiProperty({
-    example: 'Full stack',
+    example: 'FullStack',
     description: 'Internship direction',
   })
   @IsString()

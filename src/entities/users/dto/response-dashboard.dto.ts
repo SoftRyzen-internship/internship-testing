@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class ResponseDashboardDto {
   @ApiProperty({ example: 4, description: 'Total number of directions' })
-  total_number_of_directions: number;
+  totalNumberOfDirections: number;
 
   @ApiProperty({
     example: {
@@ -13,28 +13,28 @@ export class ResponseDashboardDto {
     },
     description: 'The number of students by direction',
   })
-  the_number_of_students_by_direction: IStudentsByDirection;
+  theNumberOfStudentsByDirection: IStudentsByDirection;
 
   @ApiProperty({ example: 30, description: 'How many candidates registered' })
-  how_many_candidates_registered: number;
+  howManyCandidatesRegistered: number;
 
   @ApiProperty({
     example: 25,
     description: 'How many candidates passed the test',
   })
-  how_many_candidates_passed_the_test: number;
+  howManyCandidatesPassedTheTest: number;
 
   @ApiProperty({
     example: 15,
     description: 'How many candidates passed the technical task',
   })
-  how_many_candidates_passed_the_technical_task: number;
+  howManyCandidatesPassedTheTechnicalTask: number;
 
   @ApiProperty({
     example: 15,
     description: 'How many technical tasks are checked',
   })
-  how_many_technical_tasks_are_checked: number;
+  howManyTechnicalTasksAreChecked: number;
 }
 
 export interface IStudentsByDirection {
