@@ -1,43 +1,69 @@
 import { User } from '@entities/users/users.entity';
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as fs from 'fs';
-import { MulterError } from 'multer';
-import { extname, join } from 'path';
+import { drive_v3, google } from 'googleapis';
+import { join } from 'path';
 import { Repository } from 'typeorm';
-import { UploadDto } from './dto/upload.dto';
 
 @Injectable()
 export class UploadService {
+  private readonly drive: drive_v3.Drive;
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
-  ) {}
+  ) {
+    const auth = new google.auth.GoogleAuth({
+      credentials: {
+        private_key: process.env.GOOGLE_PRIVATE_KEY,
+        client_email: process.env.GOOGLE_CLIENT_EMAIL,
+      },
+      scopes: ['https://www.googleapis.com/auth/drive'],
+    });
+    this.drive = google.drive({
+      version: 'v3',
+      auth,
+    });
+  }
 
-  async uploadFile(email: string, file: UploadDto) {
-    try {
-      const user = await this.userRepository.findOne({ where: { email } });
-      if (!user) {
-        throw new UnauthorizedException('Not authorized');
-      }
-      const destinationDirectory = `./public/avatars`;
-      if (!fs.existsSync(destinationDirectory)) {
-        fs.mkdirSync(destinationDirectory, { recursive: true });
-      }
-      const newFileName = Date.now() + extname(file.originalname);
-      const newPath = `${destinationDirectory}/${newFileName}`;
-      await this.userRepository.update(email, { avatar: newPath });
-      fs.renameSync(file.path, newPath);
-      return { filename: newFileName, path: newPath };
-    } catch (error) {
-      fs.unlinkSync(join(__dirname, '../../../', 'temp'));
-      if (error instanceof MulterError) {
-        throw new BadRequestException(error.message);
-      }
-      throw new BadRequestException();
+  async uploadFile(email: string, file: Express.Multer.File): Promise<string> {
+    const user = await this.userRepository.findOne({ where: { email } });
+    const fileId = user.fileId;
+    const targetFolderId = process.env.TARGET_FOLDER_ID;
+    const fileStream = fs.createReadStream(file.path);
+    let response: any;
+    if (fileId) {
+      response = await this.drive.files.update({
+        fileId: fileId,
+        media: {
+          mimeType: file.mimetype,
+          body: fileStream,
+        },
+        fields: 'id,thumbnailLink',
+      });
+    } else {
+      response = await this.drive.files.create({
+        requestBody: {
+          name: file.filename,
+          parents: [targetFolderId],
+        },
+        media: {
+          mimeType: file.mimetype,
+          body: fileStream,
+        },
+        fields: 'id,thumbnailLink',
+      });
     }
+
+    if (response) {
+      await this.userRepository.update(user.id, {
+        avatar: response.data.thumbnailLink,
+        fileId: response.data.id,
+      });
+    }
+    fs.unlink(join(__dirname, '../../../', 'temp'), (err) => {
+      console.log(err);
+    });
+
+    return response.data.thumbnailLink;
   }
 }
