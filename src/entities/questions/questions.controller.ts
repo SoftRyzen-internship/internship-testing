@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   Patch,
   Post,
@@ -90,5 +91,20 @@ export class QuestionsController {
   @Delete(':id')
   async deleteQuestion(@Param('id') id: number) {
     return this.questionsService.deleteQuestion(id);
+  }
+
+  // Get question by block questions
+  @ApiOperation({ summary: 'Get questions by block' })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access token',
+    required: true,
+  })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @UseGuards(JwtAuthGuard)
+  @Get('block/:blockId')
+  async getQuestionsByBlock(@Param('blockId') blockId: number) {
+    return this.questionsService.getQuestionsByBlock(blockId);
   }
 }

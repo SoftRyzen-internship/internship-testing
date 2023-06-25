@@ -17,7 +17,7 @@ export class CreateQuestionDto {
   readonly direction: string;
 
   @ApiProperty({ description: 'Block associated with the question' })
-  readonly block: string;
+  readonly blockId: number;
 
   @ApiProperty({ description: 'Difficulty level of the question' })
   readonly difficulty: string;
