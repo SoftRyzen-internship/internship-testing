@@ -13,6 +13,7 @@ import { QuestionsBlockModule } from './entities/questions-block/questions-block
 import { RedisModule } from './entities/redis/redis.module';
 import { TestsModule } from './entities/tests/tests.module';
 import { UploadModule } from './entities/upload/upload.module';
+import { TestResultModule } from './entities/test-result/test-result.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { UploadModule } from './entities/upload/upload.module';
     QuestionsBlockModule,
     DirectionModule,
     TestsModule,
+    TestResultModule,
   ],
   controllers: [],
   providers: [],
