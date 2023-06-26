@@ -1,4 +1,3 @@
-import { GoogleDriveService } from '@entities/googleDrive/googleDrive.service';
 import { InternshipStream } from '@entities/internship-stream/internship-stream.entity';
 import { MailModule } from '@entities/mail/mail.module';
 import { MailService } from '@entities/mail/mail.service';
@@ -27,13 +26,7 @@ import { SetRedisService } from './set-redis.service';
     MailModule,
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    SetRedisService,
-    MailService,
-    ConfigService,
-    GoogleDriveService,
-  ],
+  providers: [AuthService, SetRedisService, MailService, ConfigService],
   exports: [AuthService],
 })
 export class AuthModule {}

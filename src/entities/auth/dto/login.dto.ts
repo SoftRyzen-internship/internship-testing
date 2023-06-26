@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, Matches, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export class UsernameDto {
   @ApiProperty({
@@ -7,10 +7,7 @@ export class UsernameDto {
     description: 'User login',
   })
   @IsNotEmpty()
-  @IsString()
-  @Matches(/^(?:[\w.-]+@[\w-]+\.[\w]{2,4})|(?:\+\d{1,3}\d{3,14})$/, {
-    message: 'Invalid username format',
-  })
+  @IsEmail()
   email: string;
 }
 
@@ -22,7 +19,7 @@ export class LoginDto extends UsernameDto {
   password: string;
 }
 
-export class StreamDto {
+export class StreamResponseDto {
   id?: number;
   @ApiProperty({ example: '[1, 2, 3]', description: 'Ids streams' })
   // streamDirection: number[];
@@ -38,7 +35,7 @@ export class StreamDto {
   startDate?: Date;
 }
 
-export class UserDto {
+export class UserResponseDto {
   @ApiProperty({ example: 1, description: 'User id' })
   id: number;
 
@@ -63,11 +60,15 @@ export class UserDto {
   })
   roles: string[];
 
-  @ApiProperty({ type: () => StreamDto })
-  stream?: StreamDto;
+  @ApiProperty({ type: () => StreamResponseDto })
+  stream?: StreamResponseDto;
 }
 
 export class LoginResponseDto {
+  @ApiProperty({
+    example: 'Save to cookie, name: refreshToken',
+    description: 'Save to cookie, name "refreshToken"',
+  })
   refreshToken: string;
 
   @ApiProperty({
@@ -76,6 +77,6 @@ export class LoginResponseDto {
   })
   successToken: string;
 
-  @ApiProperty({ type: () => UserDto })
-  user: UserDto;
+  @ApiProperty({ type: () => UserResponseDto })
+  user: UserResponseDto;
 }
