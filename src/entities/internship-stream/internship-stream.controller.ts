@@ -25,6 +25,9 @@ import {
 import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
 import { CreateStreamDto } from './dto/create-stream.dto';
 import { UpdateStreamDto } from './dto/update-stream.dto';
+import { Roles } from '@guards/roleGuard/decorators/role.decorator';
+import { ERole } from '@src/enums/role.enum';
+import { RoleGuard } from '@guards/roleGuard/role.guard';
 
 @ApiTags('Internship stream')
 @Controller('api/internship-streams')
@@ -45,8 +48,8 @@ export class InternshipStreamController {
   @ApiConflictResponse({ description: 'This direction has already been added' })
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtAuthGuard)
-  //   @Roles(ERole.ADMIN)
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(ERole.ADMIN)
   @Post()
   async createInternshipStream(
     @Body() previousStream: CreateStreamDto,
@@ -70,7 +73,8 @@ export class InternshipStreamController {
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @ApiQuery({ name: 'number', required: false })
   @ApiQuery({ name: 'isActive', required: false })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(ERole.ADMIN)
   @Get()
   async getInternshipStreams(
     @Query('number') number?: number,
@@ -86,6 +90,7 @@ export class InternshipStreamController {
     );
   }
 
+  // Update stream
   @ApiOperation({ summary: 'Update internship stream' })
   @ApiBearerAuth()
   @ApiHeader({
@@ -97,8 +102,8 @@ export class InternshipStreamController {
   @ApiNotFoundResponse({ description: 'Internship stream not found' })
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtAuthGuard)
-  //   @Roles(ERole.ADMIN)
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(ERole.ADMIN)
   @Patch(':id')
   async updateInternshipStream(
     @Param('id') id: number,
