@@ -33,6 +33,7 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { RegisterUserDto } from './dto/create-user.dto';
 import { LoginDto, LoginResponseDto, UsernameDto } from './dto/login.dto';
 import { PhoneCodeDto, PhoneDto } from './dto/phone.dto';
+import { RegularExpressionResponseDto } from './dto/regular-expression.response.dto';
 
 @ApiTags('Authentication')
 @Controller('api/auth')
@@ -193,5 +194,15 @@ export class AuthController {
   @Get('phone-code')
   async getPhoneCode() {
     return this.authService.getPhoneCode();
+  }
+
+  // Get regular expression
+  @ApiOperation({ summary: 'Get regular expression' })
+  @ApiResponse({ status: 200, type: RegularExpressionResponseDto })
+  @ApiNotFoundResponse({ description: 'Not found' })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @Get('regular-expression')
+  getRegularExpression() {
+    return this.authService.getRegularExpression();
   }
 }

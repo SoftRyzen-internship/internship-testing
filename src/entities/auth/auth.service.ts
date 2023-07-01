@@ -13,6 +13,7 @@ import {
 import { JwtService } from '@nestjs/jwt/dist';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ERole } from '@src/enums/role.enum';
+import * as regex from '@utils/regex-expressions';
 import * as bcrypt from 'bcrypt';
 import * as code from 'country-data';
 import { Repository } from 'typeorm';
@@ -242,6 +243,23 @@ export class AuthService {
       return user;
     }
     throw new NotFoundException('Not found');
+  }
+
+  // Get regular expression
+  public async getRegularExpression() {
+    const linkRegex = new RegExp(regex.linkRegex).toString();
+    const telegramRegex = new RegExp(regex.telegramRegex).toString();
+    const phoneRegex = new RegExp(regex.phoneRegex).toString();
+    const passwordRegex = new RegExp(regex.passwordRegex).toString();
+    const emailRegex = new RegExp(regex.emailRegex).toString();
+
+    return {
+      linkRegex,
+      telegramRegex,
+      phoneRegex,
+      passwordRegex,
+      emailRegex,
+    };
   }
 
   // Generate tokens

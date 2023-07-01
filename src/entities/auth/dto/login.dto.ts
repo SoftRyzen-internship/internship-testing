@@ -1,28 +1,30 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import * as regex from '@utils/regex-expressions';
+import { IsEmail, IsString, Matches, MinLength } from 'class-validator';
 
 export class UsernameDto {
   @ApiProperty({
     example: 'user@email.com',
     description: 'User login',
   })
-  @IsNotEmpty()
+  @IsString()
   @IsEmail()
   email: string;
 }
 
 export class LoginDto extends UsernameDto {
   @ApiProperty({ example: 'password', description: 'User password' })
-  @IsNotEmpty()
   @IsString()
-  @MinLength(8)
+  @MinLength(6, { message: 'Password must be at least 6 characters long' })
+  @Matches(regex.passwordRegex, {
+    message: 'Password must contain letters and numbers',
+  })
   password: string;
 }
 
 export class StreamResponseDto {
   id?: number;
-  @ApiProperty({ example: '[1, 2, 3]', description: 'Ids streams' })
-  // streamDirection: number[];
+  @ApiProperty({ example: 1, description: 'Ids streams' })
   streamDirection?: string;
 
   @ApiProperty({ example: 'true', description: 'Status internship stream' })

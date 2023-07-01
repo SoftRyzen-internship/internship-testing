@@ -7,5 +7,5 @@ export class UpdateDirectionDto {
     description: 'Direction in which the user was trained',
   })
   @IsString()
-  direction: string;
+  public direction: string;
 }
