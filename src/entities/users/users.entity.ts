@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { MyBaseEntity } from '@utils/base.entity';
+import * as regex from '@utils/regex-expressions';
 import { Matches, MinLength } from 'class-validator';
 import { Column, Entity, JoinTable, ManyToMany, Unique } from 'typeorm';
 import { Role } from './role.entity';
@@ -9,56 +10,56 @@ export class User extends MyBaseEntity {
   @ApiProperty({ example: 'email', description: 'User  email' })
   @Column({ name: 'email', type: 'varchar' })
   @Unique(['email'])
-  email: string;
+  public email: string;
 
   @ApiProperty({ example: 'User password', description: 'User  password' })
   @Column({ name: 'password', type: 'varchar', nullable: true })
   @MinLength(6, { message: 'Password must be at least 6 characters long' })
-  @Matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/, {
+  @Matches(regex.passwordRegex, {
     message: 'Password must contain letters and numbers',
   })
-  password: string;
+  public password: string;
 
   @ApiProperty({ example: 'URL', description: 'User avatar' })
   @Column({ name: 'avatar', type: 'varchar', nullable: true })
-  avatar: string;
+  public avatar: string;
 
   @ApiProperty({
     example: '1x2y3z4aBcDeFgHiJkLmNpQrStUvWxYz',
     description: 'Avatar id in google drive',
   })
   @Column({ name: 'file_id', type: 'varchar', nullable: true })
-  fileId: string;
+  public fileId: string;
 
   @ApiProperty({ example: 'Mark', description: 'User First name' })
   @Column({ name: 'first_name', type: 'varchar', nullable: true })
-  firstName: string;
+  public firstName: string;
 
   @ApiProperty({ example: 'Spencer', description: 'User Last name' })
   @Column({ name: 'last_name', type: 'varchar', nullable: true })
-  lastName: string;
+  public lastName: string;
 
   @ApiProperty({ example: 'contactPhone', description: 'User contact phone' })
   @Column({ name: 'phone', type: 'varchar', nullable: true })
   @Unique(['phone'])
-  @Matches(/^(?:\+\d{1,3}\d{3,14})$/, {
+  @Matches(regex.phoneRegex, {
     message: 'Contact phone must be in the format "+380XXXXXXXXX"',
   })
-  phone: string;
+  public phone: string;
 
   @ApiProperty({
     example: 'Telegram contact',
     description: 'User Telegram contact',
   })
   @Column({ name: 'telegram_contact', type: 'varchar', nullable: true })
-  @Matches(/^t.me\/\w+$/, {
+  @Matches(regex.telegramRegex, {
     message: 'Telegram contact must be in the format "t.me/name"',
   })
-  telegramContact: string;
+  public telegramContact: string;
 
   @ApiProperty({ example: 'Current city', description: 'User current city' })
   @Column({ name: 'current_city', type: 'varchar', nullable: true })
-  currentCity: string;
+  public currentCity: string;
 
   @ApiProperty({
     example: 'https://www.linkedin.com/in/user/',
@@ -66,6 +67,9 @@ export class User extends MyBaseEntity {
     required: true,
   })
   @Column({ name: 'linkedin_url', type: 'varchar', nullable: true })
+  @Matches(regex.linkRegex, {
+    message: 'This should have been a link',
+  })
   public linkedinUrl: string;
 
   @ApiProperty({
@@ -74,7 +78,7 @@ export class User extends MyBaseEntity {
     required: true,
   })
   @Column({ name: 'english_level', type: 'varchar', nullable: true })
-  englishLevel: string;
+  public englishLevel: string;
 
   @ApiProperty({
     example: 'resume url',
@@ -82,14 +86,20 @@ export class User extends MyBaseEntity {
     required: true,
   })
   @Column({ name: 'resume_url', type: 'varchar', nullable: true })
-  resumeUrl: string;
+  @Matches(regex.linkRegex, {
+    message: 'This should have been a link',
+  })
+  public resumeUrl: string;
 
   @ApiProperty({
     example: 'documentation tets url',
     description: 'Documentation tets url',
   })
   @Column({ name: 'documentation_tets_url', type: 'varchar', nullable: true })
-  documentationTetsUrl: string;
+  @Matches(regex.linkRegex, {
+    message: 'This should have been a link',
+  })
+  public documentationTetsUrl: string;
 
   @ApiProperty({
     example: "Because I'm the best",
@@ -97,7 +107,7 @@ export class User extends MyBaseEntity {
     required: true,
   })
   @Column({ name: 'why_are_you', type: 'varchar', nullable: true })
-  whyAreYou: string;
+  public whyAreYou: string;
 
   @ApiProperty({
     example: 'BackEnd, NestJS, Git',
@@ -106,7 +116,7 @@ export class User extends MyBaseEntity {
     required: true,
   })
   @Column({ name: 'what_projects_interested', type: 'varchar', nullable: true })
-  whatProjectsInterested: string;
+  public whatProjectsInterested: string;
 
   @ApiProperty({
     example: 'Example of projects',
@@ -115,7 +125,7 @@ export class User extends MyBaseEntity {
     required: true,
   })
   @Column({ name: 'have_projects', type: 'varchar', nullable: true })
-  haveProjects: string;
+  public haveProjects: string;
 
   @ApiProperty({
     example: 'Manager',
@@ -123,7 +133,7 @@ export class User extends MyBaseEntity {
     required: true,
   })
   @Column({ name: 'education', type: 'varchar', nullable: true })
-  education: string;
+  public education: string;
 
   @ApiProperty({
     example: '500 USD',
@@ -131,7 +141,7 @@ export class User extends MyBaseEntity {
     required: true,
   })
   @Column({ name: 'desired_salary', type: 'varchar', nullable: true })
-  desiredSalary: string;
+  public desiredSalary: string;
 
   @ApiProperty({
     example: true,
@@ -143,21 +153,21 @@ export class User extends MyBaseEntity {
     type: 'boolean',
     default: false,
   })
-  isDataProcessingConsent: boolean;
+  public isDataProcessingConsent: boolean;
 
   @ApiProperty({
     example: 'Group 47',
     description: 'Group in which the user studied',
   })
   @Column({ name: 'group', type: 'varchar', nullable: true })
-  group: string;
+  public group: string;
 
   @ApiProperty({
     example: 'Full Stack',
     description: 'Direction in which the user was trained',
   })
   @Column({ name: 'direction', type: 'varchar', nullable: true })
-  direction: string;
+  public direction: string;
 
   @ApiProperty({ example: 1, description: 'Stream internship id' })
   @Column({
@@ -165,29 +175,29 @@ export class User extends MyBaseEntity {
     type: 'integer',
     nullable: true,
   })
-  streamId: number;
+  public streamId: number;
 
   @ApiProperty({ example: false, description: 'Is verified user' })
   @Column({ name: 'verified', type: 'boolean', default: false })
-  verified: boolean;
+  public verified: boolean;
 
   @ApiProperty({ example: false, description: 'Is passed test' })
   @Column({ name: 'is_passed_test', type: 'boolean', default: false })
-  isPassedTest: boolean;
+  public isPassedTest: boolean;
 
   @ApiProperty({ example: false, description: 'Is passed technical task' })
   @Column({ name: 'is_passed_technical_task', type: 'boolean', default: false })
-  isPassedTechnicalTask: boolean;
+  public isPassedTechnicalTask: boolean;
 
   @ApiProperty({ example: 'Verify token', description: 'Verify token' })
   @Column({ name: 'verify_token', type: 'varchar', default: null })
-  verifyToken: string;
+  public verifyToken: string;
 
   @ApiProperty({ example: false, description: 'Is there a stream' })
   @Column({ name: 'is_label_stream', type: 'boolean', default: false })
-  isLabelStream: boolean;
+  public isLabelStream: boolean;
 
   @ManyToMany(() => Role, (roles) => roles.users, { cascade: true })
   @JoinTable()
-  roles: Role[];
+  public roles: Role[];
 }

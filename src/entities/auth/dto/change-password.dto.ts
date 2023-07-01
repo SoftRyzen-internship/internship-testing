@@ -1,16 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, MinLength } from 'class-validator';
+import * as regex from '@utils/regex-expressions';
+import { IsString, Matches, MinLength } from 'class-validator';
 
 export class ChangePasswordDto {
   @ApiProperty({ example: 'password', description: 'New password user' })
-  @IsNotEmpty()
   @IsString()
-  @MinLength(8)
-  password: string;
+  @MinLength(6, { message: 'Password must be at least 6 characters long' })
+  @Matches(regex.passwordRegex, {
+    message: 'Password must contain letters and numbers',
+  })
+  public password: string;
 
   @ApiProperty({ example: 'password', description: 'Confirm password user' })
-  @IsNotEmpty()
   @IsString()
-  @MinLength(8)
-  confirmPassword: string;
+  @MinLength(6, { message: 'Password must be at least 6 characters long' })
+  @Matches(regex.passwordRegex, {
+    message: 'Password must contain letters and numbers',
+  })
+  public confirmPassword: string;
 }

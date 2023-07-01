@@ -5,6 +5,7 @@
 docker-compose.yml
 onboarding-internship-5463c67d4c51.json
 credentials.json
+.postgres
 
 # Logs
 logs

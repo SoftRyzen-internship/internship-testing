@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import * as regex from '@utils/regex-expressions';
 import { IsBoolean, IsPhoneNumber, IsString, Matches } from 'class-validator';
 
 export class UserDto {
@@ -32,7 +33,7 @@ export class UserDto {
     required: true,
   })
   @IsString()
-  @Matches(/^t.me\/\w+$/, {
+  @Matches(regex.telegramRegex, {
     message: 'Telegram contact must be in the format "t.me/name"',
   })
   public telegramContact: string;
@@ -51,6 +52,9 @@ export class UserDto {
     required: true,
   })
   @IsString()
+  @Matches(regex.linkRegex, {
+    message: 'This should have been a link',
+  })
   public linkedinUrl: string;
 
   @ApiProperty({
@@ -59,7 +63,7 @@ export class UserDto {
     required: true,
   })
   @IsString()
-  englishLevel: string;
+  public englishLevel: string;
 
   @ApiProperty({
     example: 'resume url',
@@ -67,14 +71,20 @@ export class UserDto {
     required: true,
   })
   @IsString()
-  resumeUrl: string;
+  @Matches(regex.linkRegex, {
+    message: 'This should have been a link',
+  })
+  public resumeUrl: string;
 
   @ApiProperty({
     example: 'documentation tets url',
     description: 'Documentation tets url',
   })
   @IsString()
-  documentationTetsUrl?: string;
+  @Matches(regex.linkRegex, {
+    message: 'This should have been a link',
+  })
+  public documentationTetsUrl?: string;
 
   @ApiProperty({
     example: "Because I'm the best",
@@ -82,7 +92,7 @@ export class UserDto {
     required: true,
   })
   @IsString()
-  whyAreYou: string;
+  public whyAreYou: string;
 
   @ApiProperty({
     example: 'BackEnd, NestJS, Git',
@@ -91,7 +101,7 @@ export class UserDto {
     required: true,
   })
   @IsString()
-  whatProjectsInterested: string;
+  public whatProjectsInterested: string;
 
   @ApiProperty({
     example: 'Example of projects',
@@ -100,7 +110,7 @@ export class UserDto {
     required: true,
   })
   @IsString()
-  haveProjects: string;
+  public haveProjects: string;
 
   @ApiProperty({
     example: 'Manager',
@@ -108,7 +118,7 @@ export class UserDto {
     required: true,
   })
   @IsString()
-  education: string;
+  public education: string;
 
   @ApiProperty({
     example: '500 USD',
@@ -116,7 +126,7 @@ export class UserDto {
     required: true,
   })
   @IsString()
-  desiredSalary: string;
+  public desiredSalary: string;
 
   @ApiProperty({
     example: true,
@@ -124,7 +134,7 @@ export class UserDto {
     required: true,
   })
   @IsBoolean()
-  isDataProcessingConsent: boolean;
+  public isDataProcessingConsent: boolean;
 
   @ApiProperty({
     example: 'FS43',
