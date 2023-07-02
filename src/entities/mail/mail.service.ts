@@ -59,11 +59,7 @@ export class MailService {
         },
       };
 
-      const response = await this.elasticEmailService.emailsPost(
-        emailMessageData,
-      );
-      console.log('API called successfully.');
-      console.log(response.data);
+      await this.elasticEmailService.emailsPost(emailMessageData);
       return true;
     } catch (error) {
       console.error(error);

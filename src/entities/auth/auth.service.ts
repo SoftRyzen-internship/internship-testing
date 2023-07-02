@@ -76,7 +76,10 @@ export class AuthService {
 
   // Verify email
   async verifyEmail(verifyToken: string) {
-    const user = await this.userRepository.findOne({ where: { verifyToken } });
+    const user = await this.userRepository.findOne({
+      where: { verifyToken },
+      relations: ['roles'],
+    });
     if (!user) {
       throw new NotFoundException('User not found');
     }
