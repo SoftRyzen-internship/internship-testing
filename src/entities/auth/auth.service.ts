@@ -14,7 +14,7 @@ import { JwtService } from '@nestjs/jwt/dist';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ERole } from '@src/enums/role.enum';
 import * as regex from '@utils/regex-expressions';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import * as code from 'country-data';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
