@@ -1,3 +1,6 @@
+import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
+import { Roles } from '@guards/roleGuard/decorators/role.decorator';
+import { RoleGuard } from '@guards/roleGuard/role.guard';
 import {
   Body,
   Controller,
@@ -6,10 +9,9 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
-import { QuestionsService } from './questions.service';
-import { CreateQuestionDto } from './dto/create-quest.dto';
 import {
   ApiBearerAuth,
   ApiConflictResponse,
@@ -20,10 +22,9 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
 import { ERole } from '@src/enums/role.enum';
-import { Roles } from '@guards/roleGuard/decorators/role.decorator';
-import { RoleGuard } from '@guards/roleGuard/role.guard';
+import { CreateQuestionDto } from './dto/create-quest.dto';
+import { QuestionsService } from './questions.service';
 
 @ApiTags('Questions')
 @Controller('api/questions')
@@ -35,8 +36,12 @@ export class QuestionsController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Access token',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiOkResponse({ description: 'OK' })
   @ApiConflictResponse({ description: 'This direction has already been added' })
@@ -57,8 +62,12 @@ export class QuestionsController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Access token',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiOkResponse({ description: 'OK' })
   @ApiForbiddenResponse({ description: 'Forbidden' })
@@ -82,8 +91,12 @@ export class QuestionsController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Access token',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard, RoleGuard)
@@ -98,13 +111,21 @@ export class QuestionsController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Access token',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
-  @Get('block/:blockId')
-  async getQuestionsByBlock(@Param('blockId') blockId: number) {
-    return this.questionsService.getQuestionsByBlock(blockId);
+  @Get('block/:direction')
+  async getQuestionsByBlock(
+    @Param('direction') direction: string,
+    @Query('block') block?: string,
+    @Query('count') count = 30,
+  ) {
+    return this.questionsService.getQuestionsByBlock(direction, block, count);
   }
 }

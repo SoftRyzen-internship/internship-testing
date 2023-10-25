@@ -1,32 +1,44 @@
+import { AttemptsModule } from '@entities/attempts/attempts.module';
+import { BlockIpMiddleware } from '@entities/attempts/middleware/attempts.middleware';
 import { InternshipStream } from '@entities/internship-stream/internship-stream.entity';
 import { MailModule } from '@entities/mail/mail.module';
 import { MailService } from '@entities/mail/mail.service';
-import { RedisModule } from '@entities/redis/redis.module';
+import { TechnicalTest } from '@entities/technical-test/technical-test.entity';
+import { Test } from '@entities/tests/tests.entity';
 import { Role } from '@entities/users/role.entity';
 import { User } from '@entities/users/users.entity';
 import { JwtGuardsModule } from '@guards/jwtGuard/jwt-guard.module';
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { SetRedisService } from './set-redis.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Role, InternshipStream]),
+    TypeOrmModule.forFeature([
+      User,
+      Role,
+      InternshipStream,
+      Test,
+      TechnicalTest,
+    ]),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
       serveRoot: '/avatars',
     }),
-    RedisModule,
     JwtGuardsModule,
     MailModule,
+    AttemptsModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, SetRedisService, MailService, ConfigService],
+  providers: [AuthService, MailService, ConfigService],
   exports: [AuthService],
 })
-export class AuthModule {}
+export class AuthModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(BlockIpMiddleware).forRoutes('api/auth/login');
+  }
+}

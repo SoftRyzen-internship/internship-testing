@@ -33,8 +33,12 @@ export class UploadController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Access token',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiOkResponse({ description: 'File uploaded successfully' })
   @ApiConsumes('multipart/form-data')

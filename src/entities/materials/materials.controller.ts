@@ -37,8 +37,12 @@ export class MaterialsController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Access token',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiOkResponse({ description: 'OK', type: ResponseMaterialsDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -60,8 +64,12 @@ export class MaterialsController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Access token',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiOkResponse({ description: 'OK', type: ResponseMaterialsDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -82,8 +90,12 @@ export class MaterialsController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Access token',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiOkResponse({ description: 'OK', type: [ResponseMaterialsDto] })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
@@ -100,8 +112,12 @@ export class MaterialsController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Access token',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiOkResponse({ description: 'OK', type: [ResponseMaterialsDto] })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })

@@ -16,10 +16,7 @@ import { GoogleService } from './google.service';
 @ApiTags('Google authentication')
 @Controller('/api/google')
 export class GoogleController {
-  private readonly expirationDate: Date;
-  constructor(private readonly googleService: GoogleService) {
-    this.expirationDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-  }
+  constructor(private readonly googleService: GoogleService) {}
 
   @ApiOperation({ summary: 'Google authentication' })
   @ApiResponse({ status: 200, description: 'OK' })
@@ -50,10 +47,6 @@ export class GoogleController {
     const redirectUrl = `${
       process.env.GOOGLE_REDIRECT_URL
     }?userData=${encodeURIComponent(JSON.stringify(userData))}`;
-    res.cookie('refreshToken', userData.refreshToken, {
-      expires: this.expirationDate,
-      httpOnly: true,
-    });
     res.redirect(redirectUrl);
   }
 }

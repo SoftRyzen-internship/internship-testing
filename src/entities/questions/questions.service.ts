@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateQuestionDto } from './dto/create-quest.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Question } from './question.entity';
-import { Repository, DeleteResult, Equal } from 'typeorm';
+import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 
 @Injectable()
 export class QuestionsService {
@@ -52,14 +52,29 @@ export class QuestionsService {
   }
 
   // Get questions by block questions
-  async getQuestionsByBlock(blockId: number): Promise<Question[]> {
-    const questions = await this.questionRepository.find({
-      where: { blockId: Equal(blockId) },
-    });
+  async getQuestionsByBlock(
+    direction: string,
+    block?: string,
+    count = 30,
+  ): Promise<Question[]> {
+    let query: SelectQueryBuilder<Question> =
+      this.questionRepository.createQueryBuilder('question');
 
-    if (!questions) {
-      throw new NotFoundException('Block not found');
+    query = query.where('question.direction = :direction', { direction });
+
+    if (block) {
+      query = query.andWhere('question.blockQuestions = :block', { block });
     }
+
+    const questions = await query
+      .orderBy('RANDOM()') // Random order
+      .take(count) // Limit the number of questions
+      .getMany();
+
+    if (!questions || questions.length < count) {
+      throw new NotFoundException('Not enough questions found');
+    }
+
     return questions;
   }
 }

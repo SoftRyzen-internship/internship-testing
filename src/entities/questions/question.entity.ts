@@ -1,8 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { MyBaseEntity } from '@utils/base.entity';
-import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { MyBaseEntity } from '@src/base/base.entity';
+import { Column, Entity } from 'typeorm';
 import { Difficulty } from './enums/difficulty.enum';
-import { QuestionsBlockEntity } from '@entities/questions-block/questions-block.entity';
 
 @Entity()
 export class Question extends MyBaseEntity {
@@ -25,20 +24,15 @@ export class Question extends MyBaseEntity {
   @Column()
   correctAnswerIndex: number;
 
-  @ApiProperty({ example: 'Direction', description: 'Question direction' })
+  @ApiProperty({ example: 'Backend', description: 'Question direction' })
   @Column()
   direction: string;
 
-  @ApiProperty({ example: 'Block', description: 'Question block' })
-  @Column({ name: 'question_block_id', type: 'integer' })
-  @ManyToOne(() => QuestionsBlockEntity, { onDelete: 'CASCADE' })
-  @JoinColumn({
-    name: 'question_block_id',
-    referencedColumnName: 'id'
-    })
-  blockId: number;
+  @ApiProperty({ example: 'CSS', description: 'Question block' })
+  @Column({ name: 'block_questions', type: 'varchar' })
+  blockQuestions: string;
 
-  @ApiProperty({ example: 'EASY', description: 'Question difficulty' })
+  @ApiProperty({ example: 'Easy', description: 'Question difficulty' })
   @Column({ name: 'difficulty', type: 'enum', enum: Difficulty })
   difficulty: string;
 

@@ -1,14 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-
 export class QuestionBlockDto {
-  @ApiProperty({ example: 'Full stack', description: 'Direction name' })
-  @IsNotEmpty()
+  @ApiProperty({ example: 'FrontEnd', description: 'Direction name' })
   @IsString()
+  @Transform(({ value }) => value.trim())
+  @IsNotEmpty()
   directionName: string;
 
-  @ApiProperty({ example: 'Question 1', description: 'Block name' })
+  @ApiProperty({ example: 'HTML/CSS', description: 'Block name' })
   @IsNotEmpty()
   @IsString()
   blockName: string;

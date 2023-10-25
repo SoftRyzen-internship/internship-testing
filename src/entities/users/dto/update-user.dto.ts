@@ -1,6 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import * as regex from '@utils/regex-expressions';
-import { IsBoolean, IsPhoneNumber, IsString, Matches } from 'class-validator';
+import * as regex from '@src/constants/regex-expressions';
+import { Transform } from 'class-transformer';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsPhoneNumber,
+  IsString,
+  Matches,
+  ValidateIf,
+} from 'class-validator';
 
 export class UserDto {
   @ApiProperty({
@@ -9,6 +17,8 @@ export class UserDto {
     required: true,
   })
   @IsString()
+  @Transform(({ value }) => value.trim())
+  @IsNotEmpty()
   public firstName: string;
 
   @ApiProperty({
@@ -17,6 +27,8 @@ export class UserDto {
     required: true,
   })
   @IsString()
+  @Transform(({ value }) => value.trim())
+  @IsNotEmpty()
   public lastName: string;
 
   @ApiProperty({
@@ -25,6 +37,7 @@ export class UserDto {
     required: true,
   })
   @IsPhoneNumber()
+  @IsNotEmpty()
   public phone: string;
 
   @ApiProperty({
@@ -33,6 +46,7 @@ export class UserDto {
     required: true,
   })
   @IsString()
+  @IsNotEmpty()
   @Matches(regex.telegramRegex, {
     message: 'Telegram contact must be in the format "t.me/name"',
   })
@@ -44,7 +58,19 @@ export class UserDto {
     required: true,
   })
   @IsString()
+  @Transform(({ value }) => value.trim())
+  @IsNotEmpty()
   public currentCity: string;
+
+  @ApiProperty({
+    example: 'FrontEnd',
+    description: 'Direction',
+    required: true,
+  })
+  @IsString()
+  @Transform(({ value }) => value.trim())
+  @IsNotEmpty()
+  public direction: string;
 
   @ApiProperty({
     example: 'https://www.linkedin.com/in/user/',
@@ -52,6 +78,7 @@ export class UserDto {
     required: true,
   })
   @IsString()
+  @IsNotEmpty()
   @Matches(regex.linkRegex, {
     message: 'This should have been a link',
   })
@@ -63,6 +90,8 @@ export class UserDto {
     required: true,
   })
   @IsString()
+  @Transform(({ value }) => value.trim())
+  @IsNotEmpty()
   public englishLevel: string;
 
   @ApiProperty({
@@ -71,20 +100,11 @@ export class UserDto {
     required: true,
   })
   @IsString()
+  @IsNotEmpty()
   @Matches(regex.linkRegex, {
     message: 'This should have been a link',
   })
   public resumeUrl: string;
-
-  @ApiProperty({
-    example: 'documentation tets url',
-    description: 'Documentation tets url',
-  })
-  @IsString()
-  @Matches(regex.linkRegex, {
-    message: 'This should have been a link',
-  })
-  public documentationTetsUrl?: string;
 
   @ApiProperty({
     example: "Because I'm the best",
@@ -92,6 +112,8 @@ export class UserDto {
     required: true,
   })
   @IsString()
+  @Transform(({ value }) => value.trim())
+  @IsNotEmpty()
   public whyAreYou: string;
 
   @ApiProperty({
@@ -100,6 +122,7 @@ export class UserDto {
       'What projects/tasks/technologies/tools are you interested in and would like to learn during your internship?',
     required: true,
   })
+  @Transform(({ value }) => value.trim())
   @IsString()
   public whatProjectsInterested: string;
 
@@ -110,6 +133,8 @@ export class UserDto {
     required: true,
   })
   @IsString()
+  @Transform(({ value }) => value.trim())
+  @IsNotEmpty()
   public haveProjects: string;
 
   @ApiProperty({
@@ -118,6 +143,8 @@ export class UserDto {
     required: true,
   })
   @IsString()
+  @Transform(({ value }) => value.trim())
+  @IsNotEmpty()
   public education: string;
 
   @ApiProperty({
@@ -126,6 +153,8 @@ export class UserDto {
     required: true,
   })
   @IsString()
+  @Transform(({ value }) => value.trim())
+  @IsNotEmpty()
   public desiredSalary: string;
 
   @ApiProperty({
@@ -134,13 +163,20 @@ export class UserDto {
     required: true,
   })
   @IsBoolean()
+  @IsNotEmpty()
   public isDataProcessingConsent: boolean;
 
   @ApiProperty({
-    example: 'FS43',
-    description: 'Group in which the user studied',
-    required: false,
+    example: 'documentation test url',
+    description: 'Documentation test url',
+    required: true,
   })
+  @ValidateIf((object, value) => value !== undefined)
   @IsString()
-  public group?: string;
+  @Transform(({ value }) => value.trim())
+  @IsNotEmpty()
+  @Matches(regex.linkRegex, {
+    message: 'This should have been a link',
+  })
+  public documentationTestUrl?: string;
 }

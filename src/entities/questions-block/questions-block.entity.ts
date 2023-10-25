@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { MyBaseEntity } from '@utils/base.entity';
+import { MyBaseEntity } from '@src/base/base.entity';
 import { Column, Entity } from 'typeorm';
 
 @Entity({ name: 'block_questions' })
@@ -8,7 +8,7 @@ export class QuestionsBlockEntity extends MyBaseEntity {
   @Column({ name: 'direction_name', type: 'varchar' })
   directionName: string;
 
-  @ApiProperty({ example: 'Block name', description: 'Block name' })
+  @ApiProperty({ example: 'HTML', description: 'Block name' })
   @Column({ name: 'block_name', type: 'varchar' })
   blockName: string;
 

@@ -1,11 +1,10 @@
-import { User } from '@entities/users/users.entity';
 import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
-import { JwtRefreshGuard } from '@guards/jwtGuard/jwt-refresh.guard';
 import {
   Body,
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Req,
   Res,
@@ -31,17 +30,23 @@ import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { RegisterUserDto } from './dto/create-user.dto';
-import { LoginDto, LoginResponseDto, UsernameDto } from './dto/login.dto';
+import {
+  EmailResendResponseDto,
+  EmailSendResponseDto,
+} from './dto/email-send.dto';
+import {
+  LoginDto,
+  LoginResponseDto,
+  LogoutResponseDto,
+  UsernameDto,
+} from './dto/login.dto';
 import { PhoneCodeDto, PhoneDto } from './dto/phone.dto';
 import { RegularExpressionResponseDto } from './dto/regular-expression.response.dto';
 
 @ApiTags('Authentication')
 @Controller('api/auth')
 export class AuthController {
-  private readonly expirationDate: Date;
-  constructor(private readonly authService: AuthService) {
-    this.expirationDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-  }
+  constructor(private readonly authService: AuthService) {}
 
   // Register
   @Post('register')
@@ -49,28 +54,27 @@ export class AuthController {
   @ApiResponse({ status: 201, type: RegisterUserDto })
   async registerUser(
     @Body(ValidationPipe) registerUserDto: RegisterUserDto,
-  ): Promise<User> {
+  ): Promise<LoginResponseDto> {
     return this.authService.registerUser(registerUserDto);
   }
 
   // Verify email
-  @Get('verify/:verificationToken')
+  @Get('verify-email/:verificationToken')
   @ApiOperation({ summary: 'User email verification' })
   async verifyEmail(
     @Param('verificationToken') verificationToken: string,
     @Res() res: Response,
   ) {
-    const refreshToken = await this.authService.verifyEmail(verificationToken);
-    res.cookie('refreshToken', refreshToken, {
-      expires: this.expirationDate,
-      httpOnly: true,
-    });
-    res.redirect(process.env.REDIRECT_TO_SITE_INTERNSHIP);
+    const userData = await this.authService.verifyEmail(verificationToken);
+    const redirectUrl = `${
+      process.env.REDIRECT_TO_SITE_INTERNSHIP
+    }?userData=${encodeURIComponent(JSON.stringify(userData))}`;
+    res.redirect(redirectUrl);
   }
 
   // Login
   @ApiOperation({ summary: 'Login' })
-  @ApiResponse({ status: 200, type: LoginResponseDto })
+  @ApiResponse({ status: 201, type: LoginResponseDto })
   @ApiUnauthorizedResponse({
     description: 'Email is wrong, or password is wrong or email not verified',
   })
@@ -80,22 +84,18 @@ export class AuthController {
   })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @Post('login')
-  async login(
-    @Body() loginDto: LoginDto,
-    @Req() req: MyRequest,
-    @Res() res: Response,
-  ) {
+  async login(@Body() loginDto: LoginDto, @Req() req: MyRequest) {
     const data = await this.authService.login(loginDto, req.ip);
-    res.cookie('refreshToken', data.refreshToken, {
-      expires: this.expirationDate,
-      httpOnly: true,
-    });
-    res.send({ successToken: data.successToken, user: data.user });
+    return {
+      refreshToken: data.refreshToken,
+      accessToken: data.accessToken,
+      user: data.user,
+    };
   }
 
   // Check phone
   @ApiOperation({ summary: 'Check phone' })
-  @ApiOkResponse({ description: 'OK' })
+  @ApiResponse({ status: 201, description: 'OK' })
   @ApiConflictResponse({ description: 'Phone number already exists' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @Post('check-phone')
@@ -105,12 +105,31 @@ export class AuthController {
 
   // Request change password
   @ApiOperation({ summary: 'Request change password' })
-  @ApiOkResponse({ description: 'OK' })
+  @ApiResponse({
+    status: 201,
+    description: 'Email send',
+    type: EmailSendResponseDto,
+  })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @Post('request-change-password')
   async requestChangePassword(@Body() body: UsernameDto) {
     return this.authService.requestChangePassword(body.email);
+  }
+
+  // Resend email
+  @ApiOperation({ summary: 'Resend email' })
+  @ApiResponse({
+    status: 201,
+    description: 'Email resend',
+    type: EmailResendResponseDto,
+  })
+  @ApiNotFoundResponse({ description: 'Not found' })
+  @ApiConflictResponse({ description: 'Email is already verified' })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @Post('resend-email')
+  async resendingEmail(@Body() body: UsernameDto) {
+    return this.authService.resendEmail(body.email);
   }
 
   // Verify change password
@@ -123,14 +142,11 @@ export class AuthController {
     @Param('verifyToken') verifyToken: string,
     @Res() res: Response,
   ) {
-    const refreshToken = await this.authService.verifyChangePassword(
-      verifyToken,
-    );
-    res.cookie('refreshToken', refreshToken, {
-      expires: this.expirationDate,
-      httpOnly: true,
-    });
-    res.redirect(process.env.REDIRECT_TO_PASSWORD_CHANGE_FORM);
+    const userData = await this.authService.verifyChangePassword(verifyToken);
+    const redirectUrl = `${
+      process.env.REDIRECT_TO_PASSWORD_CHANGE_FORM
+    }?userData=${encodeURIComponent(JSON.stringify(userData))}`;
+    res.redirect(redirectUrl);
   }
 
   // Change password
@@ -138,16 +154,23 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Refresh token from cookie',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiOkResponse({ description: 'Password changed' })
   @ApiBadRequestResponse({ description: 'Passwords do not match' })
-  @ApiResponse({ status: 401, description: 'Not authorized jwt expired' })
+  @ApiUnauthorizedResponse({
+    description:
+      'Not authorized jwt expired || Not authorized Invalid token type',
+  })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
-  @Post('change-password')
+  @Patch('change-password')
   async changePassword(
     @Body() changePasswordDto: ChangePasswordDto,
     @Req() req: MyRequest,
@@ -160,22 +183,28 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Refresh token from cookie',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=refresh_token',
+    },
   })
   @ApiOkResponse({ description: 'Refresh token' })
-  @ApiResponse({ status: 401, description: 'Not authorized jwt expired' })
+  @ApiUnauthorizedResponse({
+    description:
+      'Not authorized jwt expired || Not authorized Invalid token type',
+  })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtRefreshGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('refresh-token')
-  async refreshToken(@Req() req: MyRequest, @Res() res: Response) {
+  async refreshToken(@Req() req: MyRequest) {
     const data = await this.authService.refreshToken(req.user);
-    res.cookie('refreshToken', data.refreshToken, {
-      expires: this.expirationDate,
-      httpOnly: true,
-    });
-    res.send({ successToken: data.successToken });
+    return {
+      refreshToken: data.refreshToken,
+      accessToken: data.accessToken,
+    };
   }
 
   // Get phone code
@@ -183,11 +212,18 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'successToken',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiResponse({ status: 200, type: [PhoneCodeDto] })
-  @ApiResponse({ status: 401, description: 'Not authorized jwt expired' })
+  @ApiUnauthorizedResponse({
+    description:
+      'Not authorized jwt expired || Not authorized Invalid token type',
+  })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
@@ -204,5 +240,31 @@ export class AuthController {
   @Get('regular-expression')
   getRegularExpression() {
     return this.authService.getRegularExpression();
+  }
+
+  // Logout
+  @ApiOperation({ summary: 'Logout' })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access token with type',
+    required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
+  })
+  @ApiResponse({ status: 200, type: LogoutResponseDto })
+  @ApiUnauthorizedResponse({
+    description:
+      'Not authorized jwt expired || Not authorized Invalid token type',
+  })
+  @ApiNotFoundResponse({ description: 'Not found' })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @UseGuards(JwtAuthGuard)
+  @Get('logout')
+  logout(@Req() req: MyRequest) {
+    this.authService.logout(req.user.email);
+    return { message: 'Disconnect...' };
   }
 }

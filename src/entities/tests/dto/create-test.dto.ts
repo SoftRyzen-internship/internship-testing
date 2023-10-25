@@ -1,4 +1,3 @@
-
 import { ApiProperty } from '@nestjs/swagger';
 
 export class QuestionDifficultyDto {
@@ -16,16 +15,19 @@ export class CreateTestDto {
   @ApiProperty({ example: 'Full Stack', description: 'Internship Stream' })
   internshipStream: string;
 
-   @ApiProperty({ example: 1, description: 'Stream number' })
+  @ApiProperty({ example: 1, description: 'Stream number' })
   streamNumber: number;
 
-  @ApiProperty({ example: '2023-06-30', description: 'Availability start date' })
+  @ApiProperty({
+    example: '2023-06-30',
+    description: 'Availability start date',
+  })
   availabilityStartDate: Date;
 
   @ApiProperty({ example: '2023-08-30', description: 'Availability end date' })
   availabilityEndDate: Date;
 
- @ApiProperty({ example: 60, description: 'Duration test in minutes' })
+  @ApiProperty({ example: 60, description: 'Duration test in minutes' })
   duration: number;
 
   @ApiProperty({
@@ -34,6 +36,15 @@ export class CreateTestDto {
   })
   questionDifficulty: QuestionDifficultyDto;
 
-  @ApiProperty({ example: 70, description: 'Passing score' })
+  @ApiProperty({
+    example: { html: 10, css: 5, javascript: 7 },
+    description: 'Number of questions per block',
+  })
+  questionBlocks: Partial<{ [key: string]: number }>;
+
+  @ApiProperty({ example: 20, description: 'Number of questions in the test' })
+  numberOfQuestions: number;
+
+  @ApiProperty({ example: '65%', description: 'Passing score' })
   passingScore: number;
 }

@@ -40,8 +40,12 @@ export class QuestionsBlockController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Access token',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiOkResponse({ description: 'OK' })
   @ApiNotFoundResponse({ description: 'Not found' })
@@ -58,8 +62,12 @@ export class QuestionsBlockController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Access token',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiOkResponse({ description: 'OK' })
   @ApiNotFoundResponse({ description: 'Not found' })
@@ -75,18 +83,22 @@ export class QuestionsBlockController {
   }
 
   // Get all blocks questions
-  @ApiOperation({ summary: 'Get block question' })
+  @ApiOperation({ summary: 'Get all block question by directionName' })
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Access token',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiOkResponse({ description: 'OK', type: [RequestQuestionBlockDto] })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
-  @Get()
+  @Get(':directionName')
   async getBlock(@Query('directionName') directionName: string) {
     return await this.questionBlockService.getBlock(directionName);
   }
