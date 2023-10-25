@@ -7,14 +7,15 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const PORT = process.env.PORT || 3000;
+
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
     .setTitle('Internship Testing API')
     .setDescription('Documentation REST API')
     .setVersion('1.0.0')
+    .addServer(process.env.BASE_URL)
     .addBearerAuth()
-    .addTag('Internship Testing')
     .build();
 
   const document = SwaggerModule.createDocument(app, config, {

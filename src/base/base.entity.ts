@@ -8,7 +8,7 @@ import {
 
 export class MyBaseEntity extends BaseEntity {
   @ApiProperty({
-    example: '1',
+    example: 1,
     description: 'Unique id',
   })
   @PrimaryGeneratedColumn()

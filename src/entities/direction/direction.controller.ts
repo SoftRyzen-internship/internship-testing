@@ -39,8 +39,12 @@ export class DirectionController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Access token',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiOkResponse({ description: 'OK' })
   @ApiConflictResponse({ description: 'This direction has already been added' })
@@ -50,7 +54,7 @@ export class DirectionController {
   @Roles(ERole.ADMIN)
   @Post()
   async addDirection(@Body() body: AddDirectionDto, @Req() req: MyRequest) {
-    return this.directionService.addDirection(req.user.id, body.direction);
+    return this.directionService.addDirection(req.user.id, body);
   }
 
   // Get all direction
@@ -58,8 +62,12 @@ export class DirectionController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Access token',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiOkResponse({ description: 'OK' })
   @ApiBadRequestResponse({ description: 'Bad request' })
@@ -76,8 +84,12 @@ export class DirectionController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Access token',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiOkResponse({ description: 'OK' })
   @ApiForbiddenResponse({ description: 'Forbidden' })
@@ -89,6 +101,6 @@ export class DirectionController {
     @Param('id', ParseIntPipe) id: number,
     @Body() body: AddDirectionDto,
   ) {
-    return await this.directionService.updateDirection(id, body.direction);
+    return await this.directionService.updateDirection(id, body);
   }
 }

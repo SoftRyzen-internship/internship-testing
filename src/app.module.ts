@@ -4,26 +4,36 @@ import { InternshipStreamModule } from '@entities/internship-stream/internship-s
 import { MailModule } from '@entities/mail/mail.module';
 import { QuestionsModule } from '@entities/questions/questions.module';
 import { UserModule } from '@entities/users/users.module';
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { ConfigModule } from './config.module';
+import { AttemptsModule } from './entities/attempts/attempts.module';
 import { DirectionModule } from './entities/direction/direction.module';
 import { GoogleModule } from './entities/google/google.module';
 import { MaterialsModule } from './entities/materials/materials.module';
 import { QuestionsBlockModule } from './entities/questions-block/questions-block.module';
-import { RedisModule } from './entities/redis/redis.module';
+import { TestResultModule } from './entities/test-result/test-result.module';
 import { TestsModule } from './entities/tests/tests.module';
 import { UploadModule } from './entities/upload/upload.module';
-import { TestResultModule } from './entities/test-result/test-result.module';
+import { CorsMiddleware } from './middlewares/cors-middleware';
+import { TechnicalTestModule } from '@entities/technical-test/technical-test.module';
+import { APP_FILTER } from '@nestjs/core';
+import { GlobalExceptionFilter } from './logger/global-exception-filter';
+import { GlobalLoggerService } from './logger/global-logger.service';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/public',
+    }),
     ConfigModule,
     TypeOrmModule,
     AuthModule,
     UserModule,
     MailModule,
     QuestionsModule,
-    RedisModule,
     GoogleModule,
     UploadModule,
     InternshipStreamModule,
@@ -32,8 +42,20 @@ import { TestResultModule } from './entities/test-result/test-result.module';
     DirectionModule,
     TestsModule,
     TestResultModule,
+    AttemptsModule,
+    TechnicalTestModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionFilter,
+    },
+    GlobalLoggerService,
+  ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(CorsMiddleware).forRoutes('*');
+  }
+}

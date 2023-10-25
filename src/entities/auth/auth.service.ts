@@ -1,5 +1,8 @@
+import { AttemptsService } from '@entities/attempts/attempts.service';
 import { InternshipStream } from '@entities/internship-stream/internship-stream.entity';
 import { MailService } from '@entities/mail/mail.service';
+import { TechnicalTest } from '@entities/technical-test/technical-test.entity';
+import { Test } from '@entities/tests/tests.entity';
 import { Role } from '@entities/users/role.entity';
 import { User } from '@entities/users/users.entity';
 import {
@@ -12,8 +15,8 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt/dist';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as regex from '@src/constants/regex-expressions';
 import { ERole } from '@src/enums/role.enum';
-import * as regex from '@utils/regex-expressions';
 import * as bcrypt from 'bcryptjs';
 import * as code from 'country-data';
 import { Repository } from 'typeorm';
@@ -22,14 +25,16 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { RegisterUserDto } from './dto/create-user.dto';
 import { LoginDto, LoginResponseDto } from './dto/login.dto';
 import { PhoneCodeDto } from './dto/phone.dto';
-import { SetRedisService } from './set-redis.service';
 
 @Injectable()
 export class AuthService {
   private readonly countriesCodeAll: any;
   constructor(
-    private readonly setRedisService: SetRedisService,
+    private readonly attemptsService: AttemptsService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(Test) private readonly testsRepository: Repository<Test>,
+    @InjectRepository(TechnicalTest)
+    private readonly technicalTestRepository: Repository<TechnicalTest>,
     @InjectRepository(Role)
     private readonly roleRepository: Repository<Role>,
     @InjectRepository(InternshipStream)
@@ -41,7 +46,9 @@ export class AuthService {
   }
 
   // Register
-  async registerUser(registerUserDto: RegisterUserDto): Promise<User> {
+  async registerUser(
+    registerUserDto: RegisterUserDto,
+  ): Promise<LoginResponseDto> {
     const { email, password } = registerUserDto;
     const user = await this.userRepository.findOne({ where: { email } });
 
@@ -50,11 +57,7 @@ export class AuthService {
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const verifyToken = v4();
-    const verifyLink = this.generateUrlForEmailSend(
-      email,
-      `verify`,
-      verifyToken,
-    );
+    await this.sendEmailHandler(verifyToken, 'verify-email', email, null);
 
     const role = this.roleRepository.create({
       role: ERole.USER,
@@ -65,13 +68,12 @@ export class AuthService {
       password: hashedPassword,
       verifyToken,
     });
-
     newUser.roles = [role];
-    await this.mailService.sendEmail(email, verifyLink);
+
     await this.roleRepository.save(role);
     await this.userRepository.save(newUser);
 
-    return newUser;
+    return await this.responseData(newUser.email);
   }
 
   // Verify email
@@ -80,16 +82,19 @@ export class AuthService {
       where: { verifyToken },
       relations: ['roles'],
     });
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
-
     await this.userRepository.update(user.id, {
       verified: true,
       verifyToken: null,
     });
     const tokens = await this.generateTokens(user);
-    return tokens.refreshToken;
+    return {
+      refreshToken: tokens.refreshToken,
+      accessToken: tokens.accessToken,
+    };
   }
 
   // Login
@@ -105,12 +110,19 @@ export class AuthService {
 
   // Response data
   public async responseData(email: string) {
-    const user = await this.getUser('email', email);
-    const tokens = await this.generateTokens(user);
-    const roles: string[] = user.roles.map((role) => role.role);
+    const user: User = await this.getUser('email', email);
     const stream: InternshipStream = await this.streamRepository.findOne({
       where: { id: user.streamId },
     });
+    const test: Test = await this.testsRepository.findOne({
+      where: { streamNumber: stream?.id },
+    });
+    const techTest: TechnicalTest = await this.technicalTestRepository.findOne({
+      where: { direction: user.direction },
+    });
+    const tokens = await this.generateTokens(user);
+    const roles: string[] = user.roles.map((role) => role.role);
+
     const streamData = {
       id: stream?.id,
       streamDirection: stream?.streamDirection,
@@ -122,10 +134,22 @@ export class AuthService {
       roles,
       isLabelStream: user.isLabelStream,
       stream: stream ? streamData : {},
+      isVerifiedEmail: user.verified,
+      test: {
+        isSent: user.isSentTest,
+        isSuccess: user.isPassedTest,
+        startDate: test ? test.availabilityStartDate : null,
+        endDate: test ? test?.availabilityEndDate : null,
+      },
+      task: {
+        isSent: user.isSentTechnicalTask,
+        isSuccess: user.isPassedTechnicalTask,
+        deadlineDate: techTest ? techTest?.deadline : null,
+      },
     };
     const responseData: LoginResponseDto = {
-      successToken: tokens.successToken,
       refreshToken: tokens.refreshToken,
+      accessToken: tokens.accessToken,
       user: userData,
     };
 
@@ -153,22 +177,33 @@ export class AuthService {
   public async requestChangePassword(email: string) {
     const user = await this.getUser('email', email);
     const verifyToken = v4();
-    const verifyLink = this.generateUrlForEmailSend(
-      user.firstName,
-      'verify-change-password',
+    const isSend = await this.sendEmailHandler(
       verifyToken,
-    );
-    const isSendEmail = await this.mailService.sendEmail(
+      'verify-change-password',
       user.email,
-      verifyLink,
       user.firstName,
     );
-    if (!isSendEmail) {
+    if (!isSend) {
       throw new InternalServerErrorException();
     }
 
     await this.userRepository.update(user.id, { verifyToken });
-    return 'ok';
+    return { message: 'Email send' };
+  }
+
+  // Resend email
+  public async resendEmail(email: string) {
+    const user = await this.getUser('email', email);
+    const isSend = await this.sendEmailHandler(
+      user.verifyToken,
+      'verify-change-password',
+      user.email,
+      user.firstName,
+    );
+    if (!isSend) {
+      throw new InternalServerErrorException();
+    }
+    return { message: 'Email resend' };
   }
 
   // Verify change password
@@ -176,8 +211,12 @@ export class AuthService {
     const user = await this.getUser('verifyToken', verifyToken);
 
     await this.userRepository.update(user.id, { verifyToken: null });
-    const { refreshToken } = await this.generateTokens(user);
-    return refreshToken;
+    const tokens = await this.generateTokens(user);
+
+    return {
+      refreshToken: tokens.refreshToken,
+      accessToken: tokens.accessToken,
+    };
   }
 
   // Change password
@@ -198,8 +237,8 @@ export class AuthService {
   public async refreshToken(user: User) {
     const tokens = await this.generateTokens(user);
     return {
-      successToken: tokens.successToken,
       refreshToken: tokens.refreshToken,
+      accessToken: tokens.accessToken,
     };
   }
 
@@ -227,12 +266,13 @@ export class AuthService {
     }
     const passwordCompare = await bcrypt.compare(password, user.password);
     if (!passwordCompare) {
-      await this.setRedisService.attempts(userIp);
+      await this.attemptsService.attempts(userIp);
       throw new UnauthorizedException('Password is wrong');
     }
     if (!user.verified) {
       throw new UnauthorizedException('Email not verified');
     }
+    await this.attemptsService.deleteAttempts(userIp);
     return user;
   }
 
@@ -265,26 +305,43 @@ export class AuthService {
     };
   }
 
+  // Logout
+  public async logout(email: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('Not found');
+    }
+    await this.userRepository.update(user.id, {
+      refreshToken: null,
+    });
+  }
+
   // Generate tokens
-  private async generateTokens(user: User) {
+  private async generateTokens(
+    user: User,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     const roles = user.roles.map((role) =>
       typeof role === 'string' ? role : role.role,
     );
 
     const payload = { email: user.email, id: user.id, roles };
 
-    const successToken = this.jwtService.sign(payload, {
+    const accessToken = this.jwtService.sign(payload, {
       expiresIn: '15m',
       secret: process.env.ACCESS_TOKEN_PRIVATE_KEY || 'SUCCESS_TOKEN',
     });
     const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: '7d',
+      expiresIn: '30d',
       secret: process.env.REFRESH_TOKEN_PRIVATE_KEY || 'REFRESH_TOKEN',
     });
-    await this.setRedisService.setRefreshToken(user.email, refreshToken);
-    return {
-      successToken,
+
+    await this.userRepository.update(user.id, {
       refreshToken,
+    });
+
+    return {
+      refreshToken,
+      accessToken,
     };
   }
 
@@ -294,6 +351,33 @@ export class AuthService {
     path: string,
     verifyToken: string,
   ) {
-    return `<p>Hi ${name}, please confirm that this is your email address</p><a href="http://${process.env.BASE_URL}/api/auth/${path}/${verifyToken}">Confirm email</a>`;
+    return `<p>Hi ${name}, please confirm that this is your email address</p><a href="${process.env.BASE_URL}/api/auth/${path}/${verifyToken}">Confirm email</a>`;
+  }
+
+  // Send email handler
+  private async sendEmailHandler(
+    verifyToken: string,
+    path: string,
+    email: string,
+    name: string,
+  ) {
+    if (!verifyToken) {
+      throw new ConflictException('Email is already verified');
+    }
+    const nameForSend = name ? name : email;
+    const verifyLink = this.generateUrlForEmailSend(
+      nameForSend,
+      path,
+      verifyToken,
+    );
+    const isSendEmail = await this.mailService.sendEmail(
+      email,
+      verifyLink,
+      nameForSend,
+    );
+    if (isSendEmail) {
+      return true;
+    }
+    return false;
   }
 }

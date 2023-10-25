@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import * as regex from '@utils/regex-expressions';
+import * as regex from '@src/constants/regex-expressions';
 import { IsEmail, Matches, MinLength } from 'class-validator';
 
 export class RegisterUserDto {

@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class UpdateDirectionDto {
   @ApiProperty({
@@ -7,5 +8,7 @@ export class UpdateDirectionDto {
     description: 'Direction in which the user was trained',
   })
   @IsString()
+  @Transform(({ value }) => value.trim())
+  @IsNotEmpty()
   public direction: string;
 }

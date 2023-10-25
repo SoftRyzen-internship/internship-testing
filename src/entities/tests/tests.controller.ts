@@ -1,15 +1,17 @@
+import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
+import { Roles } from '@guards/roleGuard/decorators/role.decorator';
+import { RoleGuard } from '@guards/roleGuard/role.guard';
 import {
-  Controller,
-  Post,
   Body,
-  UseGuards,
+  Controller,
   Get,
-  Query,
-  Patch,
   Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
-import { TestsService } from './tests.service';
-import { CreateTestDto } from './dto/create-test.dto';
 import {
   ApiBearerAuth,
   ApiConflictResponse,
@@ -20,13 +22,15 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiQuery,
+  ApiTags,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
-import { Roles } from '@guards/roleGuard/decorators/role.decorator';
 import { ERole } from '@src/enums/role.enum';
+import { MyRequest } from '@src/types/request.interface';
+import { CreateTestDto } from './dto/create-test.dto';
 import { Test } from './tests.entity';
-import { RoleGuard } from '@guards/roleGuard/role.guard';
+import { TestsService } from './tests.service';
 
+@ApiTags('Tests')
 @Controller('api/tests')
 export class TestController {
   constructor(private readonly testService: TestsService) {}
@@ -36,15 +40,19 @@ export class TestController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Access token',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiOkResponse({ description: 'OK' })
   @ApiConflictResponse({ description: 'This test has already been added' })
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(ERole.ADMIN)
+  // @Roles(ERole.ADMIN)
   @Post()
   async createTest(@Body() createTestDto: CreateTestDto) {
     return this.testService.createTest(createTestDto);
@@ -55,21 +63,29 @@ export class TestController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Access token',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiOkResponse({ description: 'OK', type: CreateTestDto, isArray: true })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @ApiQuery({ name: 'internshipStream', required: false })
-  @ApiQuery({ name: 'startDate', required: false })
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(ERole.ADMIN)
+  @ApiQuery({ name: 'availabilityStartDate', required: false })
+  @UseGuards(JwtAuthGuard)
   @Get()
   async getTests(
+    @Req() req: MyRequest,
     @Query('internshipStream') internshipStream?: string,
-    @Query('startDate') startDate?: string,
+    @Query('availabilityStartDate') availabilityStartDate?: string,
   ) {
-    return this.testService.getTests(internshipStream, startDate);
+    return this.testService.getTests(
+      req.user.id,
+      internshipStream,
+      availabilityStartDate,
+    );
   }
 
   // Update test
@@ -77,8 +93,12 @@ export class TestController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Access toten',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiOkResponse({ description: 'OK' })
   @ApiNotFoundResponse({ description: 'Test not found' })

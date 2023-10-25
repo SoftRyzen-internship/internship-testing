@@ -1,15 +1,16 @@
+import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
+import { Roles } from '@guards/roleGuard/decorators/role.decorator';
+import { RoleGuard } from '@guards/roleGuard/role.guard';
 import {
-  Controller,
-  Post,
   Body,
-  UseGuards,
+  Controller,
   Get,
-  Query,
   Param,
   Patch,
+  Post,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
-import { InternshipStreamService } from './internship-stream.service';
-import { InternshipStream } from './internship-stream.entity';
 import {
   ApiBearerAuth,
   ApiConflictResponse,
@@ -22,12 +23,11 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
+import { ERole } from '@src/enums/role.enum';
 import { CreateStreamDto } from './dto/create-stream.dto';
 import { UpdateStreamDto } from './dto/update-stream.dto';
-import { Roles } from '@guards/roleGuard/decorators/role.decorator';
-import { ERole } from '@src/enums/role.enum';
-import { RoleGuard } from '@guards/roleGuard/role.guard';
+import { InternshipStream } from './internship-stream.entity';
+import { InternshipStreamService } from './internship-stream.service';
 
 @ApiTags('Internship stream')
 @Controller('api/internship-streams')
@@ -41,8 +41,12 @@ export class InternshipStreamController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Access token',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiOkResponse({ description: 'OK' })
   @ApiConflictResponse({ description: 'This direction has already been added' })
@@ -66,8 +70,12 @@ export class InternshipStreamController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Access token',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiOkResponse({ description: 'OK', type: InternshipStream, isArray: true })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
@@ -95,8 +103,12 @@ export class InternshipStreamController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Access token',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiOkResponse({ description: 'OK' })
   @ApiNotFoundResponse({ description: 'Internship stream not found' })
@@ -120,8 +132,12 @@ export class InternshipStreamController {
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
-    description: 'Access token',
+    description: 'Access token with type',
     required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
   })
   @ApiOkResponse({ description: 'OK', type: InternshipStream, isArray: true })
   @ApiInternalServerErrorResponse({ description: 'Server error' })

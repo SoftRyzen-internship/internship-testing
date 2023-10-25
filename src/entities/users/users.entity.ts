@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { MyBaseEntity } from '@utils/base.entity';
-import * as regex from '@utils/regex-expressions';
+import { MyBaseEntity } from '@src/base/base.entity';
+import * as regex from '@src/constants/regex-expressions';
 import { Matches, MinLength } from 'class-validator';
 import { Column, Entity, JoinTable, ManyToMany, Unique } from 'typeorm';
 import { Role } from './role.entity';
@@ -95,11 +95,11 @@ export class User extends MyBaseEntity {
     example: 'documentation tets url',
     description: 'Documentation tets url',
   })
-  @Column({ name: 'documentation_tets_url', type: 'varchar', nullable: true })
+  @Column({ name: 'documentation_test_url', type: 'varchar', nullable: true })
   @Matches(regex.linkRegex, {
     message: 'This should have been a link',
   })
-  public documentationTetsUrl: string;
+  public documentationTestUrl: string;
 
   @ApiProperty({
     example: "Because I'm the best",
@@ -185,9 +185,25 @@ export class User extends MyBaseEntity {
   @Column({ name: 'is_passed_test', type: 'boolean', default: false })
   public isPassedTest: boolean;
 
+  @ApiProperty({ example: 65, description: 'Score test' })
+  @Column({ name: 'score_test', type: 'integer', default: null })
+  public scoreTest: number;
+
+  @ApiProperty({ example: false, description: 'Is sent test' })
+  @Column({ name: 'is_sent_test', type: 'boolean', default: false })
+  public isSentTest: boolean;
+
   @ApiProperty({ example: false, description: 'Is passed technical task' })
   @Column({ name: 'is_passed_technical_task', type: 'boolean', default: false })
   public isPassedTechnicalTask: boolean;
+
+  @ApiProperty({ example: false, description: 'Is sent technical task' })
+  @Column({
+    name: 'is_sent_technical_task',
+    type: 'boolean',
+    default: false,
+  })
+  public isSentTechnicalTask: boolean;
 
   @ApiProperty({ example: 'Verify token', description: 'Verify token' })
   @Column({ name: 'verify_token', type: 'varchar', default: null })
@@ -197,7 +213,11 @@ export class User extends MyBaseEntity {
   @Column({ name: 'is_label_stream', type: 'boolean', default: false })
   public isLabelStream: boolean;
 
-  @ManyToMany(() => Role, (roles) => roles.users, { cascade: true })
+  @ApiProperty({ example: 'Refresh token', description: ' Refresh  token' })
+  @Column({ name: 'refresh_token', type: 'varchar', nullable: true })
+  refreshToken: string;
+
+  @ManyToMany(() => Role, (roles) => roles.users, { onDelete: 'CASCADE' })
   @JoinTable()
   public roles: Role[];
 }

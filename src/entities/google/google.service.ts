@@ -29,8 +29,9 @@ export class GoogleService {
 
     const newUser = this.userRepository.create({
       email,
-      roles: [role],
+      verified: true,
     });
+    newUser.roles = [role];
     await this.roleRepository.save(role);
     await this.userRepository.save(newUser);
 

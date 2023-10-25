@@ -1,17 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class MaterialsDto {
   @ApiProperty({ example: 'NextJS', description: 'Name material' })
   @IsString()
+  @Transform(({ value }) => value.trim())
+  @IsNotEmpty()
   materialName: string;
 
   @ApiProperty({ example: 1, description: 'Direction id' })
   @IsNumber()
+  @IsNotEmpty()
   directionId: number;
 
   @ApiProperty({ example: 1, description: 'Question block id' })
   @IsNumber()
+  @IsNotEmpty()
   questionBlockId: number;
 
   @ApiProperty({
@@ -19,6 +24,7 @@ export class MaterialsDto {
     description: 'Url material',
   })
   @IsString({ each: true })
+  @IsNotEmpty()
   materialsUrl: string[];
 }
 

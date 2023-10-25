@@ -1,9 +1,10 @@
+import { AttemptsModule } from '@entities/attempts/attempts.module';
 import { AuthModule } from '@entities/auth/auth.module';
 import { AuthService } from '@entities/auth/auth.service';
-import { SetRedisService } from '@entities/auth/set-redis.service';
 import { InternshipStream } from '@entities/internship-stream/internship-stream.entity';
 import { MailService } from '@entities/mail/mail.service';
-import { RedisCacheService } from '@entities/redis/redis.service';
+import { TechnicalTest } from '@entities/technical-test/technical-test.entity';
+import { Test } from '@entities/tests/tests.entity';
 import { Role } from '@entities/users/role.entity';
 import { User } from '@entities/users/users.entity';
 import { JwtGuardsModule } from '@guards/jwtGuard/jwt-guard.module';
@@ -18,7 +19,13 @@ import { GoogleService } from './google.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Role, InternshipStream]),
+    TypeOrmModule.forFeature([
+      User,
+      Role,
+      InternshipStream,
+      Test,
+      TechnicalTest,
+    ]),
     PassportModule,
     JwtGuardsModule,
     ServeStaticModule.forRoot({
@@ -26,15 +33,9 @@ import { GoogleService } from './google.service';
       serveRoot: '/avatars',
     }),
     AuthModule,
+    AttemptsModule,
   ],
   controllers: [GoogleController],
-  providers: [
-    GoogleService,
-    GoogleStrategy,
-    AuthService,
-    SetRedisService,
-    RedisCacheService,
-    MailService,
-  ],
+  providers: [GoogleService, GoogleStrategy, AuthService, MailService],
 })
 export class GoogleModule {}
