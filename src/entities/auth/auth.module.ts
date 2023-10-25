@@ -5,8 +5,9 @@ import { MailModule } from '@entities/mail/mail.module';
 import { MailService } from '@entities/mail/mail.service';
 import { TechnicalTest } from '@entities/technical-test/technical-test.entity';
 import { Test } from '@entities/tests/tests.entity';
-import { Role } from '@entities/users/role.entity';
-import { User } from '@entities/users/users.entity';
+import { TokensModule } from '@entities/tokens/tokens.module';
+import { RoleEntity } from '@entities/users/role.entity';
+import { UserEntity } from '@entities/users/users.entity';
 import { JwtGuardsModule } from '@guards/jwtGuard/jwt-guard.module';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -19,8 +20,8 @@ import { AuthService } from './auth.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      User,
-      Role,
+      UserEntity,
+      RoleEntity,
       InternshipStream,
       Test,
       TechnicalTest,
@@ -32,6 +33,7 @@ import { AuthService } from './auth.service';
     JwtGuardsModule,
     MailModule,
     AttemptsModule,
+    TokensModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, MailService, ConfigService],

@@ -3,10 +3,10 @@ import { MyBaseEntity } from '@src/base/base.entity';
 import * as regex from '@src/constants/regex-expressions';
 import { Matches, MinLength } from 'class-validator';
 import { Column, Entity, JoinTable, ManyToMany, Unique } from 'typeorm';
-import { Role } from './role.entity';
+import { RoleEntity } from './role.entity';
 
 @Entity('users')
-export class User extends MyBaseEntity {
+export class UserEntity extends MyBaseEntity {
   @ApiProperty({ example: 'email', description: 'User  email' })
   @Column({ name: 'email', type: 'varchar' })
   @Unique(['email'])
@@ -217,7 +217,7 @@ export class User extends MyBaseEntity {
   @Column({ name: 'refresh_token', type: 'varchar', nullable: true })
   refreshToken: string;
 
-  @ManyToMany(() => Role, (roles) => roles.users, { onDelete: 'CASCADE' })
+  @ManyToMany(() => RoleEntity, (roles) => roles.users, { onDelete: 'CASCADE' })
   @JoinTable()
-  public roles: Role[];
+  public roles: RoleEntity[];
 }

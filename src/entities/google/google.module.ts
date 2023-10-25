@@ -5,8 +5,9 @@ import { InternshipStream } from '@entities/internship-stream/internship-stream.
 import { MailService } from '@entities/mail/mail.service';
 import { TechnicalTest } from '@entities/technical-test/technical-test.entity';
 import { Test } from '@entities/tests/tests.entity';
-import { Role } from '@entities/users/role.entity';
-import { User } from '@entities/users/users.entity';
+import { TokensModule } from '@entities/tokens/tokens.module';
+import { RoleEntity } from '@entities/users/role.entity';
+import { UserEntity } from '@entities/users/users.entity';
 import { JwtGuardsModule } from '@guards/jwtGuard/jwt-guard.module';
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
@@ -20,8 +21,8 @@ import { GoogleService } from './google.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      User,
-      Role,
+      UserEntity,
+      RoleEntity,
       InternshipStream,
       Test,
       TechnicalTest,
@@ -34,6 +35,7 @@ import { GoogleService } from './google.service';
     }),
     AuthModule,
     AttemptsModule,
+    TokensModule,
   ],
   controllers: [GoogleController],
   providers: [GoogleService, GoogleStrategy, AuthService, MailService],

@@ -1,4 +1,4 @@
-import { User } from '@entities/users/users.entity';
+import { UserEntity } from '@entities/users/users.entity';
 import { UserModule } from '@entities/users/users.module';
 import { JwtGuardsModule } from '@guards/jwtGuard/jwt-guard.module';
 import { Module } from '@nestjs/common';
@@ -14,7 +14,7 @@ import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([UserEntity]),
     MulterModule.registerAsync({
       useClass: MulterConfigService,
     }),

@@ -1,4 +1,4 @@
-import { User } from '@entities/users/users.entity';
+import { UserEntity } from '@entities/users/users.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as fs from 'fs';
@@ -10,7 +10,8 @@ import { Repository } from 'typeorm';
 export class UploadService {
   private readonly drive: drive_v3.Drive;
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
   ) {
     const auth = new google.auth.GoogleAuth({
       credentials: {

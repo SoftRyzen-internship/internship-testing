@@ -3,45 +3,42 @@ import { InternshipStream } from '@entities/internship-stream/internship-stream.
 import { MailService } from '@entities/mail/mail.service';
 import { TechnicalTest } from '@entities/technical-test/technical-test.entity';
 import { Test } from '@entities/tests/tests.entity';
-import { Role } from '@entities/users/role.entity';
-import { User } from '@entities/users/users.entity';
+import { TokensService } from '@entities/tokens/tokens.service';
+import { RoleEntity } from '@entities/users/role.entity';
+import { UserEntity } from '@entities/users/users.entity';
 import {
   BadRequestException,
   ConflictException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt/dist';
 import { InjectRepository } from '@nestjs/typeorm';
+import { VERIFY_EMAIL } from '@src/constants/mail-path.constants';
 import * as regex from '@src/constants/regex-expressions';
 import { ERole } from '@src/enums/role.enum';
 import * as bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
-import { ChangePasswordDto } from './dto/change-password.dto';
 import { RegisterUserDto } from './dto/create-user.dto';
 import { LoginDto, LoginResponseDto } from './dto/login.dto';
-import { PhoneCodeDto } from './dto/phone.dto';
 
 @Injectable()
 export class AuthService {
-  
   constructor(
     private readonly attemptsService: AttemptsService,
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(Test) private readonly testsRepository: Repository<Test>,
     @InjectRepository(TechnicalTest)
     private readonly technicalTestRepository: Repository<TechnicalTest>,
-    @InjectRepository(Role)
-    private readonly roleRepository: Repository<Role>,
+    @InjectRepository(RoleEntity)
+    private readonly roleRepository: Repository<RoleEntity>,
     @InjectRepository(InternshipStream)
     private readonly streamRepository: Repository<InternshipStream>,
-    private readonly jwtService: JwtService,
     private readonly mailService: MailService,
-  ) {
-  }
+    private readonly tokensService: TokensService,
+  ) {}
 
   // Register
   async registerUser(
@@ -55,7 +52,12 @@ export class AuthService {
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const verifyToken = v4();
-    await this.sendEmailHandler(verifyToken, 'verify-email', email, null);
+    await this.mailService.sendEmailHandler(
+      email,
+      verifyToken,
+      VERIFY_EMAIL,
+      null,
+    );
 
     const role = this.roleRepository.create({
       role: ERole.USER,
@@ -74,27 +76,6 @@ export class AuthService {
     return await this.responseData(newUser.email);
   }
 
-  // Verify email
-  async verifyEmail(verifyToken: string) {
-    const user = await this.userRepository.findOne({
-      where: { verifyToken },
-      relations: ['roles'],
-    });
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    await this.userRepository.update(user.id, {
-      verified: true,
-      verifyToken: null,
-    });
-    const tokens = await this.generateTokens(user);
-    return {
-      refreshToken: tokens.refreshToken,
-      accessToken: tokens.accessToken,
-    };
-  }
-
   // Login
   public async login(loginDto: LoginDto, userIp: string) {
     const user = await this.userValidate(
@@ -108,7 +89,7 @@ export class AuthService {
 
   // Response data
   public async responseData(email: string) {
-    const user: User = await this.getUser('email', email);
+    const user: UserEntity = await this.getUser('email', email);
     const stream: InternshipStream = await this.streamRepository.findOne({
       where: { id: user.streamId },
     });
@@ -118,7 +99,7 @@ export class AuthService {
     const techTest: TechnicalTest = await this.technicalTestRepository.findOne({
       where: { direction: user.direction },
     });
-    const tokens = await this.generateTokens(user);
+    const tokens = await this.tokensService.generateTokens(user);
     const roles: string[] = user.roles.map((role) => role.role);
 
     const streamData = {
@@ -171,73 +152,10 @@ export class AuthService {
     return 'OK';
   }
 
-  // Request change password
-  public async requestChangePassword(email: string) {
-    const user = await this.getUser('email', email);
-    const verifyToken = v4();
-    const isSend = await this.sendEmailHandler(
-      verifyToken,
-      'verify-change-password',
-      user.email,
-      user.firstName,
-    );
-    if (!isSend) {
-      throw new InternalServerErrorException();
-    }
-
-    await this.userRepository.update(user.id, { verifyToken });
-    return { message: 'Email send' };
-  }
-
-  // Resend email
-  public async resendEmail(email: string) {
-    const user = await this.getUser('email', email);
-    const isSend = await this.sendEmailHandler(
-      user.verifyToken,
-      'verify-change-password',
-      user.email,
-      user.firstName,
-    );
-    if (!isSend) {
-      throw new InternalServerErrorException();
-    }
-    return { message: 'Email resend' };
-  }
-
-  // Verify change password
-  public async verifyChangePassword(verifyToken: string) {
-    const user = await this.getUser('verifyToken', verifyToken);
-
-    await this.userRepository.update(user.id, { verifyToken: null });
-    const tokens = await this.generateTokens(user);
-
-    return {
-      refreshToken: tokens.refreshToken,
-      accessToken: tokens.accessToken,
-    };
-  }
-
-  // Change password
-  public async changePassword(
-    changePasswordDto: ChangePasswordDto,
-    userId: number,
-  ) {
-    const { password, confirmPassword } = changePasswordDto;
-    if (password !== confirmPassword) {
-      throw new BadRequestException('Passwords do not match');
-    }
-    const hashPass = await bcrypt.hash(password, 10);
-    await this.userRepository.update(userId, { password: hashPass });
-    return { message: 'Password changed' };
-  }
-
-  // Refresh token
-  public async refreshToken(user: User) {
-    const tokens = await this.generateTokens(user);
-    return {
-      refreshToken: tokens.refreshToken,
-      accessToken: tokens.accessToken,
-    };
+  // Check email
+  async checkEmailUnique(email: string): Promise<boolean> {
+    const isUnique = await this.userRepository.findOne({ where: { email } });
+    return !isUnique;
   }
 
   // User validate
@@ -296,70 +214,5 @@ export class AuthService {
     await this.userRepository.update(user.id, {
       refreshToken: null,
     });
-  }
-
-  // Generate tokens
-  private async generateTokens(
-    user: User,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
-    const roles = user.roles.map((role) =>
-      typeof role === 'string' ? role : role.role,
-    );
-
-    const payload = { email: user.email, id: user.id, roles };
-
-    const accessToken = this.jwtService.sign(payload, {
-      expiresIn: '15m',
-      secret: process.env.ACCESS_TOKEN_PRIVATE_KEY || 'SUCCESS_TOKEN',
-    });
-    const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: '30d',
-      secret: process.env.REFRESH_TOKEN_PRIVATE_KEY || 'REFRESH_TOKEN',
-    });
-
-    await this.userRepository.update(user.id, {
-      refreshToken,
-    });
-
-    return {
-      refreshToken,
-      accessToken,
-    };
-  }
-
-  // Generate url for email send
-  private generateUrlForEmailSend(
-    name: string,
-    path: string,
-    verifyToken: string,
-  ) {
-    return `<p>Hi ${name}, please confirm that this is your email address</p><a href="${process.env.BASE_URL}/api/auth/${path}/${verifyToken}">Confirm email</a>`;
-  }
-
-  // Send email handler
-  private async sendEmailHandler(
-    verifyToken: string,
-    path: string,
-    email: string,
-    name: string,
-  ) {
-    if (!verifyToken) {
-      throw new ConflictException('Email is already verified');
-    }
-    const nameForSend = name ? name : email;
-    const verifyLink = this.generateUrlForEmailSend(
-      nameForSend,
-      path,
-      verifyToken,
-    );
-    const isSendEmail = await this.mailService.sendEmail(
-      email,
-      verifyLink,
-      nameForSend,
-    );
-    if (isSendEmail) {
-      return true;
-    }
-    return false;
   }
 }

@@ -1,6 +1,6 @@
 import { AuthService } from '@entities/auth/auth.service';
-import { Role } from '@entities/users/role.entity';
-import { User } from '@entities/users/users.entity';
+import { RoleEntity } from '@entities/users/role.entity';
+import { UserEntity } from '@entities/users/users.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ERole } from '@src/enums/role.enum';
@@ -9,9 +9,10 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class GoogleService {
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
-    @InjectRepository(Role)
-    private readonly roleRepository: Repository<Role>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(RoleEntity)
+    private readonly roleRepository: Repository<RoleEntity>,
     private readonly authService: AuthService,
   ) {}
 

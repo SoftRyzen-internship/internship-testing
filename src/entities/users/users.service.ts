@@ -9,12 +9,13 @@ import {
 } from './dto/response-dashboard.dto';
 import { UpdateDirectionDto } from './dto/update-direction.dto';
 import { UserDto } from './dto/update-user.dto';
-import { User } from './users.entity';
+import { UserEntity } from './users.entity';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
     private readonly authService: AuthService,
   ) {}
 
@@ -54,8 +55,8 @@ export class UserService {
 
   // Dashboard
   public async dashboard() {
-    const usersRegister: User[] = await this.userRepository.find();
-    const users: User[] = [...usersRegister].filter(
+    const usersRegister: UserEntity[] = await this.userRepository.find();
+    const users: UserEntity[] = [...usersRegister].filter(
       (user) => user.direction !== ERole.ADMIN,
     );
     const direction = ['QA', 'PM', 'FullStack'];
@@ -79,13 +80,13 @@ export class UserService {
   }
 
   // Filter users
-  private filterUsers(users: User[], field: string) {
+  private filterUsers(users: UserEntity[], field: string) {
     const countUsers = users.filter((user) => user[field] === true);
     return countUsers.length;
   }
 
   // User reduce
-  private userReduce(users: User[]) {
+  private userReduce(users: UserEntity[]) {
     const studentsByDirection: IStudentsByDirection = users?.reduce(
       (acc, { direction }) => {
         if (acc.hasOwnProperty(direction)) {
