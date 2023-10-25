@@ -40,7 +40,7 @@ import {
   LogoutResponseDto,
   UsernameDto,
 } from './dto/login.dto';
-import { PhoneCodeDto, PhoneDto } from './dto/phone.dto';
+import { PhoneDto } from './dto/phone.dto';
 import { RegularExpressionResponseDto } from './dto/regular-expression.response.dto';
 
 @ApiTags('Authentication')
@@ -205,31 +205,6 @@ export class AuthController {
       refreshToken: data.refreshToken,
       accessToken: data.accessToken,
     };
-  }
-
-  // Get phone code
-  @ApiOperation({ summary: 'Get phone code' })
-  @ApiBearerAuth()
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Access token with type',
-    required: true,
-    schema: {
-      type: 'string',
-      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
-    },
-  })
-  @ApiResponse({ status: 200, type: [PhoneCodeDto] })
-  @ApiUnauthorizedResponse({
-    description:
-      'Not authorized jwt expired || Not authorized Invalid token type',
-  })
-  @ApiNotFoundResponse({ description: 'Not found' })
-  @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtAuthGuard)
-  @Get('phone-code')
-  async getPhoneCode() {
-    return this.authService.getPhoneCode();
   }
 
   // Get regular expression
