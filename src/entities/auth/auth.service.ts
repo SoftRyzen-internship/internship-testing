@@ -18,7 +18,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as regex from '@src/constants/regex-expressions';
 import { ERole } from '@src/enums/role.enum';
 import * as bcrypt from 'bcryptjs';
-import * as code from 'country-data';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { ChangePasswordDto } from './dto/change-password.dto';
@@ -28,7 +27,7 @@ import { PhoneCodeDto } from './dto/phone.dto';
 
 @Injectable()
 export class AuthService {
-  private readonly countriesCodeAll: any;
+  
   constructor(
     private readonly attemptsService: AttemptsService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
@@ -42,7 +41,6 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
   ) {
-    this.countriesCodeAll = code.countries.all;
   }
 
   // Register
@@ -240,22 +238,6 @@ export class AuthService {
       refreshToken: tokens.refreshToken,
       accessToken: tokens.accessToken,
     };
-  }
-
-  // Get phone code
-  public async getPhoneCode() {
-    const allCode: PhoneCodeDto[] = [];
-
-    for (const country of this.countriesCodeAll) {
-      allCode.push({
-        phone_code: country.countryCallingCodes[0],
-        name: country.name,
-        alpha2: country.alpha2,
-        flag_url: `https://flagcdn.com/${country.alpha2.toLowerCase()}.svg`,
-      });
-    }
-
-    return allCode;
   }
 
   // User validate
