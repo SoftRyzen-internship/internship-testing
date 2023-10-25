@@ -1,4 +1,4 @@
-import { User } from '@entities/users/users.entity';
+import { UserEntity } from '@entities/users/users.entity';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CanActivate, ExecutionContext } from '@nestjs/common/interfaces';
 import { ConfigService } from '@nestjs/config';
@@ -33,7 +33,7 @@ export class JwtAuthGuard implements CanActivate {
       }
 
       const tokenType = req.headers['token-type'];
-      let user: User;
+      let user: UserEntity;
       if (tokenType === 'access_token') {
         user = this.jwtService.verify(token, {
           secret: this.configService.get<string>('ACCESS_TOKEN_PRIVATE_KEY'),

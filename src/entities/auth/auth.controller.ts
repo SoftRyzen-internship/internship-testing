@@ -3,43 +3,29 @@ import {
   Body,
   Controller,
   Get,
-  Param,
-  Patch,
   Post,
+  Query,
   Req,
-  Res,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import {
-  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiConflictResponse,
   ApiHeader,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
-  ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
   ApiTooManyRequestsResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { MyRequest } from '@src/types/request.interface';
-import { Response } from 'express';
 import { AuthService } from './auth.service';
-import { ChangePasswordDto } from './dto/change-password.dto';
 import { RegisterUserDto } from './dto/create-user.dto';
-import {
-  EmailResendResponseDto,
-  EmailSendResponseDto,
-} from './dto/email-send.dto';
-import {
-  LoginDto,
-  LoginResponseDto,
-  LogoutResponseDto,
-  UsernameDto,
-} from './dto/login.dto';
+import { LoginDto, LoginResponseDto, LogoutResponseDto } from './dto/login.dto';
 import { PhoneDto } from './dto/phone.dto';
 import { RegularExpressionResponseDto } from './dto/regular-expression.response.dto';
 
@@ -56,20 +42,6 @@ export class AuthController {
     @Body(ValidationPipe) registerUserDto: RegisterUserDto,
   ): Promise<LoginResponseDto> {
     return this.authService.registerUser(registerUserDto);
-  }
-
-  // Verify email
-  @Get('verify-email/:verificationToken')
-  @ApiOperation({ summary: 'User email verification' })
-  async verifyEmail(
-    @Param('verificationToken') verificationToken: string,
-    @Res() res: Response,
-  ) {
-    const userData = await this.authService.verifyEmail(verificationToken);
-    const redirectUrl = `${
-      process.env.REDIRECT_TO_SITE_INTERNSHIP
-    }?userData=${encodeURIComponent(JSON.stringify(userData))}`;
-    res.redirect(redirectUrl);
   }
 
   // Login
@@ -103,108 +75,23 @@ export class AuthController {
     return this.authService.checkPhone(body.phone);
   }
 
-  // Request change password
-  @ApiOperation({ summary: 'Request change password' })
+  // Check email
+  @Get('check-email')
+  @ApiOperation({ summary: 'Check email uniqueness' })
+  @ApiQuery({
+    name: 'email',
+    description: 'Email to check',
+    example: 'example@example.com',
+  })
   @ApiResponse({
-    status: 201,
-    description: 'Email send',
-    type: EmailSendResponseDto,
+    status: 200,
+    description: 'Returns if the email is unique or not',
   })
-  @ApiNotFoundResponse({ description: 'Not found' })
-  @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @Post('request-change-password')
-  async requestChangePassword(@Body() body: UsernameDto) {
-    return this.authService.requestChangePassword(body.email);
-  }
-
-  // Resend email
-  @ApiOperation({ summary: 'Resend email' })
-  @ApiResponse({
-    status: 201,
-    description: 'Email resend',
-    type: EmailResendResponseDto,
-  })
-  @ApiNotFoundResponse({ description: 'Not found' })
-  @ApiConflictResponse({ description: 'Email is already verified' })
-  @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @Post('resend-email')
-  async resendingEmail(@Body() body: UsernameDto) {
-    return this.authService.resendEmail(body.email);
-  }
-
-  // Verify change password
-  @ApiOperation({ summary: 'Verify change password' })
-  @ApiOkResponse({ description: 'OK' })
-  @ApiNotFoundResponse({ description: 'Not found' })
-  @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @Get('verify-change-password/:verifyToken')
-  async verifyChangePassword(
-    @Param('verifyToken') verifyToken: string,
-    @Res() res: Response,
-  ) {
-    const userData = await this.authService.verifyChangePassword(verifyToken);
-    const redirectUrl = `${
-      process.env.REDIRECT_TO_PASSWORD_CHANGE_FORM
-    }?userData=${encodeURIComponent(JSON.stringify(userData))}`;
-    res.redirect(redirectUrl);
-  }
-
-  // Change password
-  @ApiOperation({ summary: 'Password change' })
-  @ApiBearerAuth()
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Access token with type',
-    required: true,
-    schema: {
-      type: 'string',
-      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
-    },
-  })
-  @ApiOkResponse({ description: 'Password changed' })
-  @ApiBadRequestResponse({ description: 'Passwords do not match' })
-  @ApiUnauthorizedResponse({
-    description:
-      'Not authorized jwt expired || Not authorized Invalid token type',
-  })
-  @ApiNotFoundResponse({ description: 'Not found' })
-  @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtAuthGuard)
-  @Patch('change-password')
-  async changePassword(
-    @Body() changePasswordDto: ChangePasswordDto,
-    @Req() req: MyRequest,
-  ) {
-    return this.authService.changePassword(changePasswordDto, req.user.id);
-  }
-
-  // Refresh token
-  @ApiOperation({ summary: 'Refresh token' })
-  @ApiBearerAuth()
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Access token with type',
-    required: true,
-    schema: {
-      type: 'string',
-      format: 'Bearer YOUR_TOKEN_HERE, token-type=refresh_token',
-    },
-  })
-  @ApiOkResponse({ description: 'Refresh token' })
-  @ApiUnauthorizedResponse({
-    description:
-      'Not authorized jwt expired || Not authorized Invalid token type',
-  })
-  @ApiNotFoundResponse({ description: 'Not found' })
-  @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtAuthGuard)
-  @Get('refresh-token')
-  async refreshToken(@Req() req: MyRequest) {
-    const data = await this.authService.refreshToken(req.user);
-    return {
-      refreshToken: data.refreshToken,
-      accessToken: data.accessToken,
-    };
+  async checkEmailUnique(
+    @Query('email') email: string,
+  ): Promise<{ unique: boolean }> {
+    const isUnique = await this.authService.checkEmailUnique(email);
+    return { unique: isUnique };
   }
 
   // Get regular expression

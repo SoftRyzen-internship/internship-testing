@@ -1,7 +1,6 @@
-import { User } from '@entities/users/users.entity';
+import { UserEntity } from '@entities/users/users.entity';
 import {
   ConflictException,
-  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -15,8 +14,8 @@ export class TestsService {
   constructor(
     @InjectRepository(Test)
     private readonly testRepository: Repository<Test>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
   ) {}
   // Add test
   async createTest(createTestDto: CreateTestDto): Promise<Test> {
