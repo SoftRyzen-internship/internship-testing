@@ -152,12 +152,6 @@ export class AuthService {
     return 'OK';
   }
 
-  // Check email
-  async checkEmailUnique(email: string): Promise<boolean> {
-    const isUnique = await this.userRepository.findOne({ where: { email } });
-    return !isUnique;
-  }
-
   // User validate
   private async userValidate(email: string, password: string, userIp: string) {
     const user = await this.getUser('email', email);

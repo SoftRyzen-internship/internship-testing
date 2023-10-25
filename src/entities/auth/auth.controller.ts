@@ -75,25 +75,6 @@ export class AuthController {
     return this.authService.checkPhone(body.phone);
   }
 
-  // Check email
-  @Get('check-email')
-  @ApiOperation({ summary: 'Check email uniqueness' })
-  @ApiQuery({
-    name: 'email',
-    description: 'Email to check',
-    example: 'example@example.com',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Returns if the email is unique or not',
-  })
-  async checkEmailUnique(
-    @Query('email') email: string,
-  ): Promise<{ unique: boolean }> {
-    const isUnique = await this.authService.checkEmailUnique(email);
-    return { unique: isUnique };
-  }
-
   // Get regular expression
   @ApiOperation({ summary: 'Get regular expression' })
   @ApiResponse({ status: 200, type: RegularExpressionResponseDto })
