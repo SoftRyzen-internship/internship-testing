@@ -24,7 +24,7 @@ export class Question extends MyBaseEntity {
   @Column()
   correctAnswerIndex: number;
 
-  @ApiProperty({ example: 'Backend', description: 'Question direction' })
+  @ApiProperty({ example: 'Frontend', description: 'Question direction' })
   @Column()
   direction: string;
 

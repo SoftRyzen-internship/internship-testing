@@ -4,7 +4,7 @@ import { Column, Entity } from 'typeorm';
 
 @Entity({ name: 'block_questions' })
 export class QuestionsBlockEntity extends MyBaseEntity {
-  @ApiProperty({ example: 'PM', description: 'Direction name' })
+  @ApiProperty({ example: 'Frontend ', description: 'Direction name' })
   @Column({ name: 'direction_name', type: 'varchar' })
   directionName: string;
 

@@ -2,7 +2,7 @@ import { AttemptsService } from '@entities/attempts/attempts.service';
 import { InternshipStream } from '@entities/internship-stream/internship-stream.entity';
 import { MailService } from '@entities/mail/mail.service';
 import { TechnicalTest } from '@entities/technical-test/technical-test.entity';
-import { Test } from '@entities/tests/tests.entity';
+import { Test } from '@entities/testing/tests.entity';
 import { TokensService } from '@entities/tokens/tokens.service';
 import { RoleEntity } from '@entities/users/role.entity';
 import { UserEntity } from '@entities/users/users.entity';
