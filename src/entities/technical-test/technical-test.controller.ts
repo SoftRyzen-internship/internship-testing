@@ -52,10 +52,10 @@ export class TechnicalTestController {
   @ApiQuery({ name: 'direction', required: true })
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getTechnicalTaskByDirection(
+  public async getTechnicalTaskByDirection(
     @Req() req: MyRequest,
     @Query('direction') direction: string,
-  ): Promise<TechnicalTest[]> {
+  ) {
     return this.technicalTestService.getTechnicalTaskByDirection(direction);
   }
 
@@ -77,9 +77,9 @@ export class TechnicalTestController {
   @UseGuards(JwtAuthGuard, RoleGuard)
   //   @Roles(ERole.ADMIN)
   @Post()
-  async addTechnicalTest(
+  public async addTechnicalTest(
     @Body() createTechnicalTestDto: CreateTechnicalTestDto,
-  ): Promise<TechnicalTest> {
+  ) {
     return this.technicalTestService.addTechnicalTest(createTechnicalTestDto);
   }
 
@@ -101,7 +101,7 @@ export class TechnicalTestController {
   @UseGuards(JwtAuthGuard, RoleGuard)
   //   @Roles(ERole.ADMIN)
   @Patch(':id')
-  async updateTechnicalTest(
+  public async updateTechnicalTest(
     @Param('id') id: number,
     @Body() updateTechnicalTestDto: UpdateTechnicalTestDto,
   ): Promise<TechnicalTest> {
@@ -128,7 +128,7 @@ export class TechnicalTestController {
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
   @Post('result')
-  async addResultTechnicalTest(
+  public async addResultTechnicalTest(
     @Body() resultData: ResultTechnicalTest,
     @Req() req: MyRequest,
   ): Promise<ResultTechnicalTest> {
@@ -152,7 +152,7 @@ export class TechnicalTestController {
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
   @Get('results')
-  async getAllTestResults(): Promise<ResultTechnicalTest[]> {
+  public async getAllTestResults(): Promise<ResultTechnicalTest[]> {
     return this.technicalTestService.getAllTestResults();
   }
 
@@ -177,7 +177,7 @@ export class TechnicalTestController {
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
   @Get('results/user/:userId')
-  async getTechnicalTestResultsByUserId(
+  public async getTechnicalTestResultsByUserId(
     @Param('userId') userId: number,
   ): Promise<ResultTechnicalTest[]> {
     return this.technicalTestService.getTechnicalTestResultsByUserId(userId);

@@ -17,8 +17,9 @@ export class TestsService {
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
   ) {}
+
   // Add test
-  async createTest(createTestDto: CreateTestDto): Promise<Test> {
+  async createTest(createTestDto: CreateTestDto) {
     const existingTest = await this.testRepository.findOne({
       where: {
         internshipStream: createTestDto.internshipStream,
@@ -41,19 +42,19 @@ export class TestsService {
   }
 
   // Get all tests with filter
-  async getTests(
+  public async getTests(
     userId: number,
-    internshipStream?: string,
+    direction?: string,
     availabilityStartDate?: string,
-  ): Promise<Test[]> {
+  ) {
     // const user = await this.userRepository.findOne({ where: { id: userId } });
     // if (user && user.isSentTest) {
     //   throw new ForbiddenException('You do not have access to this test');
     // }
     const filters: Record<string, any> = {};
 
-    if (internshipStream !== undefined) {
-      filters.internshipStream = internshipStream;
+    if (direction !== undefined) {
+      filters.direction = direction;
     }
     if (availabilityStartDate !== undefined) {
       const formattedStartDate = new Date(availabilityStartDate);
@@ -64,8 +65,16 @@ export class TestsService {
       throw new NotFoundException('No tests found for the selected criteria');
     }
 
-    await this.userRepository.update(userId, { isSentTest: true });
+    // await this.userRepository.update(userId, { isSentTest: true });
     return tests;
+  }
+
+  // Start of the test
+  public async startTest(id: number) {
+    const user = await this.userRepository.findOne({ where: { id } });
+    user.isSentTest = true;
+    await this.userRepository.save(user);
+    return { message: 'Test started' };
   }
 
   // Update test

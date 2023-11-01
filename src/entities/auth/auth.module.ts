@@ -4,7 +4,6 @@ import { InternshipStream } from '@entities/internship-stream/internship-stream.
 import { MailModule } from '@entities/mail/mail.module';
 import { MailService } from '@entities/mail/mail.service';
 import { TechnicalTest } from '@entities/technical-test/technical-test.entity';
-import { Test } from '@entities/tests/tests.entity';
 import { TokensModule } from '@entities/tokens/tokens.module';
 import { RoleEntity } from '@entities/users/role.entity';
 import { UserEntity } from '@entities/users/users.entity';
@@ -16,6 +15,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { Test } from '@entities/testing/tests.entity';
 
 @Module({
   imports: [

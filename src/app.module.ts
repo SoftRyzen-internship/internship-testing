@@ -17,12 +17,12 @@ import { MaterialsModule } from './entities/materials/materials.module';
 import { PasswordModule } from './entities/passwords/passwords.module';
 import { QuestionsBlockModule } from './entities/questions-block/questions-block.module';
 import { TestResultModule } from './entities/test-result/test-result.module';
-import { TestsModule } from './entities/tests/tests.module';
 import { TokensModule } from './entities/tokens/tokens.module';
 import { UploadModule } from './entities/upload/upload.module';
 import { GlobalExceptionFilter } from './logger/global-exception-filter';
 import { GlobalLoggerService } from './logger/global-logger.service';
 import { CorsMiddleware } from './middlewares/cors-middleware';
+import { TestsModule } from '@entities/testing/tests.module';
 
 @Module({
   imports: [

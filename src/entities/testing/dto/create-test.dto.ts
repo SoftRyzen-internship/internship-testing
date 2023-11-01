@@ -48,3 +48,8 @@ export class CreateTestDto {
   @ApiProperty({ example: '65%', description: 'Passing score' })
   passingScore: number;
 }
+
+export class ResponseStartTestDto {
+  @ApiProperty({ example: 'Test started' })
+  message: string;
+}

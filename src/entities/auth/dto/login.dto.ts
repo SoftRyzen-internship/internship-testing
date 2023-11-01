@@ -47,7 +47,7 @@ export class StreamResponseDto {
 export class TestResponseDto {
   @ApiProperty({
     example: false,
-    description: 'Start date of internship stream',
+    description: 'Has the test been sent?',
   })
   isSent: boolean;
 

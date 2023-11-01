@@ -26,8 +26,7 @@ import {
 } from '@nestjs/swagger';
 import { ERole } from '@src/enums/role.enum';
 import { MyRequest } from '@src/types/request.interface';
-import { CreateTestDto } from './dto/create-test.dto';
-import { Test } from './tests.entity';
+import { CreateTestDto, ResponseStartTestDto } from './dto/create-test.dto';
 import { TestsService } from './tests.service';
 
 @ApiTags('Tests')
@@ -51,14 +50,13 @@ export class TestController {
   @ApiConflictResponse({ description: 'This test has already been added' })
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  // @Roles(ERole.ADMIN)
+  @UseGuards(JwtAuthGuard)
   @Post()
   async createTest(@Body() createTestDto: CreateTestDto) {
     return this.testService.createTest(createTestDto);
   }
 
-  // Get all tests with filtering
+  // Get test with filtering
   @ApiOperation({ summary: 'Get all tests with filtering' })
   @ApiBearerAuth()
   @ApiHeader({
@@ -72,20 +70,40 @@ export class TestController {
   })
   @ApiOkResponse({ description: 'OK', type: CreateTestDto, isArray: true })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @ApiQuery({ name: 'internshipStream', required: false })
+  @ApiQuery({ name: 'direction', required: false })
   @ApiQuery({ name: 'availabilityStartDate', required: false })
   @UseGuards(JwtAuthGuard)
   @Get()
   async getTests(
     @Req() req: MyRequest,
-    @Query('internshipStream') internshipStream?: string,
+    @Query('direction') direction?: string,
     @Query('availabilityStartDate') availabilityStartDate?: string,
   ) {
     return this.testService.getTests(
       req.user.id,
-      internshipStream,
+      direction,
       availabilityStartDate,
     );
+  }
+
+  // Start of the test
+  @ApiOperation({ summary: 'Start of the test' })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access token with type',
+    required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
+  })
+  @ApiOkResponse({ description: 'OK', type: ResponseStartTestDto })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @UseGuards(JwtAuthGuard)
+  @Get('start-test')
+  async startTest(@Req() req: MyRequest) {
+    return this.testService.startTest(req.user.id);
   }
 
   // Update test
@@ -110,7 +128,7 @@ export class TestController {
   async updateTest(
     @Param('id') id: number,
     @Body() createTestDto: CreateTestDto,
-  ): Promise<Test> {
+  ) {
     return this.testService.updateTest(id, createTestDto);
   }
 }
