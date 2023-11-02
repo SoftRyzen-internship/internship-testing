@@ -52,9 +52,9 @@ export class InternshipStream extends MyBaseEntity {
   @Column({ name: 'end_date', type: 'timestamp', nullable: true })
   endDate: Date;
 
-  @ApiProperty({ example: 15, description: 'Total number of registered' })
-  @Column({ name: 'total_number_registered', type: 'integer', default: 0 })
-  totalNumberRegistered: number;
+  @ApiProperty({ example: 825, description: 'Average test score' })
+  @Column({ name: 'average_test_score', type: 'integer', default: 0 })
+  averageTestScore: number;
 
   @ApiProperty({ example: 5, description: 'Did not complete the internship' })
   @Column({ name: 'not_complete_internship', type: 'integer', default: 0 })

@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateStreamDto } from './dto/create-stream.dto';
-import { UpdateStreamDto } from './dto/update-stream.dto';
 import { InternshipStream } from './internship-stream.entity';
 
 @Injectable()
@@ -43,34 +42,36 @@ export class InternshipStreamService {
     });
   }
 
+  // Get all streams
   public async getInternshipStreams(
-    number?: number,
-    isActive?: boolean,
-    internshipStreamName?: string,
-    startDate?: string,
+    number: number,
+    internshipStreamName: string,
+    direction: string,
+    startDate: string,
   ) {
-    const filters: Record<string, any> = {};
-
+    const filter: any = {};
     if (number !== undefined) {
-      filters.number = number;
-    }
-    if (isActive !== undefined) {
-      filters.isActive = isActive;
+      filter.number = Number(number);
     }
     if (internshipStreamName !== undefined) {
-      filters.internshipStreamName = internshipStreamName;
+      filter.internshipStreamName = internshipStreamName;
     }
     if (startDate !== undefined) {
-      filters.startDate = startDate;
+      filter.startDate = startDate;
     }
 
-    return this.internshipStreamRepository.find({ where: filters });
+    const streams = await this.internshipStreamRepository.find({
+      where: filter,
+      order: { number: 'DESC' },
+    });
+    return streams;
   }
 
+  // update stream
   public async updateInternshipStreamFields(
     id: number,
-    fieldsToUpdate: Partial<UpdateStreamDto>,
-  ): Promise<InternshipStream> {
+    fieldsToUpdate: CreateStreamDto,
+  ) {
     const stream = await this.internshipStreamRepository.findOne({
       where: { id },
     });
@@ -80,6 +81,6 @@ export class InternshipStreamService {
 
     Object.assign(stream, fieldsToUpdate);
 
-    return this.internshipStreamRepository.save(stream);
+    return await this.internshipStreamRepository.save(stream);
   }
 }

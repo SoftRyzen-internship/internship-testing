@@ -67,8 +67,8 @@ export class ResponseStreamDto {
   })
   public isActive: boolean;
 
-  @ApiProperty({ example: 15, description: 'Total number of registered' })
-  totalNumberRegistered: number;
+  @ApiProperty({ example: 800, description: 'Average test score' })
+  averageTestScore: number;
 
   @ApiProperty({ example: 5, description: 'Did not complete the internship' })
   notCompleteInternship: number;

@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  internship_testing:
+    container_name: internship_testing
+    image: postgres:latest
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/var/internship_testing_postgres/docker-volumes/postgres
+    ports:
+      - ${POSTGRES_HOST}:${POSTGRES_PORT}:5432
+    networks:
+      - internship_testing
+    restart: unless-stopped
+
+  internship_testing_pgadmin:
+    container_name: internship_testing_pgadmin
+    image: dpage/pgadmin4
+    env_file:
+      - ./.env
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - postgres:/var/internship_testing_postgres/docker-volumes/postgres
+    ports:
+      - ${PGADMIN_DEFAULT_HOST}:${PGADMIN_DEFAULT_PORT}:80
+    networks:
+      - internship_testing
+    restart: unless-stopped
+
+networks:
+  internship_testing:
+    driver: bridge
+
+volumes:
+  postgres:
+  pgadmin:

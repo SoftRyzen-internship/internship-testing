@@ -124,7 +124,6 @@ export class AuthService {
         isSent: user.isSentTechnicalTask,
         isSuccess: user.isPassedTechnicalTask,
         deadlineDate: techTest ? techTest?.deadline : null,
-        data: user.createAt,
       },
     };
     const responseData: LoginResponseDto = {

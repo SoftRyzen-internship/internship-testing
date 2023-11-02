@@ -1,19 +1,14 @@
-import { Module } from '@nestjs/common';
-import { InternshipStreamService } from './internship-stream.service';
-import { InternshipStreamController } from './internship-stream.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { InternshipStream } from './internship-stream.entity';
 import { JwtGuardsModule } from '@guards/jwtGuard/jwt-guard.module';
+import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-// import { APP_GUARD } from '@nestjs/core';
-// import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { InternshipStreamController } from './internship-stream.controller';
+import { InternshipStream } from './internship-stream.entity';
+import { InternshipStreamService } from './internship-stream.service';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([InternshipStream]), JwtGuardsModule],
-  providers: [InternshipStreamService,
-    ConfigService,],
-  // {provide: APP_GUARD, useClass: JwtAuthGuard}],
-// {provide: APP_GUARD, useClass: RoleGuard}
-  controllers: [InternshipStreamController]
+  imports: [TypeOrmModule.forFeature([InternshipStream]), JwtGuardsModule],
+  providers: [InternshipStreamService, ConfigService],
+  controllers: [InternshipStreamController],
 })
 export class InternshipStreamModule {}
