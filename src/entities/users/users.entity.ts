@@ -213,6 +213,10 @@ export class UserEntity extends MyBaseEntity {
   @Column({ name: 'is_label_stream', type: 'boolean', default: false })
   public isLabelStream: boolean;
 
+  @ApiProperty({ example: false, description: 'Did you have an internship?' })
+  @Column({ name: 'is_have_internship', type: 'boolean', default: false })
+  public isHaveInternship: boolean;
+
   @ApiProperty({ example: 'Refresh token', description: ' Refresh  token' })
   @Column({ name: 'refresh_token', type: 'varchar', nullable: true })
   refreshToken: string;

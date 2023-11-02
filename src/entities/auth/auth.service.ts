@@ -104,7 +104,7 @@ export class AuthService {
 
     const streamData = {
       id: stream?.id,
-      streamDirection: stream?.streamDirection,
+      streamDirection: stream?.internshipStreamName,
       isActive: stream?.isActive,
       startDate: stream?.startDate,
     };

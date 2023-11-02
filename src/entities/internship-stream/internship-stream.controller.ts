@@ -6,9 +6,11 @@ import {
   Controller,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -24,9 +26,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ERole } from '@src/enums/role.enum';
+import { MyRequest } from '@src/types/request.interface';
 import { CreateStreamDto } from './dto/create-stream.dto';
-import { UpdateStreamDto } from './dto/update-stream.dto';
-import { InternshipStream } from './internship-stream.entity';
+import { ResponseStreamDto } from './dto/response.dto';
 import { InternshipStreamService } from './internship-stream.service';
 
 @ApiTags('Internship stream')
@@ -48,19 +50,43 @@ export class InternshipStreamController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiOkResponse({ description: 'OK' })
+  @ApiOkResponse({ type: ResponseStreamDto })
   @ApiConflictResponse({ description: 'This direction has already been added' })
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(ERole.ADMIN)
   @Post()
-  async createInternshipStream(
-    @Body() previousStream: CreateStreamDto,
-  ): Promise<InternshipStream> {
+  public async createInternshipStream(
+    @Body() body: CreateStreamDto,
+    @Req() req: MyRequest,
+  ) {
     const createdStream =
-      await this.internshipStreamService.createInternshipStream(previousStream);
+      await this.internshipStreamService.createInternshipStream(
+        req.user.id,
+        body,
+      );
     return createdStream;
+  }
+
+  // Get active stream
+  @ApiOperation({ summary: 'Get active internship stream' })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access token with type',
+    required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
+  })
+  @ApiOkResponse({ description: 'OK', type: ResponseStreamDto })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @UseGuards(JwtAuthGuard)
+  @Get('active')
+  public async getActiveInternshipStream() {
+    return await this.internshipStreamService.getActiveInternshipStream();
   }
 
   // Get streams with sorting and filtering
@@ -77,23 +103,27 @@ export class InternshipStreamController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiOkResponse({ description: 'OK', type: InternshipStream, isArray: true })
+  @ApiOkResponse({
+    description: 'OK',
+    type: [ResponseStreamDto],
+    isArray: true,
+  })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @ApiQuery({ name: 'number', required: false })
   @ApiQuery({ name: 'isActive', required: false })
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(ERole.ADMIN)
-  @Get()
-  async getInternshipStreams(
+  @Get('all')
+  public async getInternshipStreams(
     @Query('number') number?: number,
-    @Query('isActive') isActive?: boolean,
-    @Query('streamDirection') streamDirection?: string,
+    @Query('internshipStreamName') internshipStreamName?: string,
+    @Query('direction') direction?: string,
     @Query('startDate') startDate?: string,
-  ): Promise<InternshipStream[]> {
-    return this.internshipStreamService.getInternshipStreams(
+  ) {
+    return await this.internshipStreamService.getInternshipStreams(
       number,
-      isActive,
-      streamDirection,
+      internshipStreamName,
+      direction,
       startDate,
     );
   }
@@ -117,33 +147,13 @@ export class InternshipStreamController {
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(ERole.ADMIN)
   @Patch(':id')
-  async updateInternshipStream(
-    @Param('id') id: number,
-    @Body() updateStreamDto: UpdateStreamDto,
-  ): Promise<InternshipStream> {
-    return this.internshipStreamService.updateInternshipStreamFields(
+  public async updateInternshipStream(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateStreamDto: CreateStreamDto,
+  ) {
+    return await this.internshipStreamService.updateInternshipStreamFields(
       id,
       updateStreamDto,
     );
-  }
-
-  // Get all active streams
-  @ApiOperation({ summary: 'Get all active internship streams' })
-  @ApiBearerAuth()
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Access token with type',
-    required: true,
-    schema: {
-      type: 'string',
-      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
-    },
-  })
-  @ApiOkResponse({ description: 'OK', type: InternshipStream, isArray: true })
-  @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtAuthGuard)
-  @Get('active')
-  async getActiveInternshipStreams(): Promise<InternshipStream[]> {
-    return this.internshipStreamService.getActiveInternshipStreams();
   }
 }
