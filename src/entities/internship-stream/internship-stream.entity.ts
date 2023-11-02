@@ -4,9 +4,19 @@ import { Column, Entity } from 'typeorm';
 
 @Entity('stream')
 export class InternshipStream extends MyBaseEntity {
-  @ApiProperty({ example: 'Full Stack', description: 'Internship Stream' })
+  @ApiProperty({
+    example: 'Stream Winter 2023',
+    description: 'Internship Stream',
+  })
   @Column({ name: 'internship_stream', type: 'varchar' })
-  streamDirection: string;
+  internshipStreamName: string;
+
+  @ApiProperty({
+    example: ['Frontend', 'Backend', 'QA', 'PM', 'FullStack'],
+    description: 'Directions on the stream',
+  })
+  @Column({ name: 'directions', type: 'varchar', array: true })
+  directions: string[];
 
   @ApiProperty({ example: 1, description: 'Stream number' })
   @Column({ name: 'number', type: 'integer' })
@@ -31,7 +41,7 @@ export class InternshipStream extends MyBaseEntity {
   @Column({
     name: 'start_date',
     type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
+    nullable: true,
   })
   startDate: Date;
 
@@ -41,4 +51,16 @@ export class InternshipStream extends MyBaseEntity {
   })
   @Column({ name: 'end_date', type: 'timestamp', nullable: true })
   endDate: Date;
+
+  @ApiProperty({ example: 15, description: 'Total number of registered' })
+  @Column({ name: 'total_number_registered', type: 'integer', default: 0 })
+  totalNumberRegistered: number;
+
+  @ApiProperty({ example: 5, description: 'Did not complete the internship' })
+  @Column({ name: 'not_complete_internship', type: 'integer', default: 0 })
+  notCompleteInternship: number;
+
+  @ApiProperty({ example: 10, description: 'Completed an internship' })
+  @Column({ name: 'complete_internship', type: 'integer', default: 0 })
+  completeInternship: number;
 }

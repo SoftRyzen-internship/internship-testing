@@ -104,7 +104,7 @@ export class AuthService {
 
     const streamData = {
       id: stream?.id,
-      streamDirection: stream?.streamDirection,
+      streamDirection: stream?.internshipStreamName,
       isActive: stream?.isActive,
       startDate: stream?.startDate,
     };
@@ -124,6 +124,7 @@ export class AuthService {
         isSent: user.isSentTechnicalTask,
         isSuccess: user.isPassedTechnicalTask,
         deadlineDate: techTest ? techTest?.deadline : null,
+        data: user.createAt,
       },
     };
     const responseData: LoginResponseDto = {

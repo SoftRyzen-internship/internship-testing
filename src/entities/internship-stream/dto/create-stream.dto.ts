@@ -1,27 +1,40 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsArray, IsDate, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateStreamDto {
-  @ApiProperty({ example: 'Full Stack', description: 'Internship Stream' })
-  streamDirection: string;
-
-  @ApiProperty({ example: 'true', description: 'Status internship stream' })
-  isActive: boolean;
-
-  @ApiProperty({ example: 1, description: 'Admin id' })
-  ownerId: number;
-
-  @ApiProperty({ example: 'admin', description: 'Role user`s' })
-  owner: string;
+  @ApiProperty({
+    example: 'Stream Winter 2023',
+    description: 'Internship Stream',
+  })
+  @IsString()
+  @IsNotEmpty()
+  internshipStreamName: string;
 
   @ApiProperty({
-    example: 'Start date',
+    example: ['Frontend', 'Backend', 'QA', 'PM', 'FullStack'],
+    description: 'Directions on the stream',
+  })
+  @IsArray()
+  @IsString({ each: true })
+  @IsNotEmpty()
+  directions: string[];
+
+  @ApiProperty({
+    example: '2023-11-01T00:00:00.000Z',
     description: 'Start date of internship stream',
   })
+  @IsDate()
+  @IsNotEmpty()
+  @Type(() => Date)
   startDate: Date;
 
   @ApiProperty({
-    example: 'End date',
+    example: '2023-11-01T00:00:00.000Z',
     description: 'End date of internship stream',
   })
+  @IsDate()
+  @IsNotEmpty()
+  @Type(() => Date)
   endDate: Date;
 }

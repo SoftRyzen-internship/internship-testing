@@ -1,13 +1,9 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { InternshipStream } from './internship-stream.entity';
 import { CreateStreamDto } from './dto/create-stream.dto';
 import { UpdateStreamDto } from './dto/update-stream.dto';
+import { InternshipStream } from './internship-stream.entity';
 
 @Injectable()
 export class InternshipStreamService {
@@ -16,38 +12,43 @@ export class InternshipStreamService {
     private readonly internshipStreamRepository: Repository<InternshipStream>,
   ) {}
 
-  async createInternshipStream(
-    previousStream: CreateStreamDto,
-  ): Promise<InternshipStream> {
-    if (!previousStream.streamDirection) {
-      throw new BadRequestException('Stream is required');
+  // Create new stream
+  public async createInternshipStream(adminId: number, body: CreateStreamDto) {
+    const lastActiveStream = await this.internshipStreamRepository.findOne({
+      where: { isActive: true },
+    });
+    if (lastActiveStream) {
+      lastActiveStream.isActive = false;
+      await this.internshipStreamRepository.save(lastActiveStream);
     }
 
-    const lastStream = await this.internshipStreamRepository.findOne({
-      where: { streamDirection: previousStream.streamDirection },
-      order: { number: 'DESC' },
-    });
-
     const newStream = this.internshipStreamRepository.create({
-      streamDirection: previousStream.streamDirection,
-      owner: previousStream.owner,
-      ownerId: previousStream.ownerId,
-      number: lastStream ? lastStream.number + 1 : 1,
-      isActive: true,
-      startDate: new Date(),
-      endDate: null,
+      internshipStreamName: body.internshipStreamName,
+      directions: body.directions,
+      owner: 'admin',
+      ownerId: adminId,
+      number: lastActiveStream ? lastActiveStream.number + 1 : 1,
+      startDate: body.startDate,
+      endDate: body.endDate,
     });
 
     const createdStream = await this.internshipStreamRepository.save(newStream);
     return createdStream;
   }
 
-  async getInternshipStreams(
+  // Get active stream
+  public async getActiveInternshipStream() {
+    return await this.internshipStreamRepository.findOne({
+      where: { isActive: true },
+    });
+  }
+
+  public async getInternshipStreams(
     number?: number,
     isActive?: boolean,
-    streamDirection?: string,
+    internshipStreamName?: string,
     startDate?: string,
-  ): Promise<InternshipStream[]> {
+  ) {
     const filters: Record<string, any> = {};
 
     if (number !== undefined) {
@@ -56,8 +57,8 @@ export class InternshipStreamService {
     if (isActive !== undefined) {
       filters.isActive = isActive;
     }
-    if (streamDirection !== undefined) {
-      filters.streamDirection = streamDirection;
+    if (internshipStreamName !== undefined) {
+      filters.internshipStreamName = internshipStreamName;
     }
     if (startDate !== undefined) {
       filters.startDate = startDate;
@@ -66,7 +67,7 @@ export class InternshipStreamService {
     return this.internshipStreamRepository.find({ where: filters });
   }
 
-  async updateInternshipStreamFields(
+  public async updateInternshipStreamFields(
     id: number,
     fieldsToUpdate: Partial<UpdateStreamDto>,
   ): Promise<InternshipStream> {
@@ -80,9 +81,5 @@ export class InternshipStreamService {
     Object.assign(stream, fieldsToUpdate);
 
     return this.internshipStreamRepository.save(stream);
-  }
-
-  async getActiveInternshipStreams(): Promise<InternshipStream[]> {
-    return this.internshipStreamRepository.find({ where: { isActive: true } });
   }
 }

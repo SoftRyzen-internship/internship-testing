@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -24,7 +25,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ERole } from '@src/enums/role.enum';
+import { MyRequest } from '@src/types/request.interface';
 import { CreateStreamDto } from './dto/create-stream.dto';
+import { ResponseStreamDto } from './dto/response.dto';
 import { UpdateStreamDto } from './dto/update-stream.dto';
 import { InternshipStream } from './internship-stream.entity';
 import { InternshipStreamService } from './internship-stream.service';
@@ -48,18 +51,22 @@ export class InternshipStreamController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiOkResponse({ description: 'OK' })
+  @ApiOkResponse({ type: ResponseStreamDto })
   @ApiConflictResponse({ description: 'This direction has already been added' })
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(ERole.ADMIN)
   @Post()
-  async createInternshipStream(
-    @Body() previousStream: CreateStreamDto,
-  ): Promise<InternshipStream> {
+  public async createInternshipStream(
+    @Body() body: CreateStreamDto,
+    @Req() req: MyRequest,
+  ) {
     const createdStream =
-      await this.internshipStreamService.createInternshipStream(previousStream);
+      await this.internshipStreamService.createInternshipStream(
+        req.user.id,
+        body,
+      );
     return createdStream;
   }
 
@@ -84,16 +91,16 @@ export class InternshipStreamController {
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(ERole.ADMIN)
   @Get()
-  async getInternshipStreams(
+  public async getInternshipStreams(
     @Query('number') number?: number,
     @Query('isActive') isActive?: boolean,
-    @Query('streamDirection') streamDirection?: string,
+    @Query('internshipStreamName') internshipStreamName?: string,
     @Query('startDate') startDate?: string,
   ): Promise<InternshipStream[]> {
     return this.internshipStreamService.getInternshipStreams(
       number,
       isActive,
-      streamDirection,
+      internshipStreamName,
       startDate,
     );
   }
@@ -117,7 +124,7 @@ export class InternshipStreamController {
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(ERole.ADMIN)
   @Patch(':id')
-  async updateInternshipStream(
+  public async updateInternshipStream(
     @Param('id') id: number,
     @Body() updateStreamDto: UpdateStreamDto,
   ): Promise<InternshipStream> {
@@ -127,8 +134,8 @@ export class InternshipStreamController {
     );
   }
 
-  // Get all active streams
-  @ApiOperation({ summary: 'Get all active internship streams' })
+  // Get active stream
+  @ApiOperation({ summary: 'Get active internship stream' })
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
@@ -139,11 +146,11 @@ export class InternshipStreamController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiOkResponse({ description: 'OK', type: InternshipStream, isArray: true })
+  @ApiOkResponse({ description: 'OK', type: ResponseStreamDto })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
   @Get('active')
-  async getActiveInternshipStreams(): Promise<InternshipStream[]> {
-    return this.internshipStreamService.getActiveInternshipStreams();
+  public async getActiveInternshipStream() {
+    return this.internshipStreamService.getActiveInternshipStream();
   }
 }
