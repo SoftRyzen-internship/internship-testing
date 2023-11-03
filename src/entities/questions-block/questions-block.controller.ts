@@ -25,7 +25,7 @@ import {
 import { ERole } from '@src/enums/role.enum';
 import { MyRequest } from '@src/types/request.interface';
 import {
-  QuestionBlockDto,
+  CreateQuestionBlockDto,
   RequestQuestionBlockDto,
 } from './dto/questions-block.dto';
 import { QuestionsBlockService } from './questions-block.service';
@@ -53,7 +53,7 @@ export class QuestionsBlockController {
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(ERole.ADMIN)
   @Post()
-  async addBlock(@Body() body: QuestionBlockDto, @Req() req: MyRequest) {
+  async addBlock(@Body() body: CreateQuestionBlockDto, @Req() req: MyRequest) {
     return await this.questionBlockService.addBlock(req.user.id, body);
   }
 
@@ -77,7 +77,7 @@ export class QuestionsBlockController {
   @Put(':id')
   async updateBlock(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: QuestionBlockDto,
+    @Body() body: CreateQuestionBlockDto,
   ) {
     return await this.questionBlockService.updateBlock(id, body);
   }

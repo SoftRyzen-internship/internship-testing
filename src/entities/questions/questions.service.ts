@@ -1,80 +1,90 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateQuestionDto } from './dto/create-quest.dto';
+import { QuestionsBlockEntity } from '@entities/questions-block/questions-block.entity';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CreateQuestionDto } from './dto/create-quest.dto';
 import { Question } from './question.entity';
-import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 
 @Injectable()
 export class QuestionsService {
   constructor(
     @InjectRepository(Question)
     private readonly questionRepository: Repository<Question>,
+    @InjectRepository(QuestionsBlockEntity)
+    private readonly blockQuestionRepository: Repository<QuestionsBlockEntity>,
   ) {}
 
   // Add question
-  async createQuestion(createQuestionDto: CreateQuestionDto) {
-    const question = this.questionRepository.create(createQuestionDto);
+  async createQuestion(adminId: number, body: CreateQuestionDto) {
+    const blockQuestion = await this.blockQuestionRepository.findOne({
+      where: { blockName: body.blockQuestions },
+    });
+    if (!blockQuestion) {
+      throw new BadRequestException(
+        `Invalid block name ${body.blockQuestions}`,
+      );
+    }
+    const question = this.questionRepository.create({
+      ...body,
+      blockQuestionsId: blockQuestion.id,
+      answers: JSON.stringify(body.answers),
+      owner: adminId,
+    });
 
     const createdQuestion = await this.questionRepository.save(question);
 
     return {
-      success: true,
-      message: 'Question add successfully',
-      data: createdQuestion,
+      question: {
+        ...createdQuestion,
+        answers: JSON.parse(createdQuestion.answers),
+      },
     };
   }
 
   // Update question
-  async updateQuestion(
-    id: number,
-    updateQuestionDto: Partial<CreateQuestionDto>,
-  ) {
+  async updateQuestion(id: number, body: CreateQuestionDto) {
     const question = await this.questionRepository.findOne({ where: { id } });
     if (!question) {
       throw new NotFoundException('Question not found');
     }
 
-    Object.assign(question, updateQuestionDto);
+    Object.assign(question, body);
 
     await this.questionRepository.save(question);
     return question;
   }
 
   // Delete question
-  async deleteQuestion(id: number): Promise<DeleteResult> {
-    const result = await this.questionRepository.delete(id);
+  async deleteQuestion(id: number) {
+    await this.questionRepository.delete(id);
 
-    if (result.affected === 0) {
-      throw new NotFoundException('Question not found');
-    }
-
-    return result;
+    return { message: 'Question deleted' };
   }
 
   // Get questions by block questions
-  async getQuestionsByBlock(
-    direction: string,
-    block?: string,
-    count = 30,
-  ): Promise<Question[]> {
-    let query: SelectQueryBuilder<Question> =
-      this.questionRepository.createQueryBuilder('question');
-
-    query = query.where('question.direction = :direction', { direction });
-
-    if (block) {
-      query = query.andWhere('question.blockQuestions = :block', { block });
+  async getQuestionsByBlock(blockName?: string) {
+    const blockQuestion = await this.blockQuestionRepository.findOne({
+      where: { blockName },
+    });
+    if (!blockQuestion) {
+      throw new BadRequestException(`Invalid block name ${blockName}`);
     }
-
-    const questions = await query
-      .orderBy('RANDOM()') // Random order
-      .take(count) // Limit the number of questions
+    const questions = await this.questionRepository
+      .createQueryBuilder('questions')
+      .where({
+        blockQuestionsId: blockQuestion.id,
+      })
+      .orderBy('RANDOM()')
+      .limit(blockQuestion.numberOfQuestions)
       .getMany();
 
-    if (!questions || questions.length < count) {
-      throw new NotFoundException('Not enough questions found');
-    }
-
-    return questions;
+    const responseQuestions = questions.map((question) => {
+      return { ...question, answers: JSON.parse(question.answers) };
+    });
+    return { questions: responseQuestions, total: responseQuestions.length };
   }
 }
