@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { MyBaseEntity } from '@src/base/base.entity';
 import { Column, Entity } from 'typeorm';
-import { Difficulty } from './enums/difficulty.enum';
+import { EDifficulty } from './enums/difficulty.enum';
 
-@Entity()
+@Entity('questions')
 export class Question extends MyBaseEntity {
   @ApiProperty({ example: 'What is Node.js?', description: 'Text question' })
   @Column({ name: 'questionText', type: 'varchar' })
@@ -14,29 +14,28 @@ export class Question extends MyBaseEntity {
   code: string;
 
   @ApiProperty({
-    example: ['Answer 1', 'Answer 2'],
+    example: [
+      { answer: 'Answer 1', right: true },
+      { answer: 'Answer 2', right: false },
+    ],
     description: 'Answers to the question',
   })
-  @Column({ name: 'answers', type: 'varchar', array: true })
-  answers: string[];
+  @Column({ name: 'answers', type: 'jsonb' })
+  answers: string;
 
-  @ApiProperty({ example: 2, description: 'Index of the correct answer' })
-  @Column()
-  correctAnswerIndex: number;
-
-  @ApiProperty({ example: 'Frontend', description: 'Question direction' })
-  @Column()
-  direction: string;
-
-  @ApiProperty({ example: 'CSS', description: 'Question block' })
-  @Column({ name: 'block_questions', type: 'varchar' })
-  blockQuestions: string;
+  @ApiProperty({ example: 1, description: 'Question block id' })
+  @Column({ name: 'block_questions', type: 'integer' })
+  blockQuestionsId: number;
 
   @ApiProperty({ example: 'Easy', description: 'Question difficulty' })
-  @Column({ name: 'difficulty', type: 'enum', enum: Difficulty })
+  @Column({ name: 'difficulty', type: 'enum', enum: EDifficulty })
   difficulty: string;
 
   @ApiProperty({ example: 3, description: 'Question points' })
-  @Column()
+  @Column({ name: 'points', type: 'integer' })
   points: number;
+
+  @ApiProperty({ example: 3, description: 'Admin id' })
+  @Column({ name: 'owner', type: 'integer' })
+  owner: number;
 }

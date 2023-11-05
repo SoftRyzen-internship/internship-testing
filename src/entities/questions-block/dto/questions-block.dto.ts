@@ -1,21 +1,34 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class QuestionBlockDto {
-  @ApiProperty({ example: 'FrontEnd', description: 'Direction name' })
-  @IsString()
-  @Transform(({ value }) => value.trim())
+export class CreateQuestionBlockDto {
+  @ApiProperty({
+    example: ['Frontend', 'Backend'],
+    description: 'Direction name',
+  })
+  @IsArray()
   @IsNotEmpty()
-  directionName: string;
+  directionName: string[];
 
-  @ApiProperty({ example: 'HTML/CSS', description: 'Block name' })
+  @ApiProperty({ example: 'JS', description: 'Block name' })
   @IsNotEmpty()
   @IsString()
   blockName: string;
+
+  @ApiProperty({ example: 15, description: 'Number of questions in a block' })
+  numberOfQuestions: number;
+
+  @ApiProperty({ example: 15, description: 'Block completion time' })
+  blockCompletionTime: number;
+
+  @ApiProperty({
+    example: 10,
+    description: 'Number of correct answers in a block',
+  })
+  numberOfCorrectAnswers: number;
 }
 
-export class RequestQuestionBlockDto {
+export class ResponseQuestionBlockDto extends CreateQuestionBlockDto {
   @ApiProperty({ example: 1, description: 'Questions block id' })
   @IsNumber()
   id: number;
@@ -33,14 +46,6 @@ export class RequestQuestionBlockDto {
   })
   @IsString()
   updateAt: string;
-
-  @ApiProperty({ example: 'Full stack', description: 'Direction name' })
-  @IsString()
-  directionName: string;
-
-  @ApiProperty({ example: 'Full stack', description: 'Direction name' })
-  @IsString()
-  blockName: string;
 
   @ApiProperty({ example: 1, description: 'User`s id' })
   @IsNumber()

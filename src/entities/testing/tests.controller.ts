@@ -34,6 +34,27 @@ import { TestsService } from './tests.service';
 export class TestController {
   constructor(private readonly testService: TestsService) {}
 
+  // Get test
+  @ApiOperation({ summary: 'Get test' })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access token with type',
+    required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
+  })
+  @ApiOkResponse({ description: 'OK', type: '' })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @ApiQuery({ name: 'direction', required: true })
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  public async getTest(@Req() req: MyRequest) {
+    return await this.testService.getTest(req.user.id);
+  }
+
   // Add test
   @ApiOperation({ summary: 'Create a new test' })
   @ApiBearerAuth()

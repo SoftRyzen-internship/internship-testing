@@ -1,14 +1,18 @@
+import { QuestionsBlockEntity } from '@entities/questions-block/questions-block.entity';
+import { JwtGuardsModule } from '@guards/jwtGuard/jwt-guard.module';
 import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Question } from './question.entity';
 import { QuestionsController } from './questions.controller';
 import { QuestionsService } from './questions.service';
-import { Question } from './question.entity';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { JwtGuardsModule } from '@guards/jwtGuard/jwt-guard.module';
-import { ConfigService } from '@nestjs/config';
 
 @Module({
-   imports:[TypeOrmModule.forFeature([Question]), JwtGuardsModule],
+  imports: [
+    TypeOrmModule.forFeature([Question, QuestionsBlockEntity]),
+    JwtGuardsModule,
+  ],
   controllers: [QuestionsController],
-  providers: [QuestionsService, ConfigService]
+  providers: [QuestionsService, ConfigService],
 })
 export class QuestionsModule {}

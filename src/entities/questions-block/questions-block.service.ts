@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { QuestionBlockDto } from './dto/questions-block.dto';
+import { CreateQuestionBlockDto } from './dto/questions-block.dto';
 import { QuestionsBlockEntity } from './questions-block.entity';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class QuestionsBlockService {
   ) {}
 
   // Add block questions
-  public async addBlock(id: number, body: QuestionBlockDto) {
+  public async addBlock(id: number, body: CreateQuestionBlockDto) {
     const newBlock = this.questionBlockRepository.create({
       ...body,
       ownerId: id,
@@ -24,7 +24,7 @@ export class QuestionsBlockService {
   }
 
   // Update block questions by id
-  public async updateBlock(id: number, body: QuestionBlockDto) {
+  public async updateBlock(id: number, body: CreateQuestionBlockDto) {
     const block = await this.questionBlockRepository.findOne({ where: { id } });
     if (block) {
       this.questionBlockRepository.merge(block, body);
@@ -36,8 +36,10 @@ export class QuestionsBlockService {
 
   // Get all blocks questions
   public async getBlock(directionName: string) {
-    return await this.questionBlockRepository.find({
-      where: { directionName },
-    });
+    const blockQuestions = await this.questionBlockRepository.find();
+    const filteredBlockQuestions = blockQuestions.filter((block) =>
+      block.directionName.includes(directionName),
+    );
+    return filteredBlockQuestions;
   }
 }

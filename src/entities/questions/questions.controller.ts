@@ -7,9 +7,11 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -20,10 +22,16 @@ import {
   ApiInternalServerErrorResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { ERole } from '@src/enums/role.enum';
-import { CreateQuestionDto } from './dto/create-quest.dto';
+import { MyRequest } from '@src/types/request.interface';
+import {
+  CreateQuestionDto,
+  ResponseCreateQuestionDto,
+  ResponseDeleteQuestionsDto,
+} from './dto/create-quest.dto';
 import { QuestionsService } from './questions.service';
 
 @ApiTags('Questions')
@@ -43,15 +51,19 @@ export class QuestionsController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiOkResponse({ description: 'OK' })
+  @ApiOkResponse({ description: 'OK', type: ResponseCreateQuestionDto })
   @ApiConflictResponse({ description: 'This direction has already been added' })
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(ERole.ADMIN)
   @Post()
-  async createQuestion(@Body() createQuestionDto: CreateQuestionDto) {
+  async createQuestion(
+    @Req() req: MyRequest,
+    @Body() createQuestionDto: CreateQuestionDto,
+  ) {
     const createdQuestion = await this.questionsService.createQuestion(
+      req.user.id,
       createQuestionDto,
     );
     return createdQuestion;
@@ -69,15 +81,15 @@ export class QuestionsController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiOkResponse({ description: 'OK' })
+  @ApiOkResponse({ description: 'OK', type: ResponseCreateQuestionDto })
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(ERole.ADMIN)
   @Patch(':id')
   async updateQuestion(
-    @Param('id') id: number,
-    @Body() updateQuestionDto: Partial<CreateQuestionDto>,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateQuestionDto: CreateQuestionDto,
   ) {
     const updatedQuestion = await this.questionsService.updateQuestion(
       id,
@@ -98,11 +110,16 @@ export class QuestionsController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
+  @ApiOkResponse({
+    description: 'Ok',
+    type: ResponseDeleteQuestionsDto,
+  })
+  @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(ERole.ADMIN)
   @Delete(':id')
-  async deleteQuestion(@Param('id') id: number) {
+  async deleteQuestion(@Param('id', ParseIntPipe) id: number) {
     return this.questionsService.deleteQuestion(id);
   }
 
@@ -118,14 +135,12 @@ export class QuestionsController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
+  @ApiQuery({ name: 'blockName' })
+  @ApiOkResponse({ description: 'OK', type: [ResponseCreateQuestionDto] })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
-  @Get('block/:direction')
-  async getQuestionsByBlock(
-    @Param('direction') direction: string,
-    @Query('block') block?: string,
-    @Query('count') count = 30,
-  ) {
-    return this.questionsService.getQuestionsByBlock(direction, block, count);
+  @Get()
+  async getQuestionsByBlock(@Query('blockName') blockName: string) {
+    return this.questionsService.getQuestionsByBlock(blockName);
   }
 }

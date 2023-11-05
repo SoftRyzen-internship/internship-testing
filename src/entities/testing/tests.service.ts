@@ -18,6 +18,11 @@ export class TestsService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
+  // Get test
+  public async getTest(userId: number) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+  }
+
   // Add test
   async createTest(createTestDto: CreateTestDto) {
     const existingTest = await this.testRepository.findOne({
