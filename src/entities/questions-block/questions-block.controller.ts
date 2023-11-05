@@ -7,9 +7,8 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
-  Put,
-  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -26,7 +25,7 @@ import { ERole } from '@src/enums/role.enum';
 import { MyRequest } from '@src/types/request.interface';
 import {
   CreateQuestionBlockDto,
-  RequestQuestionBlockDto,
+  ResponseQuestionBlockDto,
 } from './dto/questions-block.dto';
 import { QuestionsBlockService } from './questions-block.service';
 
@@ -69,12 +68,12 @@ export class QuestionsBlockController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiOkResponse({ description: 'OK' })
+  @ApiOkResponse({ description: 'OK', type: ResponseQuestionBlockDto })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(ERole.ADMIN)
-  @Put(':id')
+  @Patch(':id')
   async updateBlock(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: CreateQuestionBlockDto,
@@ -94,12 +93,12 @@ export class QuestionsBlockController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiOkResponse({ description: 'OK', type: [RequestQuestionBlockDto] })
+  @ApiOkResponse({ description: 'OK', type: [ResponseQuestionBlockDto] })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
   @Get(':directionName')
-  async getBlock(@Query('directionName') directionName: string) {
+  async getBlock(@Param('directionName') directionName: string) {
     return await this.questionBlockService.getBlock(directionName);
   }
 }

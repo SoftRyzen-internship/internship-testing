@@ -36,8 +36,10 @@ export class QuestionsBlockService {
 
   // Get all blocks questions
   public async getBlock(directionName: string) {
-    return await this.questionBlockRepository.find({
-      where: { directionName },
-    });
+    const blockQuestions = await this.questionBlockRepository.find();
+    const filteredBlockQuestions = blockQuestions.filter((block) =>
+      block.directionName.includes(directionName),
+    );
+    return filteredBlockQuestions;
   }
 }

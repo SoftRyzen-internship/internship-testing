@@ -28,7 +28,7 @@ export class CreateQuestionBlockDto {
   numberOfCorrectAnswers: number;
 }
 
-export class RequestQuestionBlockDto {
+export class ResponseQuestionBlockDto extends CreateQuestionBlockDto {
   @ApiProperty({ example: 1, description: 'Questions block id' })
   @IsNumber()
   id: number;
@@ -46,17 +46,6 @@ export class RequestQuestionBlockDto {
   })
   @IsString()
   updateAt: string;
-
-  @ApiProperty({
-    example: ['Frontend', 'Backend'],
-    description: 'Direction name',
-  })
-  @IsString()
-  directionName: string[];
-
-  @ApiProperty({ example: 'JS', description: 'Direction name' })
-  @IsString()
-  blockName: string;
 
   @ApiProperty({ example: 1, description: 'User`s id' })
   @IsNumber()
