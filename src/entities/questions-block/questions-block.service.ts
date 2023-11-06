@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateQuestionBlockDto } from './dto/questions-block.dto';
@@ -37,6 +37,9 @@ export class QuestionsBlockService {
   // Get all blocks questions
   public async getBlock(directionName: string) {
     const blockQuestions = await this.questionBlockRepository.find();
+    if (blockQuestions.length === 0) {
+      throw new NotFoundException('Block questions not found');
+    }
     const filteredBlockQuestions = blockQuestions.filter((block) =>
       block.directionName.includes(directionName),
     );

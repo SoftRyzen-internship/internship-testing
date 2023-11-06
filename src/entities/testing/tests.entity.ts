@@ -24,19 +24,22 @@ export class Test extends MyBaseEntity {
   public streamNumber: number;
 
   @ApiProperty({
-    example: '2023-06-30',
+    example: '2023-11-01T00:00:00.000Z',
     description: 'Availability start date',
   })
   @Column({ name: 'start_date', type: 'timestamp' })
   public startDate: Date;
 
-  @ApiProperty({ example: '2023-08-30', description: 'Availability end date' })
+  @ApiProperty({
+    example: '2023-11-01T00:00:00.000Z',
+    description: 'Availability end date',
+  })
   @Column({ name: 'end_date', type: 'timestamp' })
   public endDate: Date;
 
   @ApiProperty({ example: 60, description: 'Test time' })
   @Column({ name: 'test_time', type: 'integer' })
-  public testTime: number;
+  public testTime: string;
 
   @ApiProperty({
     example: { easy: 5, medium: 10, hard: 5 },
@@ -46,15 +49,16 @@ export class Test extends MyBaseEntity {
   public questionDifficulty: EDifficulty;
 
   @ApiProperty({
-    example: ['HTML/CSS', 'JavaScript', 'React.js'],
+    example: [
+      { blockQuestion: 'HTML/CSS', totalQuestions: 15, correctQuestions: 10 },
+    ],
     description: 'Blocks of questions in the direction',
   })
   @Column({
     name: 'question_blocks',
-    type: 'string',
-    array: true,
+    type: 'jsonb',
   })
-  public questionBlocks: string[];
+  public questionBlocks: string;
 
   @ApiProperty({ example: 100, description: 'Number of questions in the test' })
   @Column({ name: 'number_of_questions', type: 'integer' })

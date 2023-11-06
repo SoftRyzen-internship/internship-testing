@@ -41,7 +41,7 @@ export class AuthService {
   ) {}
 
   // Register
-  async registerUser(
+  public async registerUser(
     registerUserDto: RegisterUserDto,
   ): Promise<LoginResponseDto> {
     const { email, password } = registerUserDto;
@@ -153,6 +153,34 @@ export class AuthService {
     return 'OK';
   }
 
+  // Get regular expression
+  public async getRegularExpression() {
+    const linkRegex = new RegExp(regex.linkRegex).toString();
+    const telegramRegex = new RegExp(regex.telegramRegex).toString();
+    const phoneRegex = new RegExp(regex.phoneRegex).toString();
+    const passwordRegex = new RegExp(regex.passwordRegex).toString();
+    const emailRegex = new RegExp(regex.emailRegex).toString();
+
+    return {
+      linkRegex,
+      telegramRegex,
+      phoneRegex,
+      passwordRegex,
+      emailRegex,
+    };
+  }
+
+  // Logout
+  public async logout(email: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('Not found');
+    }
+    await this.userRepository.update(user.id, {
+      refreshToken: null,
+    });
+  }
+
   // User validate
   private async userValidate(email: string, password: string, userIp: string) {
     const user = await this.getUser('email', email);
@@ -181,33 +209,5 @@ export class AuthService {
       return user;
     }
     throw new NotFoundException('Not found');
-  }
-
-  // Get regular expression
-  public async getRegularExpression() {
-    const linkRegex = new RegExp(regex.linkRegex).toString();
-    const telegramRegex = new RegExp(regex.telegramRegex).toString();
-    const phoneRegex = new RegExp(regex.phoneRegex).toString();
-    const passwordRegex = new RegExp(regex.passwordRegex).toString();
-    const emailRegex = new RegExp(regex.emailRegex).toString();
-
-    return {
-      linkRegex,
-      telegramRegex,
-      phoneRegex,
-      passwordRegex,
-      emailRegex,
-    };
-  }
-
-  // Logout
-  public async logout(email: string) {
-    const user = await this.userRepository.findOne({ where: { email } });
-    if (!user) {
-      throw new NotFoundException('Not found');
-    }
-    await this.userRepository.update(user.id, {
-      refreshToken: null,
-    });
   }
 }

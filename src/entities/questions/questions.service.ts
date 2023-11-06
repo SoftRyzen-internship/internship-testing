@@ -85,6 +85,6 @@ export class QuestionsService {
     const responseQuestions = questions.map((question) => {
       return { ...question, answers: JSON.parse(question.answers) };
     });
-    return { questions: responseQuestions, total: responseQuestions.length };
+    return responseQuestions;
   }
 }

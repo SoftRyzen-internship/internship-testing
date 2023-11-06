@@ -50,31 +50,31 @@ export class TestController {
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
   @Post()
-  public async getTest(@Req() req: MyRequest) {
-    return await this.testService.getTest(req.user.id);
+  public async createTest(@Req() req: MyRequest) {
+    return await this.testService.createTest(req.user.id);
   }
 
   // Add test
-  @ApiOperation({ summary: 'Create a new test' })
-  @ApiBearerAuth()
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Access token with type',
-    required: true,
-    schema: {
-      type: 'string',
-      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
-    },
-  })
-  @ApiOkResponse({ description: 'OK' })
-  @ApiConflictResponse({ description: 'This test has already been added' })
-  @ApiForbiddenResponse({ description: 'Forbidden' })
-  @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtAuthGuard)
-  @Post()
-  async createTest(@Body() createTestDto: CreateTestDto) {
-    return this.testService.createTest(createTestDto);
-  }
+  // @ApiOperation({ summary: 'Create a new test' })
+  // @ApiBearerAuth()
+  // @ApiHeader({
+  //   name: 'Authorization',
+  //   description: 'Access token with type',
+  //   required: true,
+  //   schema: {
+  //     type: 'string',
+  //     format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+  //   },
+  // })
+  // @ApiOkResponse({ description: 'OK' })
+  // @ApiConflictResponse({ description: 'This test has already been added' })
+  // @ApiForbiddenResponse({ description: 'Forbidden' })
+  // @ApiInternalServerErrorResponse({ description: 'Server error' })
+  // @UseGuards(JwtAuthGuard)
+  // @Post()
+  // async createTest(@Body() createTestDto: CreateTestDto) {
+  //   return this.testService.createTest(createTestDto);
+  // }
 
   // Get test with filtering
   @ApiOperation({ summary: 'Get all tests with filtering' })
