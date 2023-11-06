@@ -59,7 +59,7 @@ export class UserService {
     const users: UserEntity[] = [...usersRegister].filter(
       (user) => user.direction !== ERole.ADMIN,
     );
-    const direction = ['QA', 'PM', 'FullStack'];
+    const direction = ['QA', 'PM', 'Frontend'];
     const studentsByDirection: IStudentsByDirection = this.userReduce(users);
     const countPassedTest = this.filterUsers(users, 'isPassedTest');
     const countPassedTechnicalTask = this.filterUsers(

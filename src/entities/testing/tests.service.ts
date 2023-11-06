@@ -18,32 +18,37 @@ export class TestsService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  // Get test
+  // Create test
   public async getTest(userId: number) {
     const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const test = await this.testRepository.findOne({ where: {} });
+    if (test) {
+      return test;
+    }
   }
 
   // Add test
   async createTest(createTestDto: CreateTestDto) {
-    const existingTest = await this.testRepository.findOne({
-      where: {
-        internshipStream: createTestDto.internshipStream,
-        streamNumber: createTestDto.streamNumber,
-        availabilityStartDate: createTestDto.availabilityStartDate,
-        availabilityEndDate: createTestDto.availabilityEndDate,
-        duration: createTestDto.duration,
-      },
-    });
-
-    if (existingTest) {
-      throw new ConflictException(
-        'Test with similar parameters already exists',
-      );
-    }
-
-    const test = this.testRepository.create(createTestDto);
-    const createdTest = await this.testRepository.save(test);
-    return createdTest;
+    // const existingTest = await this.testRepository.findOne({
+    //   where: {
+    //     internshipStream: createTestDto.internshipStream,
+    //     streamNumber: createTestDto.streamNumber,
+    //     startDate: createTestDto.availabilityStartDate,
+    //     endDate: createTestDto.availabilityEndDate,
+    //     testTime: createTestDto.duration,
+    //   },
+    // });
+    // if (existingTest) {
+    //   throw new ConflictException(
+    //     'Test with similar parameters already exists',
+    //   );
+    // }
+    // const test = this.testRepository.create(createTestDto);
+    // const createdTest = await this.testRepository.save(test);
+    // return createdTest;
   }
 
   // Get all tests with filter
@@ -77,7 +82,7 @@ export class TestsService {
   // Start of the test
   public async startTest(id: number) {
     const user = await this.userRepository.findOne({ where: { id } });
-    user.isSentTest = true;
+    user.isStartTest = true;
     await this.userRepository.save(user);
     return { message: 'Test started' };
   }

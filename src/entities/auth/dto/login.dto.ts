@@ -15,7 +15,7 @@ export class UsernameDto {
   })
   @IsString()
   @IsEmail()
-  email: string;
+  public email: string;
 }
 
 export class LoginDto extends UsernameDto {
@@ -26,22 +26,22 @@ export class LoginDto extends UsernameDto {
   @Matches(regex.passwordRegex, {
     message: 'Password must contain letters and numbers',
   })
-  password: string;
+  public password: string;
 }
 
 export class StreamResponseDto {
   id?: number;
   @ApiProperty({ example: 1, description: 'Ids streams' })
-  streamDirection?: string;
+  public streamDirection?: string;
 
   @ApiProperty({ example: 'true', description: 'Status internship stream' })
-  isActive?: boolean;
+  public isActive?: boolean;
 
   @ApiProperty({
     example: 'Start date',
     description: 'Start date of internship stream',
   })
-  startDate?: Date;
+  public startDate?: Date;
 }
 
 export class TestResponseDto {
@@ -49,25 +49,31 @@ export class TestResponseDto {
     example: false,
     description: 'Has the test been sent?',
   })
-  isSent: boolean;
+  public isSent: boolean;
 
   @ApiProperty({
     example: false,
     description: 'Start date of internship stream',
   })
-  isSuccess: boolean;
+  public isStartTest: boolean;
+
+  @ApiProperty({
+    example: false,
+    description: 'Start date of internship stream',
+  })
+  public isSuccess: boolean;
 
   @ApiProperty({
     example: '2023-07-12 16:03:20.157888',
     description: 'Start date of internship stream',
   })
-  startDate?: Date;
+  public startDate?: Date;
 
   @ApiProperty({
     example: '2023-07-12 16:03:20.157888',
     description: 'Start date of internship stream',
   })
-  endDate?: Date;
+  public endDate?: Date;
 }
 
 export class TaskResponseDto {
@@ -75,54 +81,54 @@ export class TaskResponseDto {
     example: false,
     description: 'Start date of internship stream',
   })
-  isSent: boolean;
+  public isSent: boolean;
 
   @ApiProperty({
     example: false,
     description: 'Start date of internship stream',
   })
-  isSuccess: boolean;
+  public isSuccess: boolean;
 
   @ApiProperty({
     example: '2023-07-12 16:03:20.157888',
     description: 'Start date of internship stream',
   })
-  deadlineDate?: Date;
+  public deadlineDate?: Date;
 }
 
 export class UserResponseDto {
   @ApiProperty({ example: 1, description: 'User id' })
-  id: number;
+  public id: number;
 
   @ApiProperty({ example: 'Peter', description: 'User name' })
-  firstName?: string;
+  public firstName?: string;
 
   @ApiProperty({ example: 'url avatar', description: 'User avatar' })
-  avatar?: string;
+  public avatar?: string;
 
   @ApiProperty({ example: 'FrontEnd', description: 'User direction' })
-  direction?: string;
+  public direction?: string;
 
   @ApiProperty({
     example: false,
     description: 'A label about the presence of active threads',
   })
-  isLabelStream: boolean;
+  public isLabelStream: boolean;
 
   @ApiProperty({
     example: ['user'],
     description: 'User`s role',
   })
-  roles: string[];
+  public roles: string[];
 
   @ApiProperty({ type: () => StreamResponseDto })
-  stream?: StreamResponseDto;
+  public stream?: StreamResponseDto;
 
   @ApiProperty({ type: () => TestResponseDto })
-  test?: TestResponseDto;
+  public test?: TestResponseDto;
 
   @ApiProperty({ type: () => TaskResponseDto })
-  task?: TaskResponseDto;
+  public task?: TaskResponseDto;
 }
 
 export class LoginResponseDto {
@@ -130,16 +136,16 @@ export class LoginResponseDto {
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
     description: 'User refresh token"',
   })
-  refreshToken: string;
+  public refreshToken: string;
 
   @ApiProperty({
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
     description: 'User success token',
   })
-  accessToken: string;
+  public accessToken: string;
 
   @ApiProperty({ type: () => UserResponseDto })
-  user: UserResponseDto;
+  public user: UserResponseDto;
 }
 
 export class LogoutResponseDto {
@@ -147,5 +153,5 @@ export class LogoutResponseDto {
     example: 'Disconnect...',
     description: 'User logout',
   })
-  message: string;
+  public message: string;
 }

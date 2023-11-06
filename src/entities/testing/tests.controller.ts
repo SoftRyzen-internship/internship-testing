@@ -48,9 +48,8 @@ export class TestController {
   })
   @ApiOkResponse({ description: 'OK', type: '' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @ApiQuery({ name: 'direction', required: true })
   @UseGuards(JwtAuthGuard)
-  @Get()
+  @Post()
   public async getTest(@Req() req: MyRequest) {
     return await this.testService.getTest(req.user.id);
   }

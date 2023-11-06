@@ -116,9 +116,10 @@ export class AuthService {
       isVerifiedEmail: user.verified,
       test: {
         isSent: user.isSentTest,
+        isStartTest: user.isStartTest,
         isSuccess: user.isPassedTest,
-        startDate: test ? test.availabilityStartDate : null,
-        endDate: test ? test?.availabilityEndDate : null,
+        startDate: test ? test.startDate : null,
+        endDate: test ? test?.endDate : null,
       },
       task: {
         isSent: user.isSentTechnicalTask,
