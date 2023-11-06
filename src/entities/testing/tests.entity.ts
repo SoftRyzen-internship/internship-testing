@@ -38,14 +38,19 @@ export class Test extends MyBaseEntity {
   public endDate: Date;
 
   @ApiProperty({ example: 60, description: 'Test time' })
-  @Column({ name: 'test_time', type: 'integer' })
+  @Column({ name: 'test_time', type: 'varchar' })
   public testTime: string;
 
   @ApiProperty({
     example: { easy: 5, medium: 10, hard: 5 },
     description: 'Number of questions per difficulty level',
   })
-  @Column({ name: 'question_difficulty', type: 'enum', enum: EDifficulty })
+  @Column({
+    name: 'question_difficulty',
+    type: 'enum',
+    enum: EDifficulty,
+    nullable: true,
+  })
   public questionDifficulty: EDifficulty;
 
   @ApiProperty({
@@ -65,11 +70,11 @@ export class Test extends MyBaseEntity {
   public numberOfQuestions: number;
 
   @ApiProperty({ example: 85, description: 'Passing score' })
-  @Column({ name: 'passing_score', type: 'integer' })
+  @Column({ name: 'passing_score', type: 'integer', default: 0 })
   public passingScore: number;
 
   @ApiProperty({ example: 85, description: 'Result of correct answers' })
-  @Column({ name: 'correct_answers', type: 'integer' })
+  @Column({ name: 'correct_answers', type: 'integer', default: 0 })
   public correctAnswers: number;
 
   @ApiProperty({ example: true, description: 'Did you pass the test?' })
