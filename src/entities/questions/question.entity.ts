@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { MyBaseEntity } from '@src/base/base.entity';
 import { Column, Entity } from 'typeorm';
-import { EDifficulty } from './enums/difficulty.enum';
+import { EDifficulty } from '../../enums/difficulty.enum';
 
 @Entity('questions')
 export class Question extends MyBaseEntity {

@@ -92,7 +92,7 @@ export class UserEntity extends MyBaseEntity {
   public resumeUrl: string;
 
   @ApiProperty({
-    example: 'documentation tets url',
+    example: 'https://my-documentation.herokuapp.com/api/docs',
     description: 'Documentation tets url',
   })
   @Column({ name: 'documentation_test_url', type: 'varchar', nullable: true })
@@ -163,7 +163,7 @@ export class UserEntity extends MyBaseEntity {
   public group: string;
 
   @ApiProperty({
-    example: 'Full Stack',
+    example: 'Frontend',
     description: 'Direction in which the user was trained',
   })
   @Column({ name: 'direction', type: 'varchar', nullable: true })
@@ -192,6 +192,10 @@ export class UserEntity extends MyBaseEntity {
   @ApiProperty({ example: false, description: 'Is sent test' })
   @Column({ name: 'is_sent_test', type: 'boolean', default: false })
   public isSentTest: boolean;
+
+  @ApiProperty({ example: false, description: 'Is start test' })
+  @Column({ name: 'is_start_test', type: 'boolean', default: false })
+  public isStartTest: boolean;
 
   @ApiProperty({ example: false, description: 'Is passed technical task' })
   @Column({ name: 'is_passed_technical_task', type: 'boolean', default: false })

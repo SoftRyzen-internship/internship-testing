@@ -6,6 +6,7 @@ import {
   Controller,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -14,7 +15,6 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
-  ApiConflictResponse,
   ApiForbiddenResponse,
   ApiHeader,
   ApiInternalServerErrorResponse,
@@ -26,16 +26,20 @@ import {
 } from '@nestjs/swagger';
 import { ERole } from '@src/enums/role.enum';
 import { MyRequest } from '@src/types/request.interface';
-import { CreateTestDto, ResponseStartTestDto } from './dto/create-test.dto';
+import {
+  ResponseStartTestDto,
+  ResponseTestDto,
+  UpdateTestDto,
+} from './dto/test.dto';
 import { TestsService } from './tests.service';
 
-@ApiTags('Tests')
+@ApiTags('Testing')
 @Controller('api/tests')
 export class TestController {
   constructor(private readonly testService: TestsService) {}
 
-  // Get test
-  @ApiOperation({ summary: 'Get test' })
+  // Create test
+  @ApiOperation({ summary: 'Create test or get test' })
   @ApiBearerAuth()
   @ApiHeader({
     name: 'Authorization',
@@ -46,35 +50,12 @@ export class TestController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiOkResponse({ description: 'OK', type: '' })
-  @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @ApiQuery({ name: 'direction', required: true })
-  @UseGuards(JwtAuthGuard)
-  @Get()
-  public async getTest(@Req() req: MyRequest) {
-    return await this.testService.getTest(req.user.id);
-  }
-
-  // Add test
-  @ApiOperation({ summary: 'Create a new test' })
-  @ApiBearerAuth()
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Access token with type',
-    required: true,
-    schema: {
-      type: 'string',
-      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
-    },
-  })
-  @ApiOkResponse({ description: 'OK' })
-  @ApiConflictResponse({ description: 'This test has already been added' })
-  @ApiForbiddenResponse({ description: 'Forbidden' })
+  @ApiOkResponse({ description: 'OK', type: ResponseTestDto })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
   @Post()
-  async createTest(@Body() createTestDto: CreateTestDto) {
-    return this.testService.createTest(createTestDto);
+  public async createTest(@Req() req: MyRequest) {
+    return await this.testService.createTest(req.user.id);
   }
 
   // Get test with filtering
@@ -89,22 +70,20 @@ export class TestController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiOkResponse({ description: 'OK', type: CreateTestDto, isArray: true })
-  @ApiInternalServerErrorResponse({ description: 'Server error' })
   @ApiQuery({ name: 'direction', required: false })
-  @ApiQuery({ name: 'availabilityStartDate', required: false })
-  @UseGuards(JwtAuthGuard)
-  @Get()
+  @ApiQuery({ name: 'startDate', required: false })
+  @ApiQuery({ name: 'userId', required: false })
+  @ApiOkResponse({ description: 'OK', type: [ResponseTestDto] })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(ERole.ADMIN)
+  @Get('all')
   async getTests(
-    @Req() req: MyRequest,
-    @Query('direction') direction?: string,
-    @Query('availabilityStartDate') availabilityStartDate?: string,
+    @Query('direction') direction: string,
+    @Query('startDate') startDate: string,
+    @Query('userId') userId: number,
   ) {
-    return this.testService.getTests(
-      req.user.id,
-      direction,
-      availabilityStartDate,
-    );
+    return this.testService.getTests(userId, direction, startDate);
   }
 
   // Start of the test
@@ -139,17 +118,16 @@ export class TestController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiOkResponse({ description: 'OK' })
+  @ApiOkResponse({ description: 'OK', type: ResponseTestDto })
   @ApiNotFoundResponse({ description: 'Test not found' })
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @Roles(ERole.ADMIN)
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async updateTest(
-    @Param('id') id: number,
-    @Body() createTestDto: CreateTestDto,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UpdateTestDto,
   ) {
-    return this.testService.updateTest(id, createTestDto);
+    return this.testService.updateTest(id, body);
   }
 }

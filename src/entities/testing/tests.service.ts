@@ -1,13 +1,12 @@
+import { InternshipStream } from '@entities/internship-stream/internship-stream.entity';
+import { QuestionsBlockService } from '@entities/questions-block/questions-block.service';
 import { UserEntity } from '@entities/users/users.entity';
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateTestDto } from './dto/create-test.dto';
+import { UpdateTestDto } from './dto/test.dto';
 import { Test } from './tests.entity';
+import { IDirectionsForTests } from './types/interfaces';
 
 @Injectable()
 export class TestsService {
@@ -16,80 +15,134 @@ export class TestsService {
     private readonly testRepository: Repository<Test>,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(InternshipStream)
+    private readonly streamRepository: Repository<InternshipStream>,
+    private readonly questionBlockService: QuestionsBlockService,
   ) {}
 
-  // Get test
-  public async getTest(userId: number) {
+  // Create test
+  public async createTest(userId: number) {
     const user = await this.userRepository.findOne({ where: { id: userId } });
-  }
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const stream = await this.streamRepository.findOne({
+      where: { id: user.streamId },
+    });
+    if (!stream) {
+      throw new NotFoundException('Stream not found');
+    }
+    const blockQuestions = await this.getBlockQuestions(user.direction);
 
-  // Add test
-  async createTest(createTestDto: CreateTestDto) {
-    const existingTest = await this.testRepository.findOne({
+    const test = await this.testRepository.findOne({
       where: {
-        internshipStream: createTestDto.internshipStream,
-        streamNumber: createTestDto.streamNumber,
-        availabilityStartDate: createTestDto.availabilityStartDate,
-        availabilityEndDate: createTestDto.availabilityEndDate,
-        duration: createTestDto.duration,
+        owner: user.id,
+        internshipStream: stream.internshipStreamName,
       },
     });
-
-    if (existingTest) {
-      throw new ConflictException(
-        'Test with similar parameters already exists',
-      );
+    if (test) {
+      return { ...test, questionBlocks: JSON.parse(test.questionBlocks) };
     }
+    const startDate = new Date(stream.startDate);
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 3);
+    const testTime = this.formatTestTime(blockQuestions.blockCompletionTime);
 
-    const test = this.testRepository.create(createTestDto);
-    const createdTest = await this.testRepository.save(test);
-    return createdTest;
+    const newTest = this.testRepository.create({
+      internshipStream: stream.internshipStreamName,
+      direction: user.direction,
+      streamNumber: stream.number,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      owner: user.id,
+      questionBlocks: JSON.stringify(blockQuestions.directions),
+      numberOfQuestions: blockQuestions.numberOfQuestions,
+      correctAnswers: blockQuestions.numberOfCorrectAnswers,
+      testTime,
+    });
+    await this.testRepository.save(newTest);
+
+    return { ...newTest, questionBlocks: blockQuestions.directions };
   }
 
   // Get all tests with filter
-  public async getTests(
-    userId: number,
-    direction?: string,
-    availabilityStartDate?: string,
-  ) {
-    // const user = await this.userRepository.findOne({ where: { id: userId } });
-    // if (user && user.isSentTest) {
-    //   throw new ForbiddenException('You do not have access to this test');
-    // }
-    const filters: Record<string, any> = {};
-
-    if (direction !== undefined) {
-      filters.direction = direction;
+  public async getTests(userId: number, direction: string, startDate: string) {
+    const filtered = {};
+    if (userId) {
+      filtered['owner'] = Number(userId);
     }
-    if (availabilityStartDate !== undefined) {
-      const formattedStartDate = new Date(availabilityStartDate);
-      filters.availabilityStartDate = formattedStartDate.toISOString();
+    if (direction) {
+      filtered['direction'] = direction;
     }
-    const tests = await this.testRepository.find({ where: filters });
-    if (tests.length === 0) {
-      throw new NotFoundException('No tests found for the selected criteria');
+    if (startDate) {
+      filtered['startDate'] = new Date(startDate);
     }
-
-    // await this.userRepository.update(userId, { isSentTest: true });
-    return tests;
+    const tests = await this.testRepository.find({ where: filtered });
+    const responseTest = tests.map((test) => {
+      return { ...test, questionBlocks: JSON.parse(test.questionBlocks) };
+    });
+    return responseTest;
   }
 
   // Start of the test
   public async startTest(id: number) {
     const user = await this.userRepository.findOne({ where: { id } });
-    user.isSentTest = true;
+    user.isStartTest = true;
     await this.userRepository.save(user);
     return { message: 'Test started' };
   }
 
   // Update test
-  async updateTest(id: number, fieldsToUpdate: Partial<CreateTestDto>) {
+  async updateTest(id: number, body: UpdateTestDto) {
     const test = await this.testRepository.findOne({ where: { id } });
     if (!test) {
       throw new NotFoundException('Test not found');
     }
 
-    Object.assign(test, fieldsToUpdate);
-    return this.testRepository.save(test);
+    Object.assign(test, body);
+    await this.testRepository.save(test);
+    return { ...test, questionBlocks: test.questionBlocks };
+  }
+
+  // Get blok questions
+  private async getBlockQuestions(directionName: string) {
+    let blockCompletionTime = 0;
+    let numberOfQuestions = 0;
+    let numberOfCorrectAnswers = 0;
+    const directions: IDirectionsForTests[] = [];
+
+    const blockQuestions = await this.questionBlockService.getBlock(
+      directionName,
+    );
+
+    for (const block of blockQuestions) {
+      blockCompletionTime = blockCompletionTime + block.blockCompletionTime;
+      numberOfQuestions = numberOfQuestions + block.numberOfQuestions;
+      numberOfCorrectAnswers =
+        numberOfCorrectAnswers + block.numberOfCorrectAnswers;
+      directions.push({
+        blockName: block.blockName,
+        numberOfQuestions: block.numberOfQuestions,
+        numberOfCorrectAnswers: block.numberOfCorrectAnswers,
+      });
+    }
+
+    return {
+      directions,
+      blockCompletionTime,
+      numberOfQuestions,
+      numberOfCorrectAnswers,
+    };
+  }
+
+  // Format time test
+  private formatTestTime(minute: number) {
+    const hours = Math.floor(minute / 60);
+    const minutes = minute % 60;
+    const seconds = 0;
+
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds
+      .toString()
+      .padStart(2, '0')}`;
   }
 }

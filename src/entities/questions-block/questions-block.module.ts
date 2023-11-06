@@ -10,5 +10,6 @@ import { QuestionsBlockService } from './questions-block.service';
   imports: [TypeOrmModule.forFeature([QuestionsBlockEntity]), JwtGuardsModule],
   controllers: [QuestionsBlockController],
   providers: [QuestionsBlockService, ConfigService],
+  exports: [QuestionsBlockService],
 })
 export class QuestionsBlockModule {}

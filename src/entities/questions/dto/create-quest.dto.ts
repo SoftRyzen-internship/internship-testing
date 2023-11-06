@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { EDifficulty } from '../enums/difficulty.enum';
+import { EDifficulty } from '../../../enums/difficulty.enum';
 
 export class CreateQuestionDto {
   @ApiProperty({ description: 'Text of the question' })
