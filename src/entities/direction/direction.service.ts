@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ERole } from '@src/enums/role.enum';
 import { Repository } from 'typeorm';
 import { Direction } from './direction.entity';
-import { AddDirectionDto } from './dto/add-direction.dto';
+import { AddDirectionDto } from './dto/direction.dto';
 
 @Injectable()
 export class DirectionService {
