@@ -3,7 +3,7 @@ import { MyBaseEntity } from '@src/base/base.entity';
 import { EDifficulty } from '@src/enums/difficulty.enum';
 import { Column, Entity } from 'typeorm';
 
-@Entity()
+@Entity('tests')
 export class Test extends MyBaseEntity {
   @ApiProperty({
     example: 'Stream Winter 2023',
@@ -65,6 +65,19 @@ export class Test extends MyBaseEntity {
   })
   public questionBlocks: string;
 
+  @ApiProperty({
+    example: [
+      { blockQuestion: 'HTML/CSS', totalQuestions: 15, correctQuestions: 10 },
+    ],
+    description: 'Test results',
+  })
+  @Column({
+    name: 'test_results',
+    type: 'jsonb',
+    nullable: true,
+  })
+  public testResults: string;
+
   @ApiProperty({ example: 100, description: 'Number of questions in the test' })
   @Column({ name: 'number_of_questions', type: 'integer' })
   public numberOfQuestions: number;
@@ -72,6 +85,13 @@ export class Test extends MyBaseEntity {
   @ApiProperty({ example: 85, description: 'Passing score' })
   @Column({ name: 'passing_score', type: 'integer', default: 0 })
   public passingScore: number;
+
+  @ApiProperty({
+    example: [1, 2, 5, 8, 7, 6, 9, 4],
+    description: 'Answers ids',
+  })
+  @Column({ name: 'answers_id', type: 'integer', array: true, nullable: true })
+  public answersId: number[];
 
   @ApiProperty({ example: 85, description: 'Result of correct answers' })
   @Column({ name: 'correct_answers', type: 'integer', default: 0 })

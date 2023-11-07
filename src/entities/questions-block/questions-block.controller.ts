@@ -46,7 +46,7 @@ export class QuestionsBlockController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiOkResponse({ description: 'OK' })
+  @ApiOkResponse({ description: 'OK', type: ResponseQuestionBlockDto })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard, RoleGuard)

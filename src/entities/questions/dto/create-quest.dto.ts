@@ -2,22 +2,22 @@ import { ApiProperty } from '@nestjs/swagger';
 import { EDifficulty } from '../../../enums/difficulty.enum';
 
 export class CreateQuestionDto {
-  @ApiProperty({ description: 'Text of the question' })
+  @ApiProperty({
+    example: 'What is Node.js?',
+    description: 'Text of the question',
+  })
   public questionText: string;
 
-  @ApiProperty({ description: 'Optional code associated with the question' })
+  @ApiProperty({
+    example: '123',
+    description: 'Optional code associated with the question',
+  })
   public code?: string;
 
   @ApiProperty({
-    example: [
-      { answer: 'Answer 1', right: true },
-      { answer: 'Answer 2', right: false },
-    ],
-    description: 'Answers to the question',
+    example: 'JS',
+    description: 'Block associated with the question',
   })
-  public answers: string[];
-
-  @ApiProperty({ description: 'Block associated with the question' })
   public blockQuestions: string;
 
   @ApiProperty({
@@ -27,7 +27,7 @@ export class CreateQuestionDto {
   })
   public difficulty: EDifficulty;
 
-  @ApiProperty({ description: 'Points assigned to the question' })
+  @ApiProperty({ example: 3, description: 'Points assigned to the question' })
   public points: number;
 }
 
