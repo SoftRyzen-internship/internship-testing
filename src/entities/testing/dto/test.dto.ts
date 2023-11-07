@@ -7,7 +7,7 @@ export class UpdateTestDto {
     description: 'Answers ids',
   })
   @IsArray()
-  public answersId: number[];
+  public answersIds: number[];
 }
 
 export class ResponseTestQuestionBlockDto {

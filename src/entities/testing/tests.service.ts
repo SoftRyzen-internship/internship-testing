@@ -4,7 +4,7 @@ import { QuestionsBlockService } from '@entities/questions-block/questions-block
 import { UserEntity } from '@entities/users/users.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { UpdateTestDto } from './dto/test.dto';
 import { Test } from './tests.entity';
 import { IDirectionsForTests } from './types/interfaces';
@@ -98,10 +98,16 @@ export class TestsService {
   // Update test
   async updateTest(id: number, body: UpdateTestDto) {
     const test = await this.testRepository.findOne({ where: { id } });
+    console.log('id :>> ', test);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
-
+    const answers = await this.answersRepository.find({
+      where: {
+        id: In(body.answersIds),
+      },
+    });
+    console.log('answers :>> ', answers);
     return '';
   }
 
