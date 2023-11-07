@@ -38,3 +38,26 @@ export class AddDirectionDto {
   @ArrayUnique()
   technologies: string[];
 }
+
+export class ResponseDirectionDto extends AddDirectionDto {
+  @ApiProperty({ example: 1, description: 'Admin id' })
+  ownerId: number;
+
+  @ApiProperty({ example: 'admin', description: 'Role' })
+  owner: string;
+
+  @ApiProperty({ example: 1, description: 'Unique id test`s' })
+  id: number;
+
+  @ApiProperty({
+    example: '2023-06-13T14:58:05.590Z',
+    description: 'Create At',
+  })
+  public createAt: string;
+
+  @ApiProperty({
+    example: '2023-06-13T14:58:05.590Z',
+    description: 'Update At',
+  })
+  public updateAt: string;
+}

@@ -7,8 +7,8 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
-  Put,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -27,10 +27,10 @@ import {
 import { ERole } from '@src/enums/role.enum';
 import { MyRequest } from '@src/types/request.interface';
 import { DirectionService } from './direction.service';
-import { AddDirectionDto } from './dto/add-direction.dto';
+import { AddDirectionDto, ResponseDirectionDto } from './dto/direction.dto';
 
 @ApiTags('Internship direction')
-@Controller('api/direction')
+@Controller('api/directions')
 export class DirectionController {
   constructor(private readonly directionService: DirectionService) {}
 
@@ -46,7 +46,7 @@ export class DirectionController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiOkResponse({ description: 'OK' })
+  @ApiOkResponse({ description: 'OK', type: ResponseDirectionDto })
   @ApiConflictResponse({ description: 'This direction has already been added' })
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
@@ -69,7 +69,7 @@ export class DirectionController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiOkResponse({ description: 'OK' })
+  @ApiOkResponse({ description: 'OK', type: [ResponseDirectionDto] })
   @ApiBadRequestResponse({ description: 'Bad request' })
   @ApiUnauthorizedResponse({ description: 'Not authorized' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
@@ -91,12 +91,12 @@ export class DirectionController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiOkResponse({ description: 'OK' })
+  @ApiOkResponse({ description: 'OK', type: ResponseDirectionDto })
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(ERole.ADMIN)
-  @Put(':id')
+  @Patch(':id')
   async updateDirection(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: AddDirectionDto,
