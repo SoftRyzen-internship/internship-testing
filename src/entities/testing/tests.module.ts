@@ -1,3 +1,4 @@
+import { AnswersEntity } from '@entities/answers/answers.entity';
 import { InternshipStream } from '@entities/internship-stream/internship-stream.entity';
 import { QuestionsBlockModule } from '@entities/questions-block/questions-block.module';
 import { UserEntity } from '@entities/users/users.entity';
@@ -11,7 +12,12 @@ import { TestsService } from './tests.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Test, UserEntity, InternshipStream]),
+    TypeOrmModule.forFeature([
+      Test,
+      UserEntity,
+      InternshipStream,
+      AnswersEntity,
+    ]),
     JwtGuardsModule,
     QuestionsBlockModule,
   ],

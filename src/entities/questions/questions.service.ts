@@ -19,7 +19,7 @@ export class QuestionsService {
   ) {}
 
   // Add question
-  async createQuestion(adminId: number, body: CreateQuestionDto) {
+  public async createQuestion(adminId: number, body: CreateQuestionDto) {
     const blockQuestion = await this.blockQuestionRepository.findOne({
       where: { blockName: body.blockQuestions },
     });
@@ -31,7 +31,6 @@ export class QuestionsService {
     const question = this.questionRepository.create({
       ...body,
       blockQuestionsId: blockQuestion.id,
-      answers: JSON.stringify(body.answers),
       owner: adminId,
     });
 
@@ -40,13 +39,12 @@ export class QuestionsService {
     return {
       question: {
         ...createdQuestion,
-        answers: JSON.parse(createdQuestion.answers),
       },
     };
   }
 
   // Update question
-  async updateQuestion(id: number, body: CreateQuestionDto) {
+  public async updateQuestion(id: number, body: CreateQuestionDto) {
     const question = await this.questionRepository.findOne({ where: { id } });
     if (!question) {
       throw new NotFoundException('Question not found');
@@ -59,14 +57,14 @@ export class QuestionsService {
   }
 
   // Delete question
-  async deleteQuestion(id: number) {
+  public async deleteQuestion(id: number) {
     await this.questionRepository.delete(id);
 
     return { message: 'Question deleted' };
   }
 
-  // Get questions by block questions
-  async getQuestionsByBlock(blockName?: string) {
+  // Get questions by block-questions
+  public async getQuestionsByBlock(blockName: string) {
     const blockQuestion = await this.blockQuestionRepository.findOne({
       where: { blockName },
     });
@@ -82,9 +80,6 @@ export class QuestionsService {
       .limit(blockQuestion.numberOfQuestions)
       .getMany();
 
-    const responseQuestions = questions.map((question) => {
-      return { ...question, answers: JSON.parse(question.answers) };
-    });
-    return responseQuestions;
+    return questions;
   }
 }

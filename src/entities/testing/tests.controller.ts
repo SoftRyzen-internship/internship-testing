@@ -29,6 +29,7 @@ import { MyRequest } from '@src/types/request.interface';
 import {
   ResponseStartTestDto,
   ResponseTestDto,
+  ResponseUpdateTestDto,
   UpdateTestDto,
 } from './dto/test.dto';
 import { TestsService } from './tests.service';
@@ -118,7 +119,7 @@ export class TestController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiOkResponse({ description: 'OK', type: ResponseTestDto })
+  @ApiOkResponse({ description: 'OK', type: ResponseUpdateTestDto })
   @ApiNotFoundResponse({ description: 'Test not found' })
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })

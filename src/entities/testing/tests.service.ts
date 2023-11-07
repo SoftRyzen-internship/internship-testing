@@ -1,3 +1,4 @@
+import { AnswersEntity } from '@entities/answers/answers.entity';
 import { InternshipStream } from '@entities/internship-stream/internship-stream.entity';
 import { QuestionsBlockService } from '@entities/questions-block/questions-block.service';
 import { UserEntity } from '@entities/users/users.entity';
@@ -17,6 +18,8 @@ export class TestsService {
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(InternshipStream)
     private readonly streamRepository: Repository<InternshipStream>,
+    @InjectRepository(AnswersEntity)
+    private readonly answersRepository: Repository<AnswersEntity>,
     private readonly questionBlockService: QuestionsBlockService,
   ) {}
 
@@ -99,9 +102,7 @@ export class TestsService {
       throw new NotFoundException('Test not found');
     }
 
-    Object.assign(test, body);
-    await this.testRepository.save(test);
-    return { ...test, questionBlocks: test.questionBlocks };
+    return '';
   }
 
   // Get blok questions

@@ -23,6 +23,7 @@ import { GlobalExceptionFilter } from './logger/global-exception-filter';
 import { GlobalLoggerService } from './logger/global-logger.service';
 import { CorsMiddleware } from './middlewares/cors-middleware';
 import { TestsModule } from '@entities/testing/tests.module';
+import { AnswersModule } from './entities/answers/answers.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { TestsModule } from '@entities/testing/tests.module';
     TechnicalTestModule,
     TokensModule,
     PasswordModule,
+    AnswersModule,
   ],
   controllers: [],
   providers: [
