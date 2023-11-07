@@ -35,11 +35,11 @@ export class InternshipStream extends MyBaseEntity {
   owner: string;
 
   @ApiProperty({
-    example: 'Start date',
+    example: '2023-11-01T00:00:00.000Z',
     description: 'Start date of internship stream',
   })
   @Column({
-    name: '2023-11-01T00:00:00.000Z',
+    name: 'start_date',
     type: 'timestamp',
     nullable: true,
   })

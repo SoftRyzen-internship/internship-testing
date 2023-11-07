@@ -3,7 +3,7 @@ import { MyBaseEntity } from '@src/base/base.entity';
 import { EDifficulty } from '@src/enums/difficulty.enum';
 import { Column, Entity } from 'typeorm';
 
-@Entity()
+@Entity('tests')
 export class Test extends MyBaseEntity {
   @ApiProperty({
     example: 'Stream Winter 2023',
