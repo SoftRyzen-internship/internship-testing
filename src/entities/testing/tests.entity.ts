@@ -86,13 +86,6 @@ export class Test extends MyBaseEntity {
   @Column({ name: 'passing_score', type: 'integer', default: 0 })
   public passingScore: number;
 
-  @ApiProperty({
-    example: [1, 2, 5, 8, 7, 6, 9, 4],
-    description: 'Answers ids',
-  })
-  @Column({ name: 'answers_id', type: 'integer', array: true, nullable: true })
-  public answersId: number[];
-
   @ApiProperty({ example: 85, description: 'Result of correct answers' })
   @Column({ name: 'correct_answers', type: 'integer', default: 0 })
   public correctAnswers: number;

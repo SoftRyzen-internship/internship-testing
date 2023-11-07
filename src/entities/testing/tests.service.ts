@@ -4,7 +4,7 @@ import { QuestionsBlockService } from '@entities/questions-block/questions-block
 import { UserEntity } from '@entities/users/users.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { UpdateTestDto } from './dto/test.dto';
 import { Test } from './tests.entity';
 import { IDirectionsForTests } from './types/interfaces';
@@ -101,8 +101,48 @@ export class TestsService {
     if (!test) {
       throw new NotFoundException('Test not found');
     }
-
-    return '';
+    const user = await this.userRepository.findOne({
+      where: { id: test.owner },
+    });
+    const answers = await this.answersRepository.find({
+      where: {
+        id: In(body.answersIds),
+      },
+    });
+    let totalCorrectAnswers = 0;
+    const answersResult = answers.reduce((acc, item) => {
+      if (item.isRight) {
+        totalCorrectAnswers = totalCorrectAnswers + 1;
+      }
+      const existingItem = acc.find(
+        (resultItem) => resultItem.blockName === item.blockName,
+      );
+      if (existingItem) {
+        existingItem.totalAnswer++;
+        if (item.isRight) {
+          existingItem.correctAnswer++;
+        }
+      } else {
+        acc.push({
+          blockName: item.blockName,
+          correctAnswer: item.isRight ? 1 : 0,
+          totalAnswer: 1,
+        });
+      }
+      return acc;
+    }, []);
+    if (totalCorrectAnswers >= test.correctAnswers) {
+      test.isPassTest = true;
+      user.isPassedTest = true;
+    }
+    test.testResults = JSON.stringify(answersResult);
+    await this.testRepository.save(test);
+    await this.userRepository.save(user);
+    return {
+      ...test,
+      questionBlocks: JSON.parse(test.questionBlocks),
+      testResults: JSON.parse(test.testResults),
+    };
   }
 
   // Get blok questions
