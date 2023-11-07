@@ -98,17 +98,51 @@ export class TestsService {
   // Update test
   async updateTest(id: number, body: UpdateTestDto) {
     const test = await this.testRepository.findOne({ where: { id } });
-    console.log('id :>> ', test);
     if (!test) {
       throw new NotFoundException('Test not found');
     }
+    const user = await this.userRepository.findOne({
+      where: { id: test.owner },
+    });
     const answers = await this.answersRepository.find({
       where: {
         id: In(body.answersIds),
       },
     });
-    console.log('answers :>> ', answers);
-    return '';
+    let totalCorrectAnswers = 0;
+    const answersResult = answers.reduce((acc, item) => {
+      if (item.isRight) {
+        totalCorrectAnswers = totalCorrectAnswers + 1;
+      }
+      const existingItem = acc.find(
+        (resultItem) => resultItem.blockName === item.blockName,
+      );
+      if (existingItem) {
+        existingItem.totalAnswer++;
+        if (item.isRight) {
+          existingItem.correctAnswer++;
+        }
+      } else {
+        acc.push({
+          blockName: item.blockName,
+          correctAnswer: item.isRight ? 1 : 0,
+          totalAnswer: 1,
+        });
+      }
+      return acc;
+    }, []);
+    if (totalCorrectAnswers >= test.correctAnswers) {
+      test.isPassTest = true;
+      user.isPassedTest = true;
+    }
+    test.testResults = JSON.stringify(answersResult);
+    await this.testRepository.save(test);
+    await this.userRepository.save(user);
+    return {
+      ...test,
+      questionBlocks: JSON.parse(test.questionBlocks),
+      testResults: JSON.parse(test.testResults),
+    };
   }
 
   // Get blok questions

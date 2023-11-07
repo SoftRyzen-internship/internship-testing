@@ -168,12 +168,6 @@ export class ResponseUpdateTestDto {
   })
   public testResults: ResponseTestQuestionBlockDto[];
 
-  @ApiProperty({
-    example: [1, 2, 5, 8, 7, 6, 9, 4],
-    description: 'Answers ids',
-  })
-  public answersId: number[];
-
   @ApiProperty({ example: 100, description: 'Number of questions in the test' })
   public numberOfQuestions: number;
 
