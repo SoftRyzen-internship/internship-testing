@@ -1,4 +1,3 @@
-import { QuestionsBlockEntity } from '@entities/questions-block/questions-block.entity';
 import { Question } from '@entities/questions/question.entity';
 import { JwtGuardsModule } from '@guards/jwtGuard/jwt-guard.module';
 import { Module } from '@nestjs/common';
@@ -10,10 +9,11 @@ import { AnswersService } from './answers.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AnswersEntity, Question, QuestionsBlockEntity]),
+    TypeOrmModule.forFeature([AnswersEntity, Question]),
     JwtGuardsModule,
   ],
   controllers: [AnswersController],
   providers: [AnswersService, ConfigService],
+  exports: [AnswersService],
 })
 export class AnswersModule {}

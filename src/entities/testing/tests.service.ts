@@ -1,13 +1,15 @@
 import { AnswersEntity } from '@entities/answers/answers.entity';
+import { AnswersService } from '@entities/answers/answers.service';
 import { InternshipStream } from '@entities/internship-stream/internship-stream.entity';
 import { QuestionsBlockService } from '@entities/questions-block/questions-block.service';
+import { QuestionsService } from '@entities/questions/questions.service';
 import { UserEntity } from '@entities/users/users.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { UpdateTestDto } from './dto/test.dto';
 import { Test } from './tests.entity';
-import { IDirectionsForTests } from './types/interfaces';
+import { IDirectionsForTests, ITestQuestions } from './types/interfaces';
 
 @Injectable()
 export class TestsService {
@@ -21,6 +23,8 @@ export class TestsService {
     @InjectRepository(AnswersEntity)
     private readonly answersRepository: Repository<AnswersEntity>,
     private readonly questionBlockService: QuestionsBlockService,
+    private readonly answersService: AnswersService,
+    private readonly questionsService: QuestionsService,
   ) {}
 
   // Create test
@@ -89,14 +93,25 @@ export class TestsService {
 
   // Start of the test
   public async startTest(id: number) {
+    let testQuestions: ITestQuestions[] = [];
     const user = await this.userRepository.findOne({ where: { id } });
+    const questionBlocks = await this.questionBlockService.getBlock(
+      user.direction,
+    );
+
+    for (const block of questionBlocks) {
+      const questions = await this.getQuestionsWithAnswers(block.blockName);
+      testQuestions.push(...questions);
+    }
     user.isStartTest = true;
     await this.userRepository.save(user);
-    return { message: 'Test started' };
+
+    testQuestions = testQuestions.sort(() => Math.random() - 0.5);
+    return testQuestions;
   }
 
   // Update test
-  async updateTest(id: number, body: UpdateTestDto) {
+  public async updateTest(id: number, body: UpdateTestDto) {
     const test = await this.testRepository.findOne({ where: { id } });
     if (!test) {
       throw new NotFoundException('Test not found');
@@ -109,7 +124,9 @@ export class TestsService {
         id: In(body.answersIds),
       },
     });
+
     let totalCorrectAnswers = 0;
+
     const answersResult = answers.reduce((acc, item) => {
       if (item.isRight) {
         totalCorrectAnswers = totalCorrectAnswers + 1;
@@ -118,9 +135,9 @@ export class TestsService {
         (resultItem) => resultItem.blockName === item.blockName,
       );
       if (existingItem) {
-        existingItem.totalAnswer++;
+        existingItem.totalAnswer = existingItem.totalAnswer + 1;
         if (item.isRight) {
-          existingItem.correctAnswer++;
+          existingItem.correctAnswer = existingItem.correctAnswer + 1;
         }
       } else {
         acc.push({
@@ -131,18 +148,40 @@ export class TestsService {
       }
       return acc;
     }, []);
+
     if (totalCorrectAnswers >= test.correctAnswers) {
       test.isPassTest = true;
       user.isPassedTest = true;
     }
+
     test.testResults = JSON.stringify(answersResult);
+
     await this.testRepository.save(test);
     await this.userRepository.save(user);
+
     return {
       ...test,
       questionBlocks: JSON.parse(test.questionBlocks),
       testResults: JSON.parse(test.testResults),
     };
+  }
+
+  // Get array questions with answers
+  private async getQuestionsWithAnswers(blockName: string) {
+    const testQuestions: ITestQuestions[] = [];
+    const questions = await this.questionsService.getQuestionsByBlock(
+      blockName,
+    );
+
+    for (const question of questions) {
+      const answers = await this.answersService.getAnswers(question.id);
+      testQuestions.push({
+        question: question.questionText,
+        answers,
+      });
+    }
+
+    return testQuestions;
   }
 
   // Get blok questions

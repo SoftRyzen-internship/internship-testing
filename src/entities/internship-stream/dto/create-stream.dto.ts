@@ -12,7 +12,13 @@ export class CreateStreamDto {
   internshipStreamName: string;
 
   @ApiProperty({
-    example: ['Frontend', 'Backend', 'QA', 'PM', 'FullStack'],
+    example: [
+      'Frontend',
+      'Backend',
+      'QA (Quality Assurance)',
+      'PM',
+      'UX/UI design',
+    ],
     description: 'Directions on the stream',
   })
   @IsArray()

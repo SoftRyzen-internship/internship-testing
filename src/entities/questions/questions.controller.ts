@@ -31,7 +31,9 @@ import {
   CreateQuestionDto,
   ResponseCreateQuestionDto,
   ResponseDeleteQuestionsDto,
-} from './dto/create-quest.dto';
+  ResponseGetQuestionDto,
+  UpdateQuestionDto,
+} from './dto/quest.dto';
 import { QuestionsService } from './questions.service';
 
 @ApiTags('Questions')
@@ -89,7 +91,7 @@ export class QuestionsController {
   @Patch(':id')
   async updateQuestion(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateQuestionDto: CreateQuestionDto,
+    @Body() updateQuestionDto: UpdateQuestionDto,
   ) {
     const updatedQuestion = await this.questionsService.updateQuestion(
       id,
@@ -142,5 +144,25 @@ export class QuestionsController {
   @Get()
   async getQuestionsByBlock(@Query('blockName') blockName: string) {
     return this.questionsService.getQuestionsByBlock(blockName);
+  }
+
+  // Get question by id
+  @ApiOperation({ summary: 'Get questions by id' })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access token with type',
+    required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
+  })
+  @ApiOkResponse({ description: 'OK', type: ResponseGetQuestionDto })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @UseGuards(JwtAuthGuard)
+  @Get(':questionId')
+  async getQuestionById(@Param('questionId') questionId: number) {
+    return this.questionsService.getQuestionById(questionId);
   }
 }

@@ -184,7 +184,18 @@ export class ResponseUpdateTestDto {
   public owner: number;
 }
 
+export class ResponseAnswersTestDto {
+  @ApiProperty({ example: 'Answer 1' })
+  public answer: string;
+
+  @ApiProperty({ example: 1 })
+  public id: number;
+}
+
 export class ResponseStartTestDto {
-  @ApiProperty({ example: 'Test started' })
-  message: string;
+  @ApiProperty({ example: 'Question 1' })
+  public question: string;
+
+  @ApiProperty({ type: [ResponseAnswersTestDto] })
+  public answers: ResponseAnswersTestDto[];
 }
