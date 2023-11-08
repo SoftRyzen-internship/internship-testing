@@ -1,3 +1,5 @@
+import { AnswersEntity } from '@entities/answers/answers.entity';
+import { AnswersService } from '@entities/answers/answers.service';
 import { QuestionsBlockEntity } from '@entities/questions-block/questions-block.entity';
 import {
   BadRequestException,
@@ -6,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateQuestionDto } from './dto/create-quest.dto';
+import { CreateQuestionDto, UpdateQuestionDto } from './dto/quest.dto';
 import { Question } from './question.entity';
 
 @Injectable()
@@ -16,35 +18,48 @@ export class QuestionsService {
     private readonly questionRepository: Repository<Question>,
     @InjectRepository(QuestionsBlockEntity)
     private readonly blockQuestionRepository: Repository<QuestionsBlockEntity>,
+    @InjectRepository(AnswersEntity)
+    private readonly answersRepository: Repository<AnswersEntity>,
+    private readonly answersService: AnswersService,
   ) {}
 
   // Add question
   public async createQuestion(adminId: number, body: CreateQuestionDto) {
+    const {
+      questionText,
+      code,
+      blockQuestionsId,
+      difficulty,
+      points,
+      answers,
+    } = body;
     const blockQuestion = await this.blockQuestionRepository.findOne({
-      where: { blockName: body.blockQuestions },
+      where: { id: blockQuestionsId },
     });
     if (!blockQuestion) {
-      throw new BadRequestException(
-        `Invalid block name ${body.blockQuestions}`,
-      );
+      throw new BadRequestException('Block questions not found');
     }
-    const question = this.questionRepository.create({
-      ...body,
+    const newQuestion = this.questionRepository.create({
+      questionText,
+      code: code ? code : null,
+      difficulty,
+      points,
       blockQuestionsId: blockQuestion.id,
       owner: adminId,
     });
 
-    const createdQuestion = await this.questionRepository.save(question);
+    const createdQuestion = await this.questionRepository.save(newQuestion);
+    const createAnswers = await this.answersService.createAnswer(
+      blockQuestion.blockName,
+      createdQuestion,
+      answers,
+    );
 
-    return {
-      question: {
-        ...createdQuestion,
-      },
-    };
+    return { ...createdQuestion, answers: createAnswers };
   }
 
   // Update question
-  public async updateQuestion(id: number, body: CreateQuestionDto) {
+  public async updateQuestion(id: number, body: UpdateQuestionDto) {
     const question = await this.questionRepository.findOne({ where: { id } });
     if (!question) {
       throw new NotFoundException('Question not found');
@@ -81,5 +96,15 @@ export class QuestionsService {
       .getMany();
 
     return questions;
+  }
+
+  // Get question by id
+  public async getQuestionById(id: number) {
+    const question = await this.questionRepository.findOne({ where: { id } });
+    const answers = await this.answersRepository.find({
+      where: { owner: question.id },
+    });
+
+    return { ...question, answers };
   }
 }

@@ -68,10 +68,7 @@ export class InternshipStreamService {
   }
 
   // update stream
-  public async updateInternshipStreamFields(
-    id: number,
-    fieldsToUpdate: CreateStreamDto,
-  ) {
+  public async updateInternshipStreamFields(id: number, body: CreateStreamDto) {
     const stream = await this.internshipStreamRepository.findOne({
       where: { id },
     });
@@ -79,7 +76,7 @@ export class InternshipStreamService {
       throw new NotFoundException('Internship stream not found');
     }
 
-    Object.assign(stream, fieldsToUpdate);
+    Object.assign(stream, body);
 
     return await this.internshipStreamRepository.save(stream);
   }

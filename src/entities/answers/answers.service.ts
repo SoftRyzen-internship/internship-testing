@@ -1,4 +1,3 @@
-import { QuestionsBlockEntity } from '@entities/questions-block/questions-block.entity';
 import { Question } from '@entities/questions/question.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,29 +12,28 @@ export class AnswersService {
     private readonly answersRepository: Repository<AnswersEntity>,
     @InjectRepository(Question)
     private readonly questionRepository: Repository<Question>,
-    @InjectRepository(QuestionsBlockEntity)
-    private readonly questionBlockRepository: Repository<QuestionsBlockEntity>,
   ) {}
 
   // Add answer
-  public async createAnswer(body: CreateAnswerDto) {
-    const question = await this.getQuestion(body.questionId);
-    const questionBlock = await this.questionBlockRepository.findOne({
-      where: { id: question.blockQuestionsId },
-    });
-    const newAnswer = this.answersRepository.create({
-      ...body,
-      blockName: questionBlock.blockName,
-      owner: question.id,
-    });
-    await this.answersRepository.save(newAnswer);
-    if (!question.answersId) {
-      question.answersId = [newAnswer.id];
-    } else {
-      question.answersId = [...question.answersId, newAnswer.id];
+  public async createAnswer(
+    blockName: string,
+    question: Question,
+    body: CreateAnswerDto[],
+  ) {
+    for (const answer of body) {
+      const newAnswer = this.answersRepository.create({
+        ...answer,
+        blockName,
+        owner: question.id,
+      });
+      await this.answersRepository.save(newAnswer);
+      question.answersId = question.answersId
+        ? [...question.answersId, newAnswer.id]
+        : [newAnswer.id];
+      await this.questionRepository.save(question);
     }
-    await this.questionRepository.save(question);
-    return newAnswer;
+
+    return await this.answersRepository.find({ where: { owner: question.id } });
   }
 
   // Get answers
@@ -64,6 +62,15 @@ export class AnswersService {
 
   // Delete answer
   public async deleteAnswer(id: number) {
+    const answer = await this.answersRepository.findOne({ where: { id } });
+    const question = await this.questionRepository.findOne({
+      where: { id: answer.owner },
+    });
+    const index = question.answersId.indexOf(id);
+    if (index !== -1) {
+      question.answersId.splice(index, 1);
+      await this.questionRepository.save(question);
+    }
     await this.answersRepository.delete(id);
     return { message: 'Answer deleted' };
   }

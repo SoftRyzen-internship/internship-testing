@@ -99,7 +99,7 @@ export class TestController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiOkResponse({ description: 'OK', type: ResponseStartTestDto })
+  @ApiOkResponse({ description: 'OK', type: [ResponseStartTestDto] })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
   @Get('start-test')

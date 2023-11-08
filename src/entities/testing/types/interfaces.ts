@@ -3,3 +3,13 @@ export interface IDirectionsForTests {
   numberOfQuestions: number;
   numberOfCorrectAnswers: number;
 }
+
+interface IAnswers {
+  answer: string;
+  id: number;
+}
+
+export interface ITestQuestions {
+  question: string;
+  answers: IAnswers[];
+}
