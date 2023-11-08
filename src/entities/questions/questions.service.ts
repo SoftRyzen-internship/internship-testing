@@ -7,7 +7,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateQuestionDto, UpdateQuestionDto } from './dto/quest.dto';
 import { Question } from './question.entity';
 
@@ -73,6 +73,16 @@ export class QuestionsService {
 
   // Delete question
   public async deleteQuestion(id: number) {
+    const question = await this.questionRepository.findOne({ where: { id } });
+    if (!question) {
+      throw new NotFoundException('Question not found');
+    }
+    const answers = await this.answersRepository.find({
+      where: {
+        id: In(question.answersId),
+      },
+    });
+    await this.answersRepository.remove(answers);
     await this.questionRepository.delete(id);
 
     return { message: 'Question deleted' };
