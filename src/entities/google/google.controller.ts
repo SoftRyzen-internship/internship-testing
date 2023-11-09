@@ -45,7 +45,7 @@ export class GoogleController {
   async googleAuthCallback(@Req() req: MyRequest, @Res() res: Response) {
     const userData = await this.googleService.auth(req.user.email);
     const redirectUrl = `${
-      process.env.GOOGLE_REDIRECT_URL
+      process.env.REDIRECT_TO_SITE_INTERNSHIP
     }?userData=${encodeURIComponent(JSON.stringify(userData))}`;
     res.redirect(redirectUrl);
   }
