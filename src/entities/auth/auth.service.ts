@@ -41,9 +41,7 @@ export class AuthService {
   ) {}
 
   // Register
-  public async registerUser(
-    registerUserDto: RegisterUserDto,
-  ): Promise<LoginResponseDto> {
+  public async registerUser(registerUserDto: RegisterUserDto) {
     const { email, password } = registerUserDto;
     const user = await this.userRepository.findOne({ where: { email } });
 

@@ -53,13 +53,13 @@ export class TestResponseDto {
 
   @ApiProperty({
     example: false,
-    description: 'Start date of internship stream',
+    description: 'Is start test',
   })
   public isStartTest: boolean;
 
   @ApiProperty({
     example: false,
-    description: 'Start date of internship stream',
+    description: 'Is success test',
   })
   public isSuccess: boolean;
 
@@ -71,7 +71,7 @@ export class TestResponseDto {
 
   @ApiProperty({
     example: '2023-07-12 16:03:20.157888',
-    description: 'Start date of internship stream',
+    description: 'End date of internship stream',
   })
   public endDate?: Date;
 }
@@ -90,10 +90,10 @@ export class TaskResponseDto {
   public isSuccess: boolean;
 
   @ApiProperty({
-    example: '2023-07-12 16:03:20.157888',
+    example: '25.07.2023 12:00',
     description: 'Start date of internship stream',
   })
-  public deadlineDate?: Date;
+  public deadlineDate: Date;
 }
 
 export class UserResponseDto {

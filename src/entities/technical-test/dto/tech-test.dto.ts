@@ -1,43 +1,43 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { MyBaseEntity } from '@src/base/base.entity';
-import { Column, Entity } from 'typeorm';
+import * as regex from '@src/constants/regex-expressions';
+import { IsArray, IsString, Matches } from 'class-validator';
 
-@Entity('tech_test')
-export class TechnicalTest extends MyBaseEntity {
-  @ApiProperty({ example: 1, description: 'Internship stream id' })
-  @Column({ name: 'internship_stream_id', type: 'integer' })
-  public internshipStreamId: number;
-
+export class CreateTechnicalTestDto {
   @ApiProperty({ example: 'Frontend', description: 'Direction' })
-  @Column({ name: 'direction', type: 'varchar' })
   public direction: string;
 
   @ApiProperty({
     example: 'Test task for <Direction>',
     description: 'Test task for <Direction>',
   })
-  @Column({ name: 'title', type: 'varchar' })
+  @IsString()
   public title: string;
 
   @ApiProperty({
     example: 'Implement functionality for a web application using React',
     description: 'Short description of test',
   })
-  @Column({ name: 'short_description', type: 'varchar' })
+  @IsString()
   public shortDescription: string;
 
   @ApiProperty({
     example: 'https://document.com',
     description: 'Materials for test',
   })
-  @Column({ name: 'tech_documentation_url', type: 'varchar' })
+  @IsString()
+  @Matches(regex.linkRegex, {
+    message: 'This should have been a link',
+  })
   public techDocumentationUrl: string;
 
   @ApiProperty({
     example: 'https://www.figma.com',
     description: 'Layout for test',
   })
-  @Column({ name: 'tech_layout_url', type: 'varchar', nullable: true })
+  @IsString()
+  @Matches(regex.linkRegex, {
+    message: 'This should have been a link',
+  })
   public techLayoutUrl: string;
 
   @ApiProperty({
@@ -47,16 +47,29 @@ export class TechnicalTest extends MyBaseEntity {
     ],
     description: 'Acceptance Criteria',
   })
-  @Column({ name: 'acceptance_criteria', type: 'varchar', array: true })
+  @IsArray()
   public acceptanceCriteria: string[];
+}
+
+export class ResponseCreateTechnicalTestDto extends CreateTechnicalTestDto {
+  @ApiProperty({ example: 1, description: 'Questions block id' })
+  id: number;
 
   @ApiProperty({
-    example: '25.07.2023 12:00',
-    description: 'Deadline',
+    example: '2023-06-17T11:48:47.135Z',
+    description: 'Questions block createAt',
   })
-  @Column({
-    name: 'deadline',
-    type: 'timestamp',
+  createAt: string;
+
+  @ApiProperty({
+    example: '2023-06-17T11:48:47.135Z',
+    description: 'Questions block updateAt',
   })
-  public deadline: Date;
+  updateAt: string;
+
+  @ApiProperty({ example: 1 })
+  internshipStreamId: number;
+
+  @ApiProperty({ example: '17.09.2023 12:00' })
+  deadline: string;
 }

@@ -10,5 +10,6 @@ import { InternshipStreamService } from './internship-stream.service';
   imports: [TypeOrmModule.forFeature([InternshipStream]), JwtGuardsModule],
   providers: [InternshipStreamService, ConfigService],
   controllers: [InternshipStreamController],
+  exports: [InternshipStreamService],
 })
 export class InternshipStreamModule {}
