@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import * as regex from '@src/constants/regex-expressions';
 import { EDifficulty } from '@src/enums/difficulty.enum';
-import { IsString, Matches } from 'class-validator';
+import { IsBoolean, IsString, Matches } from 'class-validator';
 
 export class CreateResultTechnicalDto {
   @ApiProperty({
@@ -30,6 +30,12 @@ export class CreateResultTechnicalDto {
   @ApiProperty({ example: 'Some comments', description: 'Comments' })
   @IsString()
   public comments: string;
+}
+
+export class UpdateResultTechnicalDto {
+  @ApiProperty({ example: true })
+  @IsBoolean()
+  public isPassedUserTechTest: boolean;
 }
 
 export class ResponseCreateResultTechnicalDto extends CreateResultTechnicalDto {

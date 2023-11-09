@@ -30,6 +30,7 @@ import {
   CreateResultTechnicalDto,
   ResponseCreateResultTechnicalDto,
   ResponseUpdateResultTechnicalDto,
+  UpdateResultTechnicalDto,
 } from './dto/result.dto';
 import { TechnicalTestResultService } from './technical-test-result.service';
 
@@ -142,9 +143,11 @@ export class TechnicalTestResultController {
   @Patch(':resultId')
   public async updateTechnicalResultTest(
     @Param('resultId', ParseIntPipe) resultId: number,
+    @Body() body: UpdateResultTechnicalDto,
   ) {
     return await this.technicalTestResultService.updateTechnicalResultTest(
       resultId,
+      body,
     );
   }
 }

@@ -1,13 +1,19 @@
 import { TechnicalTestService } from '@entities/technical-test/technical-test.service';
+import { UserEntity } from '@entities/users/users.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateResultTechnicalDto } from './dto/result.dto';
+import {
+  CreateResultTechnicalDto,
+  UpdateResultTechnicalDto,
+} from './dto/result.dto';
 import { ResultTechnicalTest } from './result-test.entity';
 
 @Injectable()
 export class TechnicalTestResultService {
   constructor(
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(ResultTechnicalTest)
     private readonly resultRepository: Repository<ResultTechnicalTest>,
     private readonly techTestService: TechnicalTestService,
@@ -50,10 +56,18 @@ export class TechnicalTestResultService {
   }
 
   // Update technical result test
-  public async updateTechnicalResultTest(id: number) {
+  public async updateTechnicalResultTest(
+    id: number,
+    body: UpdateResultTechnicalDto,
+  ) {
     const testResult = await this.resultRepository.findOne({ where: { id } });
+    const user = await this.userRepository.findOne({
+      where: { id: testResult.userId },
+    });
+    user.isPassedTechnicalTask = body.isPassedUserTechTest;
     testResult.isChecked = true;
     await this.resultRepository.save(testResult);
+    await this.userRepository.save(user);
     return testResult;
   }
 }

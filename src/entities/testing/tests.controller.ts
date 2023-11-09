@@ -81,7 +81,7 @@ export class TestController {
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles(ERole.ADMIN)
   @Get('all')
-  async getTests(
+  public async getTests(
     @Query('direction') direction: string,
     @Query('startDate') startDate: string,
     @Query('userId') userId: number,
@@ -105,7 +105,7 @@ export class TestController {
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
   @Get('start-test')
-  async startTest(@Req() req: MyRequest) {
+  public async startTest(@Req() req: MyRequest) {
     return this.testService.startTest(req.user.id);
   }
 
@@ -127,7 +127,7 @@ export class TestController {
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  async updateTest(
+  public async updateTest(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateTestDto,
   ) {
