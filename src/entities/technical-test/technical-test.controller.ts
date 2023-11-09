@@ -1,13 +1,14 @@
 import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
+import { Roles } from '@guards/roleGuard/decorators/role.decorator';
 import { RoleGuard } from '@guards/roleGuard/role.guard';
 import {
   Body,
   Controller,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
-  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -20,44 +21,20 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { ERole } from '@src/enums/role.enum';
 import { MyRequest } from '@src/types/request.interface';
-import { CreateTechnicalTestDto } from './dto/create-tech-test.dto';
-import { UpdateTechnicalTestDto } from './dto/update-tech-test.dto';
-import { ResultTechnicalTest } from './result-test.entity';
-import { TechnicalTest } from './technical-test.entity';
+import {
+  CreateTechnicalTestDto,
+  ResponseCreateTechnicalTestDto,
+} from './dto/tech-test.dto';
 import { TechnicalTestService } from './technical-test.service';
 
 @ApiTags('Technical tests')
-@Controller('api/technical-test')
+@Controller('api/technical-tests')
 export class TechnicalTestController {
   constructor(private readonly technicalTestService: TechnicalTestService) {}
-
-  // Get technical test
-  @ApiOperation({ summary: 'Get technical test by direction' })
-  @ApiBearerAuth()
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Access token with type',
-    required: true,
-    schema: {
-      type: 'string',
-      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
-    },
-  })
-  @ApiOkResponse({ description: 'OK', type: TechnicalTest })
-  @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @ApiQuery({ name: 'direction', required: true })
-  @UseGuards(JwtAuthGuard)
-  @Get()
-  public async getTechnicalTaskByDirection(
-    @Req() req: MyRequest,
-    @Query('direction') direction: string,
-  ) {
-    return this.technicalTestService.getTechnicalTaskByDirection(direction);
-  }
 
   // Add technical test
   @ApiOperation({ summary: 'Add new technical test' })
@@ -72,15 +49,36 @@ export class TechnicalTestController {
     },
   })
   @ApiBody({ type: CreateTechnicalTestDto })
-  @ApiCreatedResponse({ description: 'Created', type: TechnicalTest })
+  @ApiCreatedResponse({
+    description: 'Created',
+    type: ResponseCreateTechnicalTestDto,
+  })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard, RoleGuard)
-  //   @Roles(ERole.ADMIN)
+  @Roles(ERole.ADMIN)
   @Post()
-  public async addTechnicalTest(
-    @Body() createTechnicalTestDto: CreateTechnicalTestDto,
-  ) {
-    return this.technicalTestService.addTechnicalTest(createTechnicalTestDto);
+  public async addTechnicalTest(@Body() body: CreateTechnicalTestDto) {
+    return await this.technicalTestService.addTechnicalTest(body);
+  }
+
+  // Get technical test
+  @ApiOperation({ summary: 'Get technical test by direction' })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access token with type',
+    required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
+  })
+  @ApiOkResponse({ description: 'OK', type: ResponseCreateTechnicalTestDto })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  public async getTechnicalTest(@Req() req: MyRequest) {
+    return await this.technicalTestService.getTechnicalTest(req.user.id);
   }
 
   // Update technical test
@@ -95,91 +93,16 @@ export class TechnicalTestController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiOkResponse({ description: 'OK', type: TechnicalTest })
+  @ApiOkResponse({ description: 'OK', type: ResponseCreateTechnicalTestDto })
   @ApiNotFoundResponse({ description: 'Technical test not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard, RoleGuard)
-  //   @Roles(ERole.ADMIN)
+  @Roles(ERole.ADMIN)
   @Patch(':id')
   public async updateTechnicalTest(
-    @Param('id') id: number,
-    @Body() updateTechnicalTestDto: UpdateTechnicalTestDto,
-  ): Promise<TechnicalTest> {
-    return this.technicalTestService.updateTechnicalTest(
-      id,
-      updateTechnicalTestDto,
-    );
-  }
-
-  // Add technical test result
-  @ApiOperation({ summary: 'Add technical test result' })
-  @ApiBearerAuth()
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Access token with type',
-    required: true,
-    schema: {
-      type: 'string',
-      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
-    },
-  })
-  @ApiBody({ type: ResultTechnicalTest })
-  @ApiCreatedResponse({ description: 'Created', type: ResultTechnicalTest })
-  @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtAuthGuard)
-  @Post('result')
-  public async addResultTechnicalTest(
-    @Body() resultData: ResultTechnicalTest,
-    @Req() req: MyRequest,
-  ): Promise<ResultTechnicalTest> {
-    const userId = req.user.id;
-    resultData.userId = userId;
-    return this.technicalTestService.addResultTechnicalTest(resultData);
-  }
-
-  // Get all test results
-  @ApiOperation({ summary: 'Get all technical test results' })
-  @ApiBearerAuth()
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Access token with type',
-    required: true,
-    schema: {
-      type: 'string',
-      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
-    },
-  })
-  @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtAuthGuard)
-  @Get('results')
-  public async getAllTestResults(): Promise<ResultTechnicalTest[]> {
-    return this.technicalTestService.getAllTestResults();
-  }
-
-  // Get technical test results by user ID
-  @ApiOperation({ summary: 'Get technical test results by user id' })
-  @ApiBearerAuth()
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Access token with type',
-    required: true,
-    schema: {
-      type: 'string',
-      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
-    },
-  })
-  @ApiOkResponse({
-    description: 'OK',
-    type: ResultTechnicalTest,
-    isArray: true,
-  })
-  @ApiNotFoundResponse({ description: 'User not found' })
-  @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtAuthGuard)
-  @Get('results/user/:userId')
-  public async getTechnicalTestResultsByUserId(
-    @Param('userId') userId: number,
-  ): Promise<ResultTechnicalTest[]> {
-    return this.technicalTestService.getTechnicalTestResultsByUserId(userId);
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: CreateTechnicalTestDto,
+  ) {
+    return await this.technicalTestService.updateTechnicalTest(id, body);
   }
 }

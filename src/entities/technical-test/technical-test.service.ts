@@ -1,99 +1,85 @@
+import { InternshipStreamService } from '@entities/internship-stream/internship-stream.service';
+import { UserEntity } from '@entities/users/users.entity';
 import {
-  ConflictException,
+  BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { TechnicalTest } from './technical-test.entity';
-import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateTechnicalTestDto } from './dto/create-tech-test.dto';
-import { UpdateTechnicalTestDto } from './dto/update-tech-test.dto';
-import { ResultTechnicalTest } from './result-test.entity';
+import { Repository } from 'typeorm';
+import { CreateTechnicalTestDto } from './dto/tech-test.dto';
+import { TechnicalTest } from './technical-test.entity';
 
 @Injectable()
 export class TechnicalTestService {
   constructor(
     @InjectRepository(TechnicalTest)
-    private readonly questionRepository: Repository<TechnicalTest>,
-    @InjectRepository(ResultTechnicalTest)
-    private readonly resultRepository: Repository<ResultTechnicalTest>,
+    private readonly techTestRepository: Repository<TechnicalTest>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
+    private readonly streamService: InternshipStreamService,
   ) {}
 
-  // Get techical task
-  async getTechnicalTaskByDirection(
-    direction?: string,
-  ): Promise<TechnicalTest[]> {
-    if (direction) {
-      return this.questionRepository.find({ where: { direction } });
-    } else {
-      return this.questionRepository.find();
+  // Add new technical test
+  async addTechnicalTest(body: CreateTechnicalTestDto) {
+    const stream = await this.streamService.getActiveInternshipStream();
+    if (!stream) {
+      throw new BadRequestException('First, create a stream');
     }
+    const deadlineDate = this.getDateDeadline(stream.startDate);
+
+    const newTechTest = this.techTestRepository.create({
+      ...body,
+      internshipStreamId: stream.id,
+      deadline: deadlineDate.deadline,
+    });
+    await this.techTestRepository.save(newTechTest);
+
+    return { ...newTechTest, deadline: deadlineDate.formatDeadline };
   }
 
-  // Add new technical test
-  async addTechnicalTest(
-    createTechnicalTestDto: CreateTechnicalTestDto,
-  ): Promise<TechnicalTest> {
-    const newTechnicalTest = this.questionRepository.create(
-      createTechnicalTestDto,
-    );
-    return this.questionRepository.save(newTechnicalTest);
+  // Get technical task
+  async getTechnicalTest(userId: number) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    const stream = await this.streamService.getActiveInternshipStream();
+    const techTest = await this.techTestRepository.findOne({
+      where: { direction: user.direction, internshipStreamId: stream.id },
+    });
+    if (!techTest) {
+      throw new NotFoundException('Test not found');
+    }
+
+    return techTest;
   }
 
   // Update an technical test
-  async updateTechnicalTest(
-    id: number,
-    updateTechnicalTestDto: UpdateTechnicalTestDto,
-  ): Promise<TechnicalTest> {
-    const technicalTest = await this.questionRepository.findOne({
-      where: { id },
-    });
+  async updateTechnicalTest(id: number, body: CreateTechnicalTestDto) {
+    const techTest = await this.techTestRepository.findOne({ where: { id } });
+    Object.assign(techTest, body);
+    await this.techTestRepository.save(techTest);
 
-    if (!technicalTest) {
-      throw new NotFoundException('Technical test not found');
-    }
-
-    const updatedTechnicalTest = this.questionRepository.merge(
-      technicalTest,
-      updateTechnicalTestDto,
-    );
-    return this.questionRepository.save(updatedTechnicalTest);
+    return techTest;
   }
 
-  // Add result for a technical test
-  async addResultTechnicalTest(
-    resultData: ResultTechnicalTest,
-  ): Promise<ResultTechnicalTest> {
-    // const existingResult = await this.resultRepository.findOne({
-    //   where: {
-    //     userId: resultData.userId,
-    //     livePageLink: resultData.livePageLink,
-    //     repositoryLink: resultData.repositoryLink,
-    //   },
-    // });
+  // Get date deadline
+  private getDateDeadline(date: Date) {
+    const deadlineDate = new Date(date);
+    deadlineDate.setDate(deadlineDate.getDate() - 21);
+    deadlineDate.setHours(12);
+    deadlineDate.setMinutes(0);
+    const day = deadlineDate.getDate();
+    const month = deadlineDate.getMonth() + 1;
+    const year = deadlineDate.getFullYear();
+    const hours = deadlineDate.getHours();
+    const minutes = deadlineDate.getMinutes();
 
-    // if (existingResult) {
-    //   throw new ConflictException(
-    //     'Result with similar parameters already exists',
-    //   );
-    // }
-
-    return this.resultRepository.save(resultData);
-  }
-
-  // Get all test results
-  async getAllTestResults(): Promise<ResultTechnicalTest[]> {
-    return this.resultRepository.find();
-  }
-
-  // Get technical test results by user ID
-  async getTechnicalTestResultsByUserId(
-    userId: number,
-  ): Promise<ResultTechnicalTest[]> {
-    return this.resultRepository.find({
-      where: {
-        userId: userId,
-      },
-    });
+    return {
+      deadline: deadlineDate,
+      formatDeadline: `${day.toString().padStart(2, '0')}.${month
+        .toString()
+        .padStart(2, '0')}.${year} ${hours
+        .toString()
+        .padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`,
+    };
   }
 }

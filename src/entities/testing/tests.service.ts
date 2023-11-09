@@ -4,7 +4,11 @@ import { InternshipStream } from '@entities/internship-stream/internship-stream.
 import { QuestionsBlockService } from '@entities/questions-block/questions-block.service';
 import { QuestionsService } from '@entities/questions/questions.service';
 import { UserEntity } from '@entities/users/users.entity';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { UpdateTestDto } from './dto/test.dto';
@@ -27,8 +31,9 @@ export class TestsService {
     private readonly questionsService: QuestionsService,
   ) {}
 
-  // Create test
+  // Create test or get test
   public async createTest(userId: number) {
+    const currentDate = new Date();
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('User not found');
@@ -47,11 +52,15 @@ export class TestsService {
         internshipStream: stream.internshipStreamName,
       },
     });
+    const testTimeOver = new Date(test.endDate);
+    if (currentDate > testTimeOver) {
+      throw new BadRequestException('Test time is over');
+    }
     if (test) {
       return { ...test, questionBlocks: JSON.parse(test.questionBlocks) };
     }
-    const startDate = new Date(stream.startDate);
-    const endDate = new Date(startDate);
+
+    const endDate = new Date(currentDate);
     endDate.setDate(endDate.getDate() + 3);
     const testTime = this.formatTestTime(blockQuestions.blockCompletionTime);
 
@@ -59,7 +68,7 @@ export class TestsService {
       internshipStream: stream.internshipStreamName,
       direction: user.direction,
       streamNumber: stream.number,
-      startDate: startDate.toISOString(),
+      startDate: currentDate.toISOString(),
       endDate: endDate.toISOString(),
       owner: user.id,
       questionBlocks: JSON.stringify(blockQuestions.directions),

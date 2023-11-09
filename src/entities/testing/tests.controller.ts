@@ -14,6 +14,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiForbiddenResponse,
   ApiHeader,
@@ -39,7 +40,7 @@ import { TestsService } from './tests.service';
 export class TestController {
   constructor(private readonly testService: TestsService) {}
 
-  // Create test
+  // Create test or get test
   @ApiOperation({ summary: 'Create test or get test' })
   @ApiBearerAuth()
   @ApiHeader({
@@ -52,6 +53,7 @@ export class TestController {
     },
   })
   @ApiOkResponse({ description: 'OK', type: ResponseTestDto })
+  @ApiBadRequestResponse({ description: 'Test time is over' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
   @Post()
