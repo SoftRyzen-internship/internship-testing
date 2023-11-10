@@ -9,7 +9,10 @@ export class Question extends MyBaseEntity {
   @Column({ name: 'question_text', type: 'varchar' })
   public questionText: string;
 
-  @ApiProperty({ example: '123', description: 'Code of question' })
+  @ApiProperty({
+    example: '<div class=”box”></div>',
+    description: 'Code of question',
+  })
   @Column({ name: 'code', type: 'varchar', nullable: true })
   public code: string;
 
