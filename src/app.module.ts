@@ -24,6 +24,7 @@ import { GlobalExceptionFilter } from './logger/global-exception-filter';
 import { GlobalLoggerService } from './logger/global-logger.service';
 import { CorsMiddleware } from './middlewares/cors-middleware';
 import { TechnicalTestResultModule } from './entities/technical-test-result/technical-test-result.module';
+import { ParseXlsxModule } from './entities/parse-xlsx/parse-xlsx.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { TechnicalTestResultModule } from './entities/technical-test-result/tech
     PasswordModule,
     AnswersModule,
     TechnicalTestResultModule,
+    ParseXlsxModule,
   ],
   controllers: [],
   providers: [
