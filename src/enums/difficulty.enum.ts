@@ -3,3 +3,9 @@ export enum EDifficulty {
   MEDIUM = 'medium',
   HARD = 'hard',
 }
+
+export enum EPointsDifficulty {
+  EASY = 1,
+  MEDIUM = 2,
+  HARD = 3,
+}
