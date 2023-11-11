@@ -21,7 +21,11 @@ export class ParseXlsxService {
   ) {}
 
   // Upload file
-  public async uploadFileXlsx(file: Express.Multer.File, body: ParseXlsxDto) {
+  public async uploadFileXlsx(
+    file: Express.Multer.File,
+    body: ParseXlsxDto,
+    adminId: number,
+  ) {
     const jsonData = await this.convertXlsxToJSON(file, body.sheetName);
     let blockName: string;
     if (body.sheetName === 'HTMLCSS') {
@@ -58,13 +62,11 @@ export class ParseXlsxService {
       };
     });
 
-    const resultQuestions = [];
     for (const question of questions) {
-      const response = await this.questionService.createQuestion(1, question);
-      resultQuestions.push(response);
+      await this.questionService.createQuestion(adminId, question);
     }
     fs.unlinkSync(file.path);
-    return questions;
+    return { message: 'Access' };
   }
 
   // Convert XLSX to JSON

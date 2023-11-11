@@ -1,7 +1,11 @@
+import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
+import { Roles } from '@guards/roleGuard/decorators/role.decorator';
+import { RoleGuard } from '@guards/roleGuard/role.guard';
 import {
   Body,
   Controller,
   Post,
+  Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -9,7 +13,6 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
-  ApiConflictResponse,
   ApiForbiddenResponse,
   ApiHeader,
   ApiInternalServerErrorResponse,
@@ -18,13 +21,10 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { ParseXlsxDto } from './dto/parse-xlsx.dto';
-import { ParseXlsxService } from './parse-xlsx.service';
-import { ResponseCreateQuestionDto } from '@entities/questions/dto/quest.dto';
-import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
-import { Roles } from '@guards/roleGuard/decorators/role.decorator';
-import { RoleGuard } from '@guards/roleGuard/role.guard';
 import { ERole } from '@src/enums/role.enum';
+import { ParseXlsxDto, ResponseParseXlsxDto } from './dto/parse-xlsx.dto';
+import { ParseXlsxService } from './parse-xlsx.service';
+import { MyRequest } from '@src/types/request.interface';
 
 @ApiTags('Parse xlsx file')
 @Controller('api/parse-xlsx')
@@ -43,7 +43,7 @@ export class ParseXlsxController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiOkResponse({ description: 'OK', type: [ResponseCreateQuestionDto] })
+  @ApiOkResponse({ description: 'OK', type: ResponseParseXlsxDto })
   @ApiNotFoundResponse({ description: 'Block questions not found' })
   @ApiForbiddenResponse({ description: 'Forbidden' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
@@ -54,7 +54,8 @@ export class ParseXlsxController {
   public async uploadFileXlsx(
     @UploadedFile() file: Express.Multer.File,
     @Body() body: ParseXlsxDto,
+    @Req() req: MyRequest,
   ) {
-    return await this.parseXlsxService.uploadFileXlsx(file, body);
+    return await this.parseXlsxService.uploadFileXlsx(file, body, req.user.id);
   }
 }
