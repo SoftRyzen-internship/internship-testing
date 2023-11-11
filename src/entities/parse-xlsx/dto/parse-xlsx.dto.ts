@@ -9,3 +9,12 @@ export class ParseXlsxDto {
   @IsNotEmpty()
   public sheetName: string;
 }
+
+export class ResponseParseXlsxDto {
+  @ApiProperty({
+    example: 'Access',
+    description: 'File uploaded',
+  })
+  @IsNotEmpty()
+  public message: string;
+}
