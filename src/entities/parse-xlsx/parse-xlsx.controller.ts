@@ -13,6 +13,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiForbiddenResponse,
   ApiHeader,
   ApiInternalServerErrorResponse,
@@ -22,9 +23,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { ERole } from '@src/enums/role.enum';
-import { ParseXlsxDto, ResponseParseXlsxDto } from './dto/parse-xlsx.dto';
-import { ParseXlsxService } from './parse-xlsx.service';
 import { MyRequest } from '@src/types/request.interface';
+import {
+  ParseXlsxBodyFileDto,
+  ParseXlsxDto,
+  ResponseParseXlsxDto,
+} from './dto/parse-xlsx.dto';
+import { ParseXlsxService } from './parse-xlsx.service';
 
 @ApiTags('Parse xlsx file')
 @Controller('api/parse-xlsx')
@@ -42,6 +47,10 @@ export class ParseXlsxController {
       type: 'string',
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
+  })
+  @ApiBody({
+    description: 'File to upload',
+    type: ParseXlsxBodyFileDto,
   })
   @ApiOkResponse({ description: 'OK', type: ResponseParseXlsxDto })
   @ApiNotFoundResponse({ description: 'Block questions not found' })
