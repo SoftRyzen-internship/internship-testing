@@ -1,9 +1,7 @@
 import { AttemptsModule } from '@entities/attempts/attempts.module';
 import { BlockIpMiddleware } from '@entities/attempts/middleware/attempts.middleware';
-import { InternshipStream } from '@entities/internship-stream/internship-stream.entity';
 import { MailModule } from '@entities/mail/mail.module';
 import { MailService } from '@entities/mail/mail.service';
-import { TechnicalTest } from '@entities/technical-test/technical-test.entity';
 import { TokensModule } from '@entities/tokens/tokens.module';
 import { RoleEntity } from '@entities/users/role.entity';
 import { UserEntity } from '@entities/users/users.entity';
@@ -15,17 +13,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { Test } from '@entities/testing/tests.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      UserEntity,
-      RoleEntity,
-      InternshipStream,
-      Test,
-      TechnicalTest,
-    ]),
+    TypeOrmModule.forFeature([UserEntity, RoleEntity]),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
       serveRoot: '/avatars',

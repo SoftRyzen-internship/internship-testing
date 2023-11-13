@@ -7,11 +7,13 @@ import {
   ApiNotFoundResponse,
   ApiOperation,
   ApiResponse,
+  ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { DashboardService } from './dashboard.service';
 import { ResponseDashboardDto } from './dto/dashboard.dto';
 
+@ApiTags('Dashboard')
 @Controller('api/dashboard')
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}

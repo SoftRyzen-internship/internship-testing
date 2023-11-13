@@ -4,7 +4,7 @@ import { Column, Entity } from 'typeorm';
 import { EDifficulty } from '../../enums/difficulty.enum';
 
 @Entity('questions')
-export class Question extends MyBaseEntity {
+export class QuestionEntity extends MyBaseEntity {
   @ApiProperty({ example: 'What is Node.js?', description: 'Text question' })
   @Column({ name: 'question_text', type: 'varchar' })
   public questionText: string;

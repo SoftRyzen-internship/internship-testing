@@ -3,7 +3,7 @@ import { MyBaseEntity } from '@src/base/base.entity';
 import { Column, Entity } from 'typeorm';
 
 @Entity('tech_test')
-export class TechnicalTest extends MyBaseEntity {
+export class TechnicalTestEntity extends MyBaseEntity {
   @ApiProperty({ example: 1, description: 'Internship stream id' })
   @Column({ name: 'internship_stream_id', type: 'integer' })
   public internshipStreamId: number;

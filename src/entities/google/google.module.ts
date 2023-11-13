@@ -1,9 +1,6 @@
 import { AttemptsModule } from '@entities/attempts/attempts.module';
 import { AuthService } from '@entities/auth/auth.service';
-import { InternshipStream } from '@entities/internship-stream/internship-stream.entity';
 import { MailService } from '@entities/mail/mail.service';
-import { TechnicalTest } from '@entities/technical-test/technical-test.entity';
-import { Test } from '@entities/testing/tests.entity';
 import { TokensModule } from '@entities/tokens/tokens.module';
 import { RoleEntity } from '@entities/users/role.entity';
 import { UserEntity } from '@entities/users/users.entity';
@@ -20,13 +17,7 @@ import { GoogleService } from './google.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      UserEntity,
-      RoleEntity,
-      InternshipStream,
-      Test,
-      TechnicalTest,
-    ]),
+    TypeOrmModule.forFeature([UserEntity, RoleEntity]),
     PassportModule,
     JwtGuardsModule,
     ServeStaticModule.forRoot({

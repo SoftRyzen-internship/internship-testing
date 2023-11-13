@@ -4,13 +4,13 @@ import { JwtGuardsModule } from '@guards/jwtGuard/jwt-guard.module';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ResultTechnicalTest } from './result-test.entity';
+import { ResultTechnicalTestEntity } from './result-test.entity';
 import { TechnicalTestResultController } from './technical-test-result.controller';
 import { TechnicalTestResultService } from './technical-test-result.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ResultTechnicalTest, UserEntity]),
+    TypeOrmModule.forFeature([ResultTechnicalTestEntity, UserEntity]),
     JwtGuardsModule,
     TechnicalTestModule,
   ],

@@ -6,14 +6,14 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { ERole } from '@src/enums/role.enum';
 import { Repository } from 'typeorm';
-import { Direction } from './direction.entity';
+import { DirectionEntity } from './direction.entity';
 import { AddDirectionDto } from './dto/direction.dto';
 
 @Injectable()
 export class DirectionService {
   constructor(
-    @InjectRepository(Direction)
-    private readonly directionRepository: Repository<Direction>,
+    @InjectRepository(DirectionEntity)
+    private readonly directionRepository: Repository<DirectionEntity>,
   ) {}
 
   public async addDirection(id: number, body: AddDirectionDto) {

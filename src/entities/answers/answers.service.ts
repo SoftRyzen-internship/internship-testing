@@ -1,4 +1,4 @@
-import { Question } from '@entities/questions/question.entity';
+import { QuestionEntity } from '@entities/questions/question.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -10,14 +10,14 @@ export class AnswersService {
   constructor(
     @InjectRepository(AnswersEntity)
     private readonly answersRepository: Repository<AnswersEntity>,
-    @InjectRepository(Question)
-    private readonly questionRepository: Repository<Question>,
+    @InjectRepository(QuestionEntity)
+    private readonly questionRepository: Repository<QuestionEntity>,
   ) {}
 
   // Add answer
   public async createAnswer(
     blockName: string,
-    question: Question,
+    question: QuestionEntity,
     body: CreateAnswerDto[],
   ) {
     for (const answer of body) {

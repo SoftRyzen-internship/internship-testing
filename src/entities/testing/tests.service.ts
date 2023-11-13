@@ -1,6 +1,6 @@
 import { AnswersEntity } from '@entities/answers/answers.entity';
 import { AnswersService } from '@entities/answers/answers.service';
-import { InternshipStream } from '@entities/internship-stream/internship-stream.entity';
+import { InternshipStreamEntity } from '@entities/internship-stream/internship-stream.entity';
 import { QuestionsBlockService } from '@entities/questions-block/questions-block.service';
 import { QuestionsService } from '@entities/questions/questions.service';
 import { UserEntity } from '@entities/users/users.entity';
@@ -12,18 +12,18 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { UpdateTestDto } from './dto/test.dto';
-import { Test } from './tests.entity';
+import { TestEntity } from './tests.entity';
 import { IDirectionsForTests, ITestQuestions } from './types/interfaces';
 
 @Injectable()
 export class TestsService {
   constructor(
-    @InjectRepository(Test)
-    private readonly testRepository: Repository<Test>,
+    @InjectRepository(TestEntity)
+    private readonly testRepository: Repository<TestEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-    @InjectRepository(InternshipStream)
-    private readonly streamRepository: Repository<InternshipStream>,
+    @InjectRepository(InternshipStreamEntity)
+    private readonly streamRepository: Repository<InternshipStreamEntity>,
     @InjectRepository(AnswersEntity)
     private readonly answersRepository: Repository<AnswersEntity>,
     private readonly questionBlockService: QuestionsBlockService,

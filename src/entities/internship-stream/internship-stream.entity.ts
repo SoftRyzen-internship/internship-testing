@@ -3,7 +3,7 @@ import { MyBaseEntity } from '@src/base/base.entity';
 import { Column, Entity } from 'typeorm';
 
 @Entity('stream')
-export class InternshipStream extends MyBaseEntity {
+export class InternshipStreamEntity extends MyBaseEntity {
   @ApiProperty({
     example: 'Stream Winter 2023',
     description: 'Internship Stream',

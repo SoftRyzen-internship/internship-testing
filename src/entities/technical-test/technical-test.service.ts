@@ -9,13 +9,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { getDateDeadline } from '@utils/format-deadline-tech-test';
 import { Repository } from 'typeorm';
 import { CreateTechnicalTestDto } from './dto/tech-test.dto';
-import { TechnicalTest } from './technical-test.entity';
+import { TechnicalTestEntity } from './technical-test.entity';
 
 @Injectable()
 export class TechnicalTestService {
   constructor(
-    @InjectRepository(TechnicalTest)
-    private readonly techTestRepository: Repository<TechnicalTest>,
+    @InjectRepository(TechnicalTestEntity)
+    private readonly techTestRepository: Repository<TechnicalTestEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     private readonly streamService: InternshipStreamService,

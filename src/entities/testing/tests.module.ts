@@ -1,6 +1,6 @@
 import { AnswersEntity } from '@entities/answers/answers.entity';
 import { AnswersModule } from '@entities/answers/answers.module';
-import { InternshipStream } from '@entities/internship-stream/internship-stream.entity';
+import { InternshipStreamEntity } from '@entities/internship-stream/internship-stream.entity';
 import { QuestionsBlockModule } from '@entities/questions-block/questions-block.module';
 import { QuestionsModule } from '@entities/questions/questions.module';
 import { UserEntity } from '@entities/users/users.entity';
@@ -9,15 +9,15 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TestController } from './tests.controller';
-import { Test } from './tests.entity';
+import { TestEntity } from './tests.entity';
 import { TestsService } from './tests.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      Test,
+      TestEntity,
       UserEntity,
-      InternshipStream,
+      InternshipStreamEntity,
       AnswersEntity,
     ]),
     JwtGuardsModule,
