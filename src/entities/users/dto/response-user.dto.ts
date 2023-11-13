@@ -1,6 +1,58 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class ResponseUserDto {
+export class TestResponseCurrentUserDto {
+  @ApiProperty({
+    example: false,
+    description: 'Has the test been sent?',
+  })
+  public isSent: boolean;
+
+  @ApiProperty({
+    example: false,
+    description: 'Is start test',
+  })
+  public isStartTest: boolean;
+
+  @ApiProperty({
+    example: false,
+    description: 'Is success test',
+  })
+  public isSuccess: boolean;
+
+  @ApiProperty({
+    example: '2023-07-12 16:03:20.157888',
+    description: 'Start date of internship stream',
+  })
+  public startDate?: Date;
+
+  @ApiProperty({
+    example: '2023-07-12 16:03:20.157888',
+    description: 'End date of internship stream',
+  })
+  public endDate?: Date;
+}
+
+export class TaskResponseCurrentUserDto {
+  @ApiProperty({
+    example: false,
+    description: 'Start date of internship stream',
+  })
+  public isSent: boolean;
+
+  @ApiProperty({
+    example: false,
+    description: 'Start date of internship stream',
+  })
+  public isSuccess: boolean;
+
+  @ApiProperty({
+    example: '25.07.2023 12:00',
+    description: 'Start date of internship stream',
+  })
+  public deadlineDate: Date;
+}
+
+export class ResponseCurrentUserDto {
   @ApiProperty({ example: 1, description: 'Unique id user`s' })
   public id: number;
 
@@ -16,69 +68,143 @@ export class ResponseUserDto {
   })
   public updateAt: string;
 
+  @ApiProperty({ example: 'email', description: 'User  email' })
+  public email: string;
+
+  @ApiProperty({ example: 'URL', description: 'User avatar' })
+  public avatar: string;
+
   @ApiProperty({ example: 'Mark', description: 'User First name' })
   public firstName: string;
 
   @ApiProperty({ example: 'Spencer', description: 'User Last name' })
   public lastName: string;
 
-  @ApiProperty({ example: 'email@mail.net', description: 'User email' })
-  public email: string;
-
-  @ApiProperty({ example: '+380XXXXXXXXX', description: 'User contact phone' })
+  @ApiProperty({ example: 'contactPhone', description: 'User contact phone' })
   public phone: string;
 
   @ApiProperty({
-    example: 't.me/userName',
+    example: 'Telegram contact',
     description: 'User Telegram contact',
   })
   public telegramContact: string;
-
-  @ApiProperty({
-    example: 'Full Stack',
-    description: 'Direction in which the user was trained',
-  })
-  public direction: string;
-
-  @ApiProperty({
-    example: 'Group A',
-    description: 'Group in which the user studied',
-  })
-  public group: string;
 
   @ApiProperty({ example: 'Current city', description: 'User current city' })
   public currentCity: string;
 
   @ApiProperty({
-    example: '/avatars/avatar_pokemon.png',
-    description: 'User avatar url',
+    example: 'https://www.linkedin.com/in/user/',
+    description: 'User linkedin url',
+    required: true,
   })
-  public avatar: string;
+  public linkedinUrl: string;
 
   @ApiProperty({
-    example: 'Group T',
-    description: 'Internship field',
+    example: 'Beginner/Elementary(A1)',
+    description: 'English level',
+    required: true,
   })
-  public fieldOfInternship: string;
+  public englishLevel: string;
 
   @ApiProperty({
-    example: '5 stream',
-    description: 'Name internship stream',
+    example: 'resume url',
+    description: 'Resume url',
+    required: true,
   })
-  public nameInternshipStream: string;
+  public resumeUrl: string;
 
   @ApiProperty({
-    example: 'true',
-    description: 'Is confirm email',
+    example: 'https://my-documentation.herokuapp.com/api/docs',
+    description: 'Documentation tets url',
   })
+  public documentationTestUrl: string;
+
+  @ApiProperty({
+    example: "Because I'm the best",
+    description: 'Why are you the best candidate? What motivates you?',
+    required: true,
+  })
+  public whyAreYou: string;
+
+  @ApiProperty({
+    example: 'BackEnd, NestJS, Git',
+    description:
+      'What projects/tasks/technologies/tools are you interested in and would like to learn during your internship?',
+    required: true,
+  })
+  public whatProjectsInterested: string;
+
+  @ApiProperty({
+    example: 'Example of projects',
+    description:
+      'Do you have projects that you have worked on before and how did you succeed in completing them?',
+    required: true,
+  })
+  public haveProjects: string;
+
+  @ApiProperty({
+    example: 'Manager',
+    description: 'Your education and specialization before IT?',
+    required: true,
+  })
+  public education: string;
+
+  @ApiProperty({
+    example: '500 USD',
+    description: 'Specify the desired salary',
+    required: true,
+  })
+  public desiredSalary: string;
+
+  @ApiProperty({
+    example: true,
+    description: 'Data processing consent',
+    required: true,
+  })
+  public isDataProcessingConsent: boolean;
+
+  @ApiProperty({
+    example: 'Frontend',
+    description: 'Direction in which the user was trained',
+  })
+  public direction: string;
+
+  @ApiProperty({ example: 1, description: 'Stream internship id' })
+  public streamId: number;
+
+  @ApiProperty({ example: false, description: 'Is verified user' })
   public verified: boolean;
-
-  @ApiProperty({
-    example: 'user',
-    description: 'Role user`s',
-  })
-  public role: string;
 
   @ApiProperty({ example: false, description: 'Is passed test' })
   public isPassedTest: boolean;
+
+  @ApiProperty({ example: 65, description: 'Score test' })
+  public scoreTest: number;
+
+  @ApiProperty({ example: false, description: 'Is sent test' })
+  public isSentTest: boolean;
+
+  @ApiProperty({ example: false, description: 'Is start test' })
+  public isStartTest: boolean;
+
+  @ApiProperty({ example: false, description: 'Is passed technical task' })
+  public isPassedTechnicalTask: boolean;
+
+  @ApiProperty({ example: false, description: 'Is sent technical task' })
+  public isSentTechnicalTask: boolean;
+
+  @ApiProperty({ example: false, description: 'Is there a stream' })
+  public isLabelStream: boolean;
+
+  @ApiProperty({ example: false, description: 'Did you have an internship?' })
+  public isHaveInternship: boolean;
+
+  @ApiProperty({ example: ['user', 'admin'], description: 'User roles' })
+  public roles: string[];
+
+  @ApiProperty({ type: () => TestResponseCurrentUserDto })
+  public test?: TestResponseCurrentUserDto;
+
+  @ApiProperty({ type: () => TaskResponseCurrentUserDto })
+  public task?: TaskResponseCurrentUserDto;
 }

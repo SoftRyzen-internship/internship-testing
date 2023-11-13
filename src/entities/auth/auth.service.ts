@@ -1,8 +1,5 @@
 import { AttemptsService } from '@entities/attempts/attempts.service';
-import { InternshipStream } from '@entities/internship-stream/internship-stream.entity';
 import { MailService } from '@entities/mail/mail.service';
-import { TechnicalTest } from '@entities/technical-test/technical-test.entity';
-import { Test } from '@entities/testing/tests.entity';
 import { TokensService } from '@entities/tokens/tokens.service';
 import { RoleEntity } from '@entities/users/role.entity';
 import { UserEntity } from '@entities/users/users.entity';
@@ -20,8 +17,7 @@ import { ERole } from '@src/enums/role.enum';
 import * as bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
-import { RegisterUserDto } from './dto/create-user.dto';
-import { LoginDto, LoginResponseDto } from './dto/login.dto';
+import { AuthDto } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -29,20 +25,15 @@ export class AuthService {
     private readonly attemptsService: AttemptsService,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-    @InjectRepository(Test) private readonly testsRepository: Repository<Test>,
-    @InjectRepository(TechnicalTest)
-    private readonly technicalTestRepository: Repository<TechnicalTest>,
     @InjectRepository(RoleEntity)
     private readonly roleRepository: Repository<RoleEntity>,
-    @InjectRepository(InternshipStream)
-    private readonly streamRepository: Repository<InternshipStream>,
     private readonly mailService: MailService,
     private readonly tokensService: TokensService,
   ) {}
 
   // Register
-  public async registerUser(registerUserDto: RegisterUserDto) {
-    const { email, password } = registerUserDto;
+  public async registerUser(body: AuthDto) {
+    const { email, password } = body;
     const user = await this.userRepository.findOne({ where: { email } });
 
     if (user) {
@@ -62,7 +53,7 @@ export class AuthService {
     });
 
     const newUser = this.userRepository.create({
-      ...registerUserDto,
+      ...body,
       password: hashedPassword,
       verifyToken,
     });
@@ -71,75 +62,14 @@ export class AuthService {
     await this.roleRepository.save(role);
     await this.userRepository.save(newUser);
 
-    return await this.responseData(newUser.email);
+    return await this.tokensService.generateTokens(newUser);
   }
 
   // Login
-  public async login(loginDto: LoginDto, userIp: string) {
-    const user = await this.userValidate(
-      loginDto.email,
-      loginDto.password,
-      userIp,
-    );
+  public async login(body: AuthDto, userIp: string) {
+    const user = await this.userValidate(body.email, body.password, userIp);
 
-    return await this.responseData(user.email);
-  }
-
-  // Response data
-  public async responseData(email: string) {
-    const user: UserEntity = await this.getUser('email', email);
-    const stream: InternshipStream = await this.streamRepository.findOne({
-      where: { id: user.streamId },
-    });
-    const test: Test = await this.testsRepository.findOne({
-      where: { streamNumber: stream?.id },
-    });
-    const techTest: TechnicalTest = await this.technicalTestRepository.findOne({
-      where: { direction: user.direction },
-    });
-    const tokens = await this.tokensService.generateTokens(user);
-    const roles: string[] = user.roles.map((role) => role.role);
-
-    const streamData = {
-      id: stream?.id,
-      streamDirection: stream?.internshipStreamName,
-      isActive: stream?.isActive,
-      startDate: stream?.startDate,
-    };
-    const userData = {
-      id: user.id,
-      roles,
-      isLabelStream: user.isLabelStream,
-      stream: stream ? streamData : {},
-      isVerifiedEmail: user.verified,
-      test: {
-        isSent: user.isSentTest,
-        isStartTest: user.isStartTest,
-        isSuccess: user.isPassedTest,
-        startDate: test ? test.startDate : null,
-        endDate: test ? test?.endDate : null,
-      },
-      task: {
-        isSent: user.isSentTechnicalTask,
-        isSuccess: user.isPassedTechnicalTask,
-        deadlineDate: techTest ? techTest?.deadline : null,
-      },
-    };
-    const responseData: LoginResponseDto = {
-      refreshToken: tokens.refreshToken,
-      accessToken: tokens.accessToken,
-      user: userData,
-    };
-
-    if (!user.firstName || !user.phone) {
-      return responseData;
-    }
-
-    userData['firstName'] = user.firstName;
-    userData['avatar'] = user.avatar;
-    userData['direction'] = user.direction;
-
-    return responseData;
+    return await this.tokensService.generateTokens(user);
   }
 
   // Check phone

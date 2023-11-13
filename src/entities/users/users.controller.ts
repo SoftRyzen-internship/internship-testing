@@ -1,4 +1,3 @@
-import { LoginResponseDto } from '@entities/auth/dto/login.dto';
 import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
 import { Body, Controller, Get, Patch, Req, UseGuards } from '@nestjs/common';
 import {
@@ -12,6 +11,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { MyRequest } from '@src/types/request.interface';
+import { ResponseCurrentUserDto } from './dto/response-user.dto';
 import { UpdateDirectionDto } from './dto/update-direction.dto';
 import { UserDto } from './dto/update-user.dto';
 import { UserService } from './users.service';
@@ -33,7 +33,7 @@ export class UserController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiResponse({ status: 200, type: LoginResponseDto })
+  @ApiResponse({ status: 200, type: ResponseCurrentUserDto })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiUnauthorizedResponse({ description: 'Not authorized Invalid token type' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
@@ -60,7 +60,7 @@ export class UserController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiResponse({ status: 200, type: LoginResponseDto })
+  @ApiResponse({ status: 200, type: ResponseCurrentUserDto })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiUnauthorizedResponse({
     description:

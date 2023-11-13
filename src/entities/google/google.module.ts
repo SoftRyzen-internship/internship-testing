@@ -1,5 +1,4 @@
 import { AttemptsModule } from '@entities/attempts/attempts.module';
-import { AuthModule } from '@entities/auth/auth.module';
 import { AuthService } from '@entities/auth/auth.service';
 import { InternshipStream } from '@entities/internship-stream/internship-stream.entity';
 import { MailService } from '@entities/mail/mail.service';
@@ -8,6 +7,7 @@ import { Test } from '@entities/testing/tests.entity';
 import { TokensModule } from '@entities/tokens/tokens.module';
 import { RoleEntity } from '@entities/users/role.entity';
 import { UserEntity } from '@entities/users/users.entity';
+import { UserModule } from '@entities/users/users.module';
 import { JwtGuardsModule } from '@guards/jwtGuard/jwt-guard.module';
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
@@ -33,7 +33,7 @@ import { GoogleService } from './google.service';
       rootPath: join(__dirname, '..', 'public'),
       serveRoot: '/avatars',
     }),
-    AuthModule,
+    UserModule,
     AttemptsModule,
     TokensModule,
   ],
