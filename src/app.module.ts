@@ -25,6 +25,7 @@ import { GlobalLoggerService } from './logger/global-logger.service';
 import { CorsMiddleware } from './middlewares/cors-middleware';
 import { TechnicalTestResultModule } from './entities/technical-test-result/technical-test-result.module';
 import { ParseXlsxModule } from './entities/parse-xlsx/parse-xlsx.module';
+import { DashboardModule } from './entities/dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { ParseXlsxModule } from './entities/parse-xlsx/parse-xlsx.module';
     AnswersModule,
     TechnicalTestResultModule,
     ParseXlsxModule,
+    DashboardModule,
   ],
   controllers: [],
   providers: [
