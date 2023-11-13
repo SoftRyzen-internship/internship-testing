@@ -10,6 +10,7 @@ import {
 import { UpdateDirectionDto } from './dto/update-direction.dto';
 import { UserDto } from './dto/update-user.dto';
 import { UserEntity } from './users.entity';
+import { IUpdateUser } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
@@ -22,6 +23,60 @@ export class UserService {
   // Current user
   public async currentUser(email: string) {
     return await this.authService.responseData(email);
+
+    // const user: UserEntity = await this.getUser('email', email);
+    // const stream: InternshipStream = await this.streamRepository.findOne({
+    //   where: { id: user.streamId },
+    // });
+    // const test: Test = await this.testsRepository.findOne({
+    //   where: { streamNumber: stream?.id },
+    // });
+    // const techTest: TechnicalTest = await this.technicalTestRepository.findOne({
+    //   where: { direction: user.direction },
+    // });
+    // const tokens = await this.tokensService.generateTokens(user);
+    // const roles: string[] = user.roles.map((role) => role.role);
+
+    // const streamData = {
+    //   id: stream?.id,
+    //   streamDirection: stream?.internshipStreamName,
+    //   isActive: stream?.isActive,
+    //   startDate: stream?.startDate,
+    // };
+    // const userData = {
+    //   id: user.id,
+    //   roles,
+    //   isLabelStream: user.isLabelStream,
+    //   stream: stream ? streamData : {},
+    //   isVerifiedEmail: user.verified,
+    //   test: {
+    //     isSent: user.isSentTest,
+    //     isStartTest: user.isStartTest,
+    //     isSuccess: user.isPassedTest,
+    //     startDate: test ? test.startDate : null,
+    //     endDate: test ? test?.endDate : null,
+    //   },
+    //   task: {
+    //     isSent: user.isSentTechnicalTask,
+    //     isSuccess: user.isPassedTechnicalTask,
+    //     deadlineDate: techTest ? techTest?.deadline : null,
+    //   },
+    // };
+    // const responseData: LoginResponseDto = {
+    //   refreshToken: tokens.refreshToken,
+    //   accessToken: tokens.accessToken,
+    //   user: userData,
+    // };
+
+    // if (!user.firstName || !user.phone) {
+    //   return responseData;
+    // }
+
+    // userData['firstName'] = user.firstName;
+    // userData['avatar'] = user.avatar;
+    // userData['direction'] = user.direction;
+
+    // return responseData;
   }
 
   // Get user
@@ -36,13 +91,14 @@ export class UserService {
   }
 
   // Update user
-  public async updateUser(email: string, body: UserDto) {
+  public async updateUser(email: string, body: IUpdateUser) {
     const user = await this.getUser(email);
     if (user) {
       await this.userRepository.update(user.id, body);
     }
     return await this.authService.responseData(email);
   }
+
   // Update direction
   public async updateUserDirection(
     email: string,
