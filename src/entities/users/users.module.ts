@@ -1,4 +1,5 @@
 import { AuthModule } from '@entities/auth/auth.module';
+import { Direction } from '@entities/direction/direction.entity';
 import { InternshipStream } from '@entities/internship-stream/internship-stream.entity';
 import { TechnicalTest } from '@entities/technical-test/technical-test.entity';
 import { Test } from '@entities/testing/tests.entity';
@@ -21,6 +22,7 @@ import { UserService } from './users.service';
       Test,
       TechnicalTest,
       InternshipStream,
+      Direction,
     ]),
     JwtGuardsModule,
     TokensModule,

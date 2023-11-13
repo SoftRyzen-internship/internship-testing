@@ -1,3 +1,4 @@
+import { Direction } from '@entities/direction/direction.entity';
 import { InternshipStream } from '@entities/internship-stream/internship-stream.entity';
 import { TechnicalTest } from '@entities/technical-test/technical-test.entity';
 import { Test } from '@entities/testing/tests.entity';
@@ -25,6 +26,8 @@ export class UserService {
     private readonly technicalTestRepository: Repository<TechnicalTest>,
     @InjectRepository(InternshipStream)
     private readonly streamRepository: Repository<InternshipStream>,
+    @InjectRepository(Direction)
+    private readonly directionRepository: Repository<Direction>,
     private readonly tokensService: TokensService,
   ) {}
 
@@ -110,7 +113,7 @@ export class UserService {
     const users: UserEntity[] = [...usersRegister].filter(
       (user) => user.direction !== ERole.ADMIN,
     );
-    const direction = ['QA', 'PM', 'Frontend'];
+    const direction = await this.directionRepository.find();
     const studentsByDirection: IStudentsByDirection = this.userReduce(users);
     const countPassedTest = this.filterUsers(users, 'isPassedTest');
     const countPassedTechnicalTask = this.filterUsers(
