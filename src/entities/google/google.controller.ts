@@ -1,4 +1,3 @@
-import { LoginResponseDto } from '@entities/auth/dto/login.dto';
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
@@ -11,6 +10,7 @@ import {
 } from '@nestjs/swagger';
 import { MyRequest } from '@src/types/request.interface';
 import { Response } from 'express';
+import { GoogleAuthResponseDto } from './dto/google.dto';
 import { GoogleService } from './google.service';
 
 @ApiTags('Google authentication')
@@ -37,7 +37,7 @@ export class GoogleController {
     example:
       '{successToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..., user: {id: 1, ...}}',
   })
-  @ApiResponse({ status: 200, type: LoginResponseDto })
+  @ApiResponse({ status: 200, type: GoogleAuthResponseDto })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @Get('/callback')

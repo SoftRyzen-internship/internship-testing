@@ -1,7 +1,11 @@
-import { AuthService } from '@entities/auth/auth.service';
+import { InternshipStream } from '@entities/internship-stream/internship-stream.entity';
+import { TechnicalTest } from '@entities/technical-test/technical-test.entity';
+import { Test } from '@entities/testing/tests.entity';
+import { TokensService } from '@entities/tokens/tokens.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ERole } from '@src/enums/role.enum';
+import { getDateDeadline } from '@utils/format-deadline-tech-test';
 import { Repository } from 'typeorm';
 import {
   IStudentsByDirection,
@@ -10,79 +14,70 @@ import {
 import { UpdateDirectionDto } from './dto/update-direction.dto';
 import { UserDto } from './dto/update-user.dto';
 import { UserEntity } from './users.entity';
-import { IUpdateUser } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-    private readonly authService: AuthService,
+    @InjectRepository(Test) private readonly testsRepository: Repository<Test>,
+    @InjectRepository(TechnicalTest)
+    private readonly technicalTestRepository: Repository<TechnicalTest>,
+    @InjectRepository(InternshipStream)
+    private readonly streamRepository: Repository<InternshipStream>,
+    private readonly tokensService: TokensService,
   ) {}
 
   // Current user
   public async currentUser(email: string) {
-    return await this.authService.responseData(email);
+    const user: UserEntity = await this.getUser(email);
+    const userWithoutPassword = this.deleteFieldsOfUser(user);
+    const stream: InternshipStream = await this.streamRepository.findOne({
+      where: { id: user.streamId },
+    });
+    const test: Test = await this.testsRepository.findOne({
+      where: { streamNumber: stream?.id },
+    });
+    const techTest: TechnicalTest = await this.technicalTestRepository.findOne({
+      where: { direction: user.direction },
+    });
+    const tokens = await this.tokensService.generateTokens(user);
 
-    // const user: UserEntity = await this.getUser('email', email);
-    // const stream: InternshipStream = await this.streamRepository.findOne({
-    //   where: { id: user.streamId },
-    // });
-    // const test: Test = await this.testsRepository.findOne({
-    //   where: { streamNumber: stream?.id },
-    // });
-    // const techTest: TechnicalTest = await this.technicalTestRepository.findOne({
-    //   where: { direction: user.direction },
-    // });
-    // const tokens = await this.tokensService.generateTokens(user);
-    // const roles: string[] = user.roles.map((role) => role.role);
+    const userData = {
+      ...userWithoutPassword,
+      test: {
+        isSent: user.isSentTest,
+        isStartTest: user.isStartTest,
+        isSuccess: user.isPassedTest,
+        startDate: test ? test.startDate : null,
+        endDate: test ? test.endDate : null,
+      },
+      task: {
+        isSent: user.isSentTechnicalTask,
+        isSuccess: user.isPassedTechnicalTask,
+        deadlineDate: techTest
+          ? getDateDeadline(techTest.deadline).formatDeadline
+          : null,
+      },
+    };
+    const responseData = {
+      refreshToken: tokens.refreshToken,
+      accessToken: tokens.accessToken,
+      user: userData,
+    };
 
-    // const streamData = {
-    //   id: stream?.id,
-    //   streamDirection: stream?.internshipStreamName,
-    //   isActive: stream?.isActive,
-    //   startDate: stream?.startDate,
-    // };
-    // const userData = {
-    //   id: user.id,
-    //   roles,
-    //   isLabelStream: user.isLabelStream,
-    //   stream: stream ? streamData : {},
-    //   isVerifiedEmail: user.verified,
-    //   test: {
-    //     isSent: user.isSentTest,
-    //     isStartTest: user.isStartTest,
-    //     isSuccess: user.isPassedTest,
-    //     startDate: test ? test.startDate : null,
-    //     endDate: test ? test?.endDate : null,
-    //   },
-    //   task: {
-    //     isSent: user.isSentTechnicalTask,
-    //     isSuccess: user.isPassedTechnicalTask,
-    //     deadlineDate: techTest ? techTest?.deadline : null,
-    //   },
-    // };
-    // const responseData: LoginResponseDto = {
-    //   refreshToken: tokens.refreshToken,
-    //   accessToken: tokens.accessToken,
-    //   user: userData,
-    // };
+    if (!user.firstName || !user.phone) {
+      return responseData;
+    }
 
-    // if (!user.firstName || !user.phone) {
-    //   return responseData;
-    // }
-
-    // userData['firstName'] = user.firstName;
-    // userData['avatar'] = user.avatar;
-    // userData['direction'] = user.direction;
-
-    // return responseData;
+    return responseData;
   }
 
   // Get user
   public async getUser(email: string) {
     const user = await this.userRepository.findOne({
       where: { email },
+      relations: ['roles'],
     });
     if (!user) {
       throw new NotFoundException();
@@ -91,12 +86,12 @@ export class UserService {
   }
 
   // Update user
-  public async updateUser(email: string, body: IUpdateUser) {
+  public async updateUser(email: string, body: UserDto) {
     const user = await this.getUser(email);
     if (user) {
       await this.userRepository.update(user.id, body);
     }
-    return await this.authService.responseData(email);
+    return await this.currentUser(email);
   }
 
   // Update direction
@@ -155,5 +150,16 @@ export class UserService {
       {},
     );
     return studentsByDirection;
+  }
+
+  // Delete fields of user
+  private deleteFieldsOfUser(user: UserEntity) {
+    const roles: string[] = user.roles.map((role) => role.role);
+    delete user.password;
+    delete user.verifyToken;
+    delete user.fileId;
+    delete user.refreshToken;
+
+    return { ...user, roles };
   }
 }
