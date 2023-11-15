@@ -1,3 +1,4 @@
+import { DirectionEntity } from '@entities/direction/direction.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -9,6 +10,8 @@ export class InternshipStreamService {
   constructor(
     @InjectRepository(InternshipStreamEntity)
     private readonly internshipStreamRepository: Repository<InternshipStreamEntity>,
+    @InjectRepository(DirectionEntity)
+    private readonly directionRepository: Repository<DirectionEntity>,
   ) {}
 
   // Create new stream
@@ -37,9 +40,21 @@ export class InternshipStreamService {
 
   // Get active stream
   public async getActiveInternshipStream() {
-    return await this.internshipStreamRepository.findOne({
+    const stream = await this.internshipStreamRepository.findOne({
       where: { isActive: true },
     });
+    const directions: DirectionEntity[] = [];
+
+    if (stream && stream.directions.length !== 0) {
+      for (const directionStream of stream.directions) {
+        const direction = await this.directionRepository.findOne({
+          where: { direction: directionStream },
+        });
+        directions.push(direction);
+      }
+    }
+
+    return { ...stream, directions };
   }
 
   // Get all streams
