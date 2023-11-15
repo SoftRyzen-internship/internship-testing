@@ -1,3 +1,4 @@
+import { DirectionEntity } from '@entities/direction/direction.entity';
 import { JwtGuardsModule } from '@guards/jwtGuard/jwt-guard.module';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -8,7 +9,7 @@ import { InternshipStreamService } from './internship-stream.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([InternshipStreamEntity]),
+    TypeOrmModule.forFeature([InternshipStreamEntity, DirectionEntity]),
     JwtGuardsModule,
   ],
   providers: [InternshipStreamService, ConfigService],

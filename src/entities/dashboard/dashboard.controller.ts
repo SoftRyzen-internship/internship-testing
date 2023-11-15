@@ -1,4 +1,6 @@
 import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
+import { Roles } from '@guards/roleGuard/decorators/role.decorator';
+import { RoleGuard } from '@guards/roleGuard/role.guard';
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -10,6 +12,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { ERole } from '@src/enums/role.enum';
 import { DashboardService } from './dashboard.service';
 import { ResponseDashboardDto } from './dto/dashboard.dto';
 
@@ -37,7 +40,8 @@ export class DashboardController {
   })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(ERole.ADMIN)
   @Get()
   public async dashboard() {
     return await this.dashboardService.dashboard();
