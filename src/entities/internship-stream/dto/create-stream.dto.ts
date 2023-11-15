@@ -9,22 +9,15 @@ export class CreateStreamDto {
   })
   @IsString()
   @IsNotEmpty()
-  internshipStreamName: string;
+  public internshipStreamName: string;
 
   @ApiProperty({
-    example: [
-      'Frontend',
-      'Backend',
-      'QA (Quality Assurance)',
-      'PM',
-      'UX/UI design',
-    ],
-    description: 'Directions on the stream',
+    example: [1, 2, 3],
+    description: 'Directions id on the stream',
   })
   @IsArray()
-  @IsString({ each: true })
   @IsNotEmpty()
-  directions: string[];
+  public directionsIds: number[];
 
   @ApiProperty({
     example: '2023-11-01T00:00:00.000Z',
@@ -33,7 +26,7 @@ export class CreateStreamDto {
   @IsDate()
   @IsNotEmpty()
   @Type(() => Date)
-  startDate: Date;
+  public startDate: Date;
 
   @ApiProperty({
     example: '2023-11-01T00:00:00.000Z',
@@ -42,5 +35,41 @@ export class CreateStreamDto {
   @IsDate()
   @IsNotEmpty()
   @Type(() => Date)
-  endDate: Date;
+  public endDate: Date;
+
+  @ApiProperty({
+    example: '2023-11-01T00:00:00.000Z',
+    description: 'Start date of testing',
+  })
+  @IsDate()
+  @IsNotEmpty()
+  @Type(() => Date)
+  public startDateTesting: Date;
+
+  @ApiProperty({
+    example: '2023-11-01T00:00:00.000Z',
+    description: 'End date of testing',
+  })
+  @IsDate()
+  @IsNotEmpty()
+  @Type(() => Date)
+  public endDateTesting: Date;
+
+  @ApiProperty({
+    example: '2023-11-01T00:00:00.000Z',
+    description: 'Start date of technical test',
+  })
+  @IsDate()
+  @IsNotEmpty()
+  @Type(() => Date)
+  public startDateTechnicalTest: Date;
+
+  @ApiProperty({
+    example: '2023-11-01T00:00:00.000Z',
+    description: 'End date of internship stream',
+  })
+  @IsDate()
+  @IsNotEmpty()
+  @Type(() => Date)
+  public endDateTechnicalTest: Date;
 }

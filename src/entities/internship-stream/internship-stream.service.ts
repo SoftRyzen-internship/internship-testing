@@ -25,13 +25,10 @@ export class InternshipStreamService {
     }
 
     const newStream = this.internshipStreamRepository.create({
-      internshipStreamName: body.internshipStreamName,
-      directions: body.directions,
+      ...body,
       owner: 'admin',
       ownerId: adminId,
       number: lastActiveStream ? lastActiveStream.number + 1 : 1,
-      startDate: body.startDate,
-      endDate: body.endDate,
     });
 
     const createdStream = await this.internshipStreamRepository.save(newStream);
@@ -45,10 +42,10 @@ export class InternshipStreamService {
     });
     const directions: DirectionEntity[] = [];
 
-    if (stream && stream.directions.length !== 0) {
-      for (const directionStream of stream.directions) {
+    if (stream && stream.directionsId.length !== 0) {
+      for (const directionIdStream of stream.directionsId) {
         const direction = await this.directionRepository.findOne({
-          where: { direction: directionStream },
+          where: { id: directionIdStream },
         });
         directions.push(direction);
       }
