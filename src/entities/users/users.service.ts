@@ -52,9 +52,7 @@ export class UserService {
       task: {
         isSent: user.isSentTechnicalTask,
         isSuccess: user.isPassedTechnicalTask,
-        deadlineDate: techTest
-          ? getDateDeadline(techTest.deadline).formatDeadline
-          : null,
+        deadlineDate: techTest ? getDateDeadline(techTest.deadline) : null,
       },
     };
     const responseData = {

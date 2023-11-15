@@ -27,16 +27,16 @@ export class TechnicalTestService {
     if (!stream) {
       throw new BadRequestException('First, create a stream');
     }
-    const deadlineDate = getDateDeadline(stream.startDate);
+    const deadlineDate = getDateDeadline(stream.endDateTechnicalTest);
 
     const newTechTest = this.techTestRepository.create({
       ...body,
       internshipStreamId: stream.id,
-      deadline: deadlineDate.deadline,
+      deadline: stream.endDateTechnicalTest,
     });
     await this.techTestRepository.save(newTechTest);
 
-    return { ...newTechTest, deadline: deadlineDate.formatDeadline };
+    return { ...newTechTest, deadline: deadlineDate };
   }
 
   // Get technical task

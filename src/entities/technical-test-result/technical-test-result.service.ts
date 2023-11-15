@@ -2,7 +2,7 @@ import { TechnicalTestService } from '@entities/technical-test/technical-test.se
 import { UserEntity } from '@entities/users/users.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
 import {
   CreateResultTechnicalDto,
   UpdateResultTechnicalDto,
@@ -39,11 +39,11 @@ export class TechnicalTestResultService {
 
   // Get all test results
   public async getAllTestResults(isChecked: boolean) {
-    if (isChecked === undefined) {
-      return await this.resultRepository.find();
-    } else {
-      return await this.resultRepository.find({ where: { isChecked } });
+    const filtered: FindManyOptions = {};
+    if (isChecked !== undefined) {
+      filtered.where = { isChecked };
     }
+    return await this.resultRepository.find(filtered);
   }
 
   // Get technical test results by user ID
