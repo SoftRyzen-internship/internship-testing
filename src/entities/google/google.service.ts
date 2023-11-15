@@ -1,4 +1,4 @@
-import { AuthService } from '@entities/auth/auth.service';
+import { TokensService } from '@entities/tokens/tokens.service';
 import { RoleEntity } from '@entities/users/role.entity';
 import { UserEntity } from '@entities/users/users.entity';
 import { Injectable } from '@nestjs/common';
@@ -13,15 +13,16 @@ export class GoogleService {
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(RoleEntity)
     private readonly roleRepository: Repository<RoleEntity>,
-    private readonly authService: AuthService,
+    private readonly tokensService: TokensService,
   ) {}
 
   public async auth(email: string) {
     const user = await this.userRepository.findOne({
       where: { email },
+      relations: ['roles'],
     });
     if (user) {
-      return await this.authService.responseData(user.email);
+      return await this.tokensService.generateTokens(user);
     }
 
     const role = this.roleRepository.create({
@@ -36,6 +37,6 @@ export class GoogleService {
     await this.roleRepository.save(role);
     await this.userRepository.save(newUser);
 
-    return await this.authService.responseData(newUser.email);
+    return await this.tokensService.generateTokens(newUser);
   }
 }

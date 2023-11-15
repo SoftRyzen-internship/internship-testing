@@ -156,13 +156,6 @@ export class UserEntity extends MyBaseEntity {
   public isDataProcessingConsent: boolean;
 
   @ApiProperty({
-    example: 'Group 47',
-    description: 'Group in which the user studied',
-  })
-  @Column({ name: 'group', type: 'varchar', nullable: true })
-  public group: string;
-
-  @ApiProperty({
     example: 'Frontend',
     description: 'Direction in which the user was trained',
   })
@@ -223,7 +216,7 @@ export class UserEntity extends MyBaseEntity {
 
   @ApiProperty({ example: 'Refresh token', description: ' Refresh  token' })
   @Column({ name: 'refresh_token', type: 'varchar', nullable: true })
-  refreshToken: string;
+  public refreshToken: string;
 
   @ManyToMany(() => RoleEntity, (roles) => roles.users, { onDelete: 'CASCADE' })
   @JoinTable()

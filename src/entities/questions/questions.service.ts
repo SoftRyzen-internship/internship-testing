@@ -1,21 +1,21 @@
-import { AnswersEntity } from '@entities/answers/answers.entity'
-import { AnswersService } from '@entities/answers/answers.service'
-import { QuestionsBlockEntity } from '@entities/questions-block/questions-block.entity'
+import { AnswersEntity } from '@entities/answers/answers.entity';
+import { AnswersService } from '@entities/answers/answers.service';
+import { QuestionsBlockEntity } from '@entities/questions-block/questions-block.entity';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
-} from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { In, Repository } from 'typeorm'
-import { CreateQuestionDto, UpdateQuestionDto } from './dto/quest.dto'
-import { Question } from './question.entity'
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { In, Repository } from 'typeorm';
+import { CreateQuestionDto, UpdateQuestionDto } from './dto/quest.dto';
+import { QuestionEntity } from './question.entity';
 
 @Injectable()
 export class QuestionsService {
   constructor(
-    @InjectRepository(Question)
-    private readonly questionRepository: Repository<Question>,
+    @InjectRepository(QuestionEntity)
+    private readonly questionRepository: Repository<QuestionEntity>,
     @InjectRepository(QuestionsBlockEntity)
     private readonly blockQuestionRepository: Repository<QuestionsBlockEntity>,
     @InjectRepository(AnswersEntity)
@@ -40,9 +40,11 @@ export class QuestionsService {
       throw new BadRequestException('Block questions not found');
     }
 
-    const question = await this.questionRepository.findOne({where: {questionText}})
-    if(question) {
-      return true
+    const question = await this.questionRepository.findOne({
+      where: { questionText },
+    });
+    if (question) {
+      return true;
     }
     const newQuestion = this.questionRepository.create({
       questionText,

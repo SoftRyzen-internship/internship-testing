@@ -4,7 +4,7 @@ import { EDifficulty } from '@src/enums/difficulty.enum';
 import { Column, Entity } from 'typeorm';
 
 @Entity('result_tech_test')
-export class ResultTechnicalTest extends MyBaseEntity {
+export class ResultTechnicalTestEntity extends MyBaseEntity {
   @ApiProperty({
     example: 1,
     description: 'User id',

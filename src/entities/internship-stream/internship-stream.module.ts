@@ -3,11 +3,14 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { InternshipStreamController } from './internship-stream.controller';
-import { InternshipStream } from './internship-stream.entity';
+import { InternshipStreamEntity } from './internship-stream.entity';
 import { InternshipStreamService } from './internship-stream.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([InternshipStream]), JwtGuardsModule],
+  imports: [
+    TypeOrmModule.forFeature([InternshipStreamEntity]),
+    JwtGuardsModule,
+  ],
   providers: [InternshipStreamService, ConfigService],
   controllers: [InternshipStreamController],
   exports: [InternshipStreamService],

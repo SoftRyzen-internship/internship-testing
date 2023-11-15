@@ -3,8 +3,8 @@ import { MyBaseEntity } from '@src/base/base.entity';
 import { Column, Entity, Unique } from 'typeorm';
 
 @Entity('direction')
-export class Direction extends MyBaseEntity {
-  @ApiProperty({ example: 'Full stack', description: 'Internship direction' })
+export class DirectionEntity extends MyBaseEntity {
+  @ApiProperty({ example: 'Frontend', description: 'Internship direction' })
   @Column({ name: 'internship_direction', type: 'varchar' })
   @Unique(['direction'])
   direction: string;

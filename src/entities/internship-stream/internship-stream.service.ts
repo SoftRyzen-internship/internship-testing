@@ -2,13 +2,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateStreamDto } from './dto/create-stream.dto';
-import { InternshipStream } from './internship-stream.entity';
+import { InternshipStreamEntity } from './internship-stream.entity';
 
 @Injectable()
 export class InternshipStreamService {
   constructor(
-    @InjectRepository(InternshipStream)
-    private readonly internshipStreamRepository: Repository<InternshipStream>,
+    @InjectRepository(InternshipStreamEntity)
+    private readonly internshipStreamRepository: Repository<InternshipStreamEntity>,
   ) {}
 
   // Create new stream

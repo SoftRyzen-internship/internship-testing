@@ -7,15 +7,15 @@ import {
   CreateResultTechnicalDto,
   UpdateResultTechnicalDto,
 } from './dto/result.dto';
-import { ResultTechnicalTest } from './result-test.entity';
+import { ResultTechnicalTestEntity } from './result-test.entity';
 
 @Injectable()
 export class TechnicalTestResultService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-    @InjectRepository(ResultTechnicalTest)
-    private readonly resultRepository: Repository<ResultTechnicalTest>,
+    @InjectRepository(ResultTechnicalTestEntity)
+    private readonly resultRepository: Repository<ResultTechnicalTestEntity>,
     private readonly techTestService: TechnicalTestService,
   ) {}
 

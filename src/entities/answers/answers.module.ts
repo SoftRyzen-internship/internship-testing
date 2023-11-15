@@ -1,4 +1,4 @@
-import { Question } from '@entities/questions/question.entity';
+import { QuestionEntity } from '@entities/questions/question.entity';
 import { JwtGuardsModule } from '@guards/jwtGuard/jwt-guard.module';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -9,7 +9,7 @@ import { AnswersService } from './answers.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AnswersEntity, Question]),
+    TypeOrmModule.forFeature([AnswersEntity, QuestionEntity]),
     JwtGuardsModule,
   ],
   controllers: [AnswersController],

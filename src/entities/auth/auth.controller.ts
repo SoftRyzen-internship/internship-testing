@@ -22,10 +22,13 @@ import {
 } from '@nestjs/swagger';
 import { MyRequest } from '@src/types/request.interface';
 import { AuthService } from './auth.service';
-import { RegisterUserDto } from './dto/create-user.dto';
-import { LoginDto, LoginResponseDto, LogoutResponseDto } from './dto/login.dto';
-import { PhoneDto } from './dto/phone.dto';
-import { RegularExpressionResponseDto } from './dto/regular-expression.response.dto';
+import {
+  AuthDto,
+  AuthResponseDto,
+  LogoutResponseDto,
+  PhoneDto,
+  RegularExpressionResponseDto,
+} from './dto/auth.dto';
 
 @ApiTags('Authentication')
 @Controller('api/auth')
@@ -35,16 +38,14 @@ export class AuthController {
   // Register
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
-  @ApiResponse({ status: 201, type: RegisterUserDto })
-  async registerUser(
-    @Body(ValidationPipe) registerUserDto: RegisterUserDto,
-  ): Promise<LoginResponseDto> {
-    return this.authService.registerUser(registerUserDto);
+  @ApiResponse({ status: 201, type: AuthResponseDto })
+  public async registerUser(@Body(ValidationPipe) body: AuthDto) {
+    return await this.authService.registerUser(body);
   }
 
   // Login
   @ApiOperation({ summary: 'Login' })
-  @ApiResponse({ status: 201, type: LoginResponseDto })
+  @ApiResponse({ status: 201, type: AuthResponseDto })
   @ApiUnauthorizedResponse({
     description: 'Email is wrong, or password is wrong or email not verified',
   })
@@ -54,12 +55,11 @@ export class AuthController {
   })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @Post('login')
-  async login(@Body() loginDto: LoginDto, @Req() req: MyRequest) {
-    const data = await this.authService.login(loginDto, req.ip);
+  public async login(@Body() body: AuthDto, @Req() req: MyRequest) {
+    const data = await this.authService.login(body, req.ip);
     return {
       refreshToken: data.refreshToken,
       accessToken: data.accessToken,
-      user: data.user,
     };
   }
 
@@ -69,7 +69,7 @@ export class AuthController {
   @ApiConflictResponse({ description: 'Phone number already exists' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @Post('check-phone')
-  async checkPhone(@Body() body: PhoneDto) {
+  public async checkPhone(@Body() body: PhoneDto) {
     return this.authService.checkPhone(body.phone);
   }
 
@@ -104,8 +104,8 @@ export class AuthController {
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
   @Get('logout')
-  logout(@Req() req: MyRequest) {
-    this.authService.logout(req.user.email);
+  public async logout(@Req() req: MyRequest) {
+    await this.authService.logout(req.user.email);
     return { message: 'Disconnect...' };
   }
 }

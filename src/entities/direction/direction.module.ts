@@ -6,12 +6,12 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DirectionController } from './direction.controller';
-import { Direction } from './direction.entity';
+import { DirectionEntity } from './direction.entity';
 import { DirectionService } from './direction.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Direction]),
+    TypeOrmModule.forFeature([DirectionEntity]),
     JwtGuardsModule,
     RoleGuardsModule,
   ],
