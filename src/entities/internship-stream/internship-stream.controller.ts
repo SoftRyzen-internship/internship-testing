@@ -61,12 +61,10 @@ export class InternshipStreamController {
     @Body() body: CreateStreamDto,
     @Req() req: MyRequest,
   ) {
-    const createdStream =
-      await this.internshipStreamService.createInternshipStream(
-        req.user.id,
-        body,
-      );
-    return createdStream;
+    return await this.internshipStreamService.createInternshipStream(
+      req.user.id,
+      body,
+    );
   }
 
   // Get active stream

@@ -1,7 +1,7 @@
 import { DirectionEntity } from '@entities/direction/direction.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
 import { CreateStreamDto } from './dto/create-stream.dto';
 import { InternshipStreamEntity } from './internship-stream.entity';
 
@@ -61,22 +61,20 @@ export class InternshipStreamService {
     direction: string,
     startDate: string,
   ) {
-    const filter: any = {};
+    const filter: FindManyOptions = {
+      order: { number: 'DESC' },
+    };
     if (number !== undefined) {
-      filter.number = Number(number);
+      filter.where = { ...filter.where, number: Number(number) };
     }
     if (internshipStreamName !== undefined) {
-      filter.internshipStreamName = internshipStreamName;
+      filter.where = { ...filter.where, internshipStreamName };
     }
     if (startDate !== undefined) {
-      filter.startDate = startDate;
+      filter.where = { ...filter.where, startDate };
     }
 
-    const streams = await this.internshipStreamRepository.find({
-      where: filter,
-      order: { number: 'DESC' },
-    });
-    return streams;
+    return await this.internshipStreamRepository.find(filter);
   }
 
   // update stream

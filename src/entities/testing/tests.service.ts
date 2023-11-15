@@ -60,16 +60,14 @@ export class TestsService {
       return { ...test, questionBlocks: JSON.parse(test.questionBlocks) };
     }
 
-    const endDate = new Date(currentDate);
-    endDate.setDate(endDate.getDate() + 3);
     const testTime = this.formatTestTime(blockQuestions.blockCompletionTime);
 
     const newTest = this.testRepository.create({
       internshipStream: stream.internshipStreamName,
       direction: user.direction,
       streamNumber: stream.number,
-      startDate: currentDate.toISOString(),
-      endDate: endDate.toISOString(),
+      startDate: stream.startDateTesting,
+      endDate: stream.endDateTesting,
       owner: user.id,
       questionBlocks: JSON.stringify(blockQuestions.directions),
       numberOfQuestions: blockQuestions.numberOfQuestions,
