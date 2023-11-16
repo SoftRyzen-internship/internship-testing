@@ -1,4 +1,3 @@
-import { InternshipStreamEntity } from '@entities/internship-stream/internship-stream.entity';
 import { TechnicalTestEntity } from '@entities/technical-test/technical-test.entity';
 import { TestEntity } from '@entities/testing/tests.entity';
 import { TokensService } from '@entities/tokens/tokens.service';
@@ -19,8 +18,6 @@ export class UserService {
     private readonly testsRepository: Repository<TestEntity>,
     @InjectRepository(TechnicalTestEntity)
     private readonly technicalTestRepository: Repository<TechnicalTestEntity>,
-    @InjectRepository(InternshipStreamEntity)
-    private readonly streamRepository: Repository<InternshipStreamEntity>,
     private readonly tokensService: TokensService,
   ) {}
 
@@ -28,11 +25,8 @@ export class UserService {
   public async currentUser(email: string) {
     const user: UserEntity = await this.getUser(email);
     const userWithoutPassword = this.deleteFieldsOfUser(user);
-    const stream: InternshipStreamEntity = await this.streamRepository.findOne({
-      where: { id: user.streamId },
-    });
     const test: TestEntity = await this.testsRepository.findOne({
-      where: { streamNumber: stream?.id },
+      where: { owner: user.id },
     });
     const techTest: TechnicalTestEntity =
       await this.technicalTestRepository.findOne({
@@ -48,6 +42,7 @@ export class UserService {
         isSuccess: user.isPassedTest,
         startDate: test ? test.startDate : null,
         endDate: test ? test.endDate : null,
+        testResult: test ? JSON.parse(test.testResults) : [],
       },
       task: {
         isSent: user.isSentTechnicalTask,

@@ -26,6 +26,7 @@ import { CorsMiddleware } from './middlewares/cors-middleware';
 import { TechnicalTestResultModule } from './entities/technical-test-result/technical-test-result.module';
 import { ParseXlsxModule } from './entities/parse-xlsx/parse-xlsx.module';
 import { DashboardModule } from './entities/dashboard/dashboard.module';
+import { TasksModule } from './entities/tasks/tasks.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { DashboardModule } from './entities/dashboard/dashboard.module';
     TechnicalTestResultModule,
     ParseXlsxModule,
     DashboardModule,
+    TasksModule,
   ],
   controllers: [],
   providers: [

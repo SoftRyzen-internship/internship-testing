@@ -45,7 +45,7 @@ export class DashboardService {
       'isPassedTechnicalTask',
     );
     const data: ResponseDashboardDto = {
-      totalNumberOfDirections: stream.directionsId.length,
+      totalNumberOfDirections: stream.directionsIds.length,
       theNumberOfStudentsByDirection: studentsByDirection,
       howManyCandidatesRegistered: users.length,
       howManyCandidatesPassedTheTest: countPassedTest,
