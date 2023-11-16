@@ -26,6 +26,10 @@ export class InternshipStreamEntity extends MyBaseEntity {
   @Column({ name: 'is_active', type: 'boolean', default: true })
   public isActive: boolean;
 
+  @ApiProperty({ example: 'true', description: 'Is open register' })
+  @Column({ name: 'is_open_register', type: 'boolean', default: true })
+  public isOpenRegister: boolean;
+
   @ApiProperty({ example: 1, description: 'Admin id' })
   @Column({ name: 'owner_id', type: 'integer', nullable: true })
   public ownerId: number;

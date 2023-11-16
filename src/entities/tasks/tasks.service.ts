@@ -19,7 +19,7 @@ export class TasksService {
       where: { isActive: true },
     });
     if (currentDate > stream.endDateTechnicalTest) {
-      stream.isActive = false;
+      stream.isOpenRegister = false;
       await this.internshipStreamRepository.save(stream);
     }
   }

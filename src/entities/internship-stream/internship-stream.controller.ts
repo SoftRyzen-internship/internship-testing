@@ -28,7 +28,7 @@ import {
 import { ERole } from '@src/enums/role.enum';
 import { MyRequest } from '@src/types/request.interface';
 import { CreateStreamDto } from './dto/create-stream.dto';
-import { ResponseStreamDto } from './dto/response.dto';
+import { ResponseActiveStreamDto, ResponseStreamDto } from './dto/response.dto';
 import { InternshipStreamService } from './internship-stream.service';
 
 @ApiTags('Internship stream')
@@ -79,7 +79,7 @@ export class InternshipStreamController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiOkResponse({ description: 'OK', type: ResponseStreamDto })
+  @ApiOkResponse({ description: 'OK', type: ResponseActiveStreamDto })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @UseGuards(JwtAuthGuard)
   @Get('active')
@@ -104,7 +104,6 @@ export class InternshipStreamController {
   @ApiOkResponse({
     description: 'OK',
     type: [ResponseStreamDto],
-    isArray: true,
   })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @ApiQuery({ name: 'number', required: false })
