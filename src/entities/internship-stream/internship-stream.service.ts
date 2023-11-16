@@ -16,19 +16,19 @@ export class InternshipStreamService {
 
   // Create new stream
   public async createInternshipStream(adminId: number, body: CreateStreamDto) {
-    const lastActiveStream = await this.internshipStreamRepository.find({
-      order: { createAt: 'DESC' },
+    const lastActiveStream = await this.internshipStreamRepository.findOne({
+      where: { isActive: true },
     });
-    // if (lastActiveStream) {
-    //   lastActiveStream.isActive = false;
-    //   await this.internshipStreamRepository.save(lastActiveStream);
-    // }
+    if (lastActiveStream) {
+      lastActiveStream.isActive = false;
+      await this.internshipStreamRepository.save(lastActiveStream);
+    }
 
     const newStream = this.internshipStreamRepository.create({
       ...body,
       owner: 'admin',
       ownerId: adminId,
-      number: lastActiveStream ? lastActiveStream[0].number + 1 : 1,
+      number: lastActiveStream ? lastActiveStream.number + 1 : 1,
     });
 
     const createdStream = await this.internshipStreamRepository.save(newStream);
