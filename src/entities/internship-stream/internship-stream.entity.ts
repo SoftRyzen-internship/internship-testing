@@ -15,8 +15,8 @@ export class InternshipStreamEntity extends MyBaseEntity {
     example: [1, 2, 3],
     description: 'Directions id on the stream',
   })
-  @Column({ name: 'directions_id', type: 'integer', array: true })
-  public directionsId: number[];
+  @Column({ name: 'directions_ids', type: 'integer', array: true })
+  public directionsIds: number[];
 
   @ApiProperty({ example: 1, description: 'Stream number' })
   @Column({ name: 'number', type: 'integer' })
