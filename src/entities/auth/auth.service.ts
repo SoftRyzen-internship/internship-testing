@@ -76,7 +76,7 @@ export class AuthService {
   public async checkPhone(phone: string) {
     const user = await this.userRepository.findOne({ where: { phone } });
     if (user) {
-      throw new ConflictException('Phone number already exists');
+      throw new ConflictException('Phone number already exists!');
     }
     return 'OK';
   }
