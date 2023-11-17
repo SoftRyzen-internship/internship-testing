@@ -1,4 +1,5 @@
 import { AttemptsService } from '@entities/attempts/attempts.service';
+import { InternshipStreamService } from '@entities/internship-stream/internship-stream.service';
 import { MailService } from '@entities/mail/mail.service';
 import { TokensService } from '@entities/tokens/tokens.service';
 import { RoleEntity } from '@entities/users/role.entity';
@@ -29,16 +30,21 @@ export class AuthService {
     private readonly roleRepository: Repository<RoleEntity>,
     private readonly mailService: MailService,
     private readonly tokensService: TokensService,
+    private readonly streamService: InternshipStreamService,
   ) {}
 
   // Register
   public async registerUser(body: AuthDto) {
     const { email, password } = body;
+    const stream = await this.streamService.getActiveInternshipStream();
+    if (stream) {
+      throw new BadRequestException('No active stream');
+    }
     const user = await this.userRepository.findOne({ where: { email } });
-
     if (user) {
       throw new ConflictException('User is already exists');
     }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const verifyToken = v4();
     await this.mailService.sendEmailHandler(
@@ -56,6 +62,7 @@ export class AuthService {
       ...body,
       password: hashedPassword,
       verifyToken,
+      streamId: stream.id,
     });
     newUser.roles = [role];
 
@@ -76,7 +83,7 @@ export class AuthService {
   public async checkPhone(phone: string) {
     const user = await this.userRepository.findOne({ where: { phone } });
     if (user) {
-      throw new ConflictException('Phone number already exists');
+      throw new ConflictException('Phone number already exists!');
     }
     return 'OK';
   }

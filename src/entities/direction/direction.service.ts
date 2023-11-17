@@ -1,11 +1,13 @@
+import { InternshipStreamEntity } from '@entities/internship-stream/internship-stream.entity';
 import {
   BadRequestException,
   ConflictException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ERole } from '@src/enums/role.enum';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { DirectionEntity } from './direction.entity';
 import { AddDirectionDto } from './dto/direction.dto';
 
@@ -14,6 +16,8 @@ export class DirectionService {
   constructor(
     @InjectRepository(DirectionEntity)
     private readonly directionRepository: Repository<DirectionEntity>,
+    @InjectRepository(InternshipStreamEntity)
+    private readonly streamRepository: Repository<InternshipStreamEntity>,
   ) {}
 
   public async addDirection(id: number, body: AddDirectionDto) {
@@ -31,7 +35,17 @@ export class DirectionService {
   }
 
   public async geAllDirection() {
-    return this.directionRepository.find();
+    const stream = await this.streamRepository.findOne({
+      where: { isActive: true },
+    });
+    if (!stream) {
+      throw new NotFoundException('Internship stream not found');
+    }
+    return this.directionRepository.find({
+      where: {
+        id: In(stream.directionsIds),
+      },
+    });
   }
 
   public async updateDirection(id: number, body: AddDirectionDto) {

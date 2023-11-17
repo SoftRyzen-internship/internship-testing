@@ -8,10 +8,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DirectionController } from './direction.controller';
 import { DirectionEntity } from './direction.entity';
 import { DirectionService } from './direction.service';
+import { InternshipStreamEntity } from '@entities/internship-stream/internship-stream.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([DirectionEntity]),
+    TypeOrmModule.forFeature([DirectionEntity, InternshipStreamEntity]),
     JwtGuardsModule,
     RoleGuardsModule,
   ],

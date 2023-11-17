@@ -1,5 +1,6 @@
 import { AttemptsModule } from '@entities/attempts/attempts.module';
 import { BlockIpMiddleware } from '@entities/attempts/middleware/attempts.middleware';
+import { InternshipStreamModule } from '@entities/internship-stream/internship-stream.module';
 import { MailModule } from '@entities/mail/mail.module';
 import { MailService } from '@entities/mail/mail.service';
 import { TokensModule } from '@entities/tokens/tokens.module';
@@ -25,6 +26,7 @@ import { AuthService } from './auth.service';
     MailModule,
     AttemptsModule,
     TokensModule,
+    InternshipStreamModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, MailService, ConfigService],

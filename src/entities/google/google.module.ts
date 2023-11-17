@@ -1,5 +1,6 @@
 import { AttemptsModule } from '@entities/attempts/attempts.module';
 import { AuthService } from '@entities/auth/auth.service';
+import { InternshipStreamModule } from '@entities/internship-stream/internship-stream.module';
 import { MailService } from '@entities/mail/mail.service';
 import { TokensModule } from '@entities/tokens/tokens.module';
 import { RoleEntity } from '@entities/users/role.entity';
@@ -27,6 +28,7 @@ import { GoogleService } from './google.service';
     UserModule,
     AttemptsModule,
     TokensModule,
+    InternshipStreamModule,
   ],
   controllers: [GoogleController],
   providers: [GoogleService, GoogleStrategy, AuthService, MailService],
