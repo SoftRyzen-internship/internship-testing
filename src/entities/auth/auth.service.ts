@@ -37,7 +37,7 @@ export class AuthService {
   public async registerUser(body: AuthDto) {
     const { email, password } = body;
     const stream = await this.streamService.getActiveInternshipStream();
-    if (stream) {
+    if (!stream) {
       throw new BadRequestException('No active stream');
     }
     const user = await this.userRepository.findOne({ where: { email } });
