@@ -75,7 +75,7 @@ export class StreamsInfoResponseDto {
   direction: string;
 }
 
-export class ResponseCurrentUserDto {
+export class ResponseCurrentDto {
   @ApiProperty({ example: 1, description: 'Unique id user`s' })
   public id: number;
 
@@ -225,14 +225,25 @@ export class ResponseCurrentUserDto {
   @ApiProperty({ example: ['user', 'admin'], description: 'User roles' })
   public roles: string[];
 
-  @ApiProperty({ type: () => TestResponseCurrentUserDto })
-  public test: TestResponseCurrentUserDto;
-
-  @ApiProperty({ type: () => TaskResponseCurrentUserDto })
-  public task: TaskResponseCurrentUserDto;
-
   @ApiProperty({
     type: () => StreamsInfoResponseDto,
   })
   public streamsInfo: StreamsInfoResponseDto;
+}
+
+export class ResponseCurrentUserDto {
+  @ApiProperty({
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    description: 'User refresh token"',
+  })
+  public refreshToken: string;
+
+  @ApiProperty({
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    description: 'User success token',
+  })
+  public accessToken: string;
+
+  @ApiProperty({ type: () => ResponseCurrentDto })
+  user: ResponseCurrentDto;
 }

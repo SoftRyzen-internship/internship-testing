@@ -11,6 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateDirectionDto } from './dto/update-direction.dto';
 import { UserDto } from './dto/update-user.dto';
+import { IStreamInfo } from './types/interfaces';
 import { UserEntity } from './users.entity';
 
 @Injectable()
@@ -74,6 +75,14 @@ export class UserService {
   // Update direction
   public async updateUserDirection(email: string, body: UpdateDirectionDto) {
     const user = await this.getUser(email);
+    const streamInfoParse: IStreamInfo[] = user.streamsInfo
+      ? JSON.parse(user.streamsInfo)
+      : [];
+    for (const info of streamInfoParse) {
+      if (info.direction === body.direction) {
+        throw new BadRequestException("You can't choose this direction");
+      }
+    }
     const stream = await this.streamRepository.findOne({
       where: { id: user.streamId },
     });
@@ -83,14 +92,14 @@ export class UserService {
       startDate: stream.startDate,
       internshipStreamName: stream.internshipStreamName,
     };
-    const a = JSON.parse(user.streamsInfo);
-    const streamsInfo = [a, currentStreamInfo];
+    const streamsInfo = [...streamInfoParse, currentStreamInfo];
     const updateUser: Partial<UserEntity> = {
       direction: body.direction,
       streamsInfo: JSON.stringify(streamsInfo),
     };
     Object.assign(user, updateUser);
-    return await this.userRepository.save(user);
+    await this.userRepository.save(user);
+    return await this.currentUser(user.email);
   }
 
   // Update stream
@@ -113,7 +122,8 @@ export class UserService {
     };
 
     Object.assign(user, updateUserStream);
-    return await this.userRepository.save(user);
+    await this.userRepository.save(user);
+    return await this.currentUser(user.email);
   }
 
   private deleteFieldsOfUser(user: UserEntity) {

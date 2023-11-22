@@ -72,6 +72,7 @@ export class UserController {
   })
   @ApiResponse({ status: 200, type: ResponseCurrentUserDto })
   @ApiNotFoundResponse({ description: 'Not found' })
+  @ApiBadRequestResponse({ description: "You can't choose this direction" })
   @ApiUnauthorizedResponse({
     description:
       'Not authorized jwt expired || Not authorized Invalid token type',
@@ -100,7 +101,7 @@ export class UserController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiResponse({ status: 200, type: UserDto })
+  @ApiResponse({ status: 200, type: ResponseCurrentUserDto })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiUnauthorizedResponse({
     description:
@@ -128,7 +129,7 @@ export class UserController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiResponse({ status: 200, type: UserDto })
+  @ApiResponse({ status: 200, type: ResponseCurrentUserDto })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiBadRequestResponse({
     description: 'The user is already registered for this stream',

@@ -67,6 +67,37 @@ export class InternshipStreamController {
     );
   }
 
+  // Get stream by id
+  @ApiOperation({
+    summary: 'Get stream by id',
+  })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access token with type',
+    required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
+  })
+  @ApiOkResponse({
+    description: 'OK',
+    type: ResponseStreamDto,
+  })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @UseGuards(JwtAuthGuard)
+  @Get(':streamId')
+  public async getInternshipStreamById(
+    @Param('streamId', ParseIntPipe) streamId: number,
+    @Req() req: MyRequest,
+  ) {
+    return await this.internshipStreamService.getInternshipStreamById(
+      streamId,
+      req.user.id,
+    );
+  }
+
   // Get active stream
   @ApiOperation({ summary: 'Get active internship stream' })
   @ApiBearerAuth()
@@ -124,38 +155,6 @@ export class InternshipStreamController {
       internshipStreamName,
       direction,
       startDate,
-    );
-  }
-
-  // Get stream by id
-  @ApiOperation({
-    summary: 'Get stream by id',
-  })
-  @ApiBearerAuth()
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Access token with type',
-    required: true,
-    schema: {
-      type: 'string',
-      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
-    },
-  })
-  @ApiOkResponse({
-    description: 'OK',
-    type: [ResponseStreamDto],
-  })
-  @ApiInternalServerErrorResponse({ description: 'Server error' })
-  @ApiQuery({ name: 'streamId', required: true })
-  @UseGuards(JwtAuthGuard)
-  @Get()
-  public async getInternshipStreamById(
-    @Query('streamId') streamId: number,
-    @Req() req: MyRequest,
-  ) {
-    return await this.internshipStreamService.getInternshipStreamById(
-      streamId,
-      req.user.id,
     );
   }
 

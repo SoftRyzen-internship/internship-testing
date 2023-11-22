@@ -80,7 +80,6 @@ export class InternshipStreamService {
     return await this.internshipStreamRepository.find(filter);
   }
 
-
   // Get stream by id
   public async getInternshipStreamById(streamId: number, userId: number) {
     const user = await this.userRepository.findOne({ where: { id: userId } });
@@ -109,7 +108,9 @@ export class InternshipStreamService {
       task: {
         isSent: user.isSentTechnicalTask,
         isSuccess: user.isPassedTechnicalTask,
-        deadlineDate: getDateDeadline(stream.endDateTechnicalTest),
+        deadlineDate: stream.endDateTechnicalTest
+          ? getDateDeadline(stream.endDateTechnicalTest)
+          : null,
       },
     };
   }
