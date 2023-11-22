@@ -12,7 +12,7 @@ import { ConfigModule } from 'src/config.module';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
-      // ssl: { rejectUnauthorized: false },
+      ssl: { rejectUnauthorized: false },
       entities: ['dist/src/entities/**/*.entity.js'],
       migrations: ['dist/db/migrations/**/*.js'],
       synchronize: true,
