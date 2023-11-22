@@ -27,6 +27,7 @@ import { TechnicalTestResultModule } from './entities/technical-test-result/tech
 import { ParseXlsxModule } from './entities/parse-xlsx/parse-xlsx.module';
 import { DashboardModule } from './entities/dashboard/dashboard.module';
 import { TasksModule } from './entities/tasks/tasks.module';
+import { BaseModule } from './entities/base/base.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { TasksModule } from './entities/tasks/tasks.module';
     ParseXlsxModule,
     DashboardModule,
     TasksModule,
+    BaseModule,
   ],
   controllers: [],
   providers: [

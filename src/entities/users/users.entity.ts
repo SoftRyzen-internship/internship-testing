@@ -186,7 +186,7 @@ export class UserEntity extends MyBaseEntity {
     type: 'jsonb',
     nullable: true,
   })
-  public streamsInfo: string;
+  public streamsHistory: string;
 
   @ApiProperty({ example: false, description: 'Is verified user' })
   @Column({ name: 'verified', type: 'boolean', default: false })
