@@ -36,7 +36,9 @@ export class UserService {
 
     const userData: Partial<Omit<UserEntity, 'roles'>> = {
       ...userWithoutPassword,
-      streamsInfo: user.streamsInfo ? JSON.parse(user.streamsInfo) : null,
+      streamsHistory: user.streamsHistory
+        ? JSON.parse(user.streamsHistory)
+        : null,
     };
     const responseData = {
       refreshToken: tokens.refreshToken,
@@ -75,8 +77,8 @@ export class UserService {
   // Update direction
   public async updateUserDirection(email: string, body: UpdateDirectionDto) {
     const user = await this.getUser(email);
-    const streamInfoParse: IStreamInfo[] = user.streamsInfo
-      ? JSON.parse(user.streamsInfo)
+    const streamInfoParse: IStreamInfo[] = user.streamsHistory
+      ? JSON.parse(user.streamsHistory)
       : [];
     for (const info of streamInfoParse) {
       if (info.direction === body.direction) {
@@ -95,7 +97,7 @@ export class UserService {
     const streamsInfo = [...streamInfoParse, currentStreamInfo];
     const updateUser: Partial<UserEntity> = {
       direction: body.direction,
-      streamsInfo: JSON.stringify(streamsInfo),
+      streamsHistory: JSON.stringify(streamsInfo),
     };
     Object.assign(user, updateUser);
     await this.userRepository.save(user);

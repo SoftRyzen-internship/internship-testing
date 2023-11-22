@@ -25,7 +25,7 @@ Make sure you have the following versions of software installed:
 
 ```bash
 node v18.17.1
-npm v9.6.7
+yarn v1.22.19
 ```
 
 [Nodejs official website](https://nodejs.org/en)

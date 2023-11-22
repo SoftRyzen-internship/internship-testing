@@ -1,58 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class TestResponseCurrentUserDto {
-  @ApiProperty({
-    example: false,
-    description: 'Has the test been sent?',
-  })
-  public isSent: boolean;
-
-  @ApiProperty({
-    example: false,
-    description: 'Is start test',
-  })
-  public isStartTest: boolean;
-
-  @ApiProperty({
-    example: false,
-    description: 'Is success test',
-  })
-  public isSuccess: boolean;
-
-  @ApiProperty({
-    example: '2023-07-12 16:03:20.157888',
-    description: 'Start date of internship stream',
-  })
-  public startDate?: Date;
-
-  @ApiProperty({
-    example: '2023-07-12 16:03:20.157888',
-    description: 'End date of internship stream',
-  })
-  public endDate?: Date;
-}
-
-export class TaskResponseCurrentUserDto {
-  @ApiProperty({
-    example: false,
-    description: 'Start date of internship stream',
-  })
-  public isSent: boolean;
-
-  @ApiProperty({
-    example: false,
-    description: 'Start date of internship stream',
-  })
-  public isSuccess: boolean;
-
-  @ApiProperty({
-    example: '25.07.2023 12:00',
-    description: 'Start date of internship stream',
-  })
-  public deadlineDate: Date;
-}
-
-export class StreamsInfoResponseDto {
+export class StreamsHistoryResponseDto {
   @ApiProperty({ example: 1, description: 'Stream internship id' })
   streamId: number;
 
@@ -226,9 +174,9 @@ export class ResponseCurrentDto {
   public roles: string[];
 
   @ApiProperty({
-    type: () => StreamsInfoResponseDto,
+    type: () => [StreamsHistoryResponseDto],
   })
-  public streamsInfo: StreamsInfoResponseDto;
+  public streamsHistory: StreamsHistoryResponseDto[];
 }
 
 export class ResponseCurrentUserDto {
