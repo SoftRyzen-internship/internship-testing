@@ -58,7 +58,7 @@ export class TestController {
   @UseGuards(JwtAuthGuard)
   @Post()
   public async createTest(@Req() req: MyRequest) {
-    return await this.testService.createTest(req.user.id);
+    return await this.testService.createOrGetTest(req.user.id);
   }
 
   // Get test with filtering

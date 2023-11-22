@@ -1,7 +1,11 @@
 import { DirectionEntity } from '@entities/direction/direction.entity';
+import { ResultTechnicalTestEntity } from '@entities/technical-test-result/result-test.entity';
+import { TestEntity } from '@entities/testing/tests.entity';
+import { UserEntity } from '@entities/users/users.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindManyOptions, Repository } from 'typeorm';
+import { getDateDeadline } from '@utils/format-deadline-tech-test';
+import { FindManyOptions, In, Repository } from 'typeorm';
 import { CreateStreamDto } from './dto/create-stream.dto';
 import { InternshipStreamEntity } from './internship-stream.entity';
 
@@ -12,6 +16,12 @@ export class InternshipStreamService {
     private readonly internshipStreamRepository: Repository<InternshipStreamEntity>,
     @InjectRepository(DirectionEntity)
     private readonly directionRepository: Repository<DirectionEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(TestEntity)
+    private readonly testingRepository: Repository<TestEntity>,
+    @InjectRepository(ResultTechnicalTestEntity)
+    private readonly techTestRepository: Repository<ResultTechnicalTestEntity>,
   ) {}
 
   // Create new stream
@@ -40,21 +50,14 @@ export class InternshipStreamService {
     const stream = await this.internshipStreamRepository.findOne({
       where: { isActive: true },
     });
-    const directions: DirectionEntity[] = [];
-
-    if (stream && stream.directionsIds.length !== 0) {
-      for (const directionIdStream of stream.directionsIds) {
-        const direction = await this.directionRepository.findOne({
-          where: { id: directionIdStream },
-        });
-        directions.push(direction);
-      }
-    }
+    const directions: DirectionEntity[] = await this.getDirectionForStream(
+      stream.directionsIds,
+    );
 
     return { ...stream, directions };
   }
 
-  // Get all streams
+  // Get streams with sorting and filtering
   public async getInternshipStreams(
     number: number,
     internshipStreamName: string,
@@ -77,6 +80,41 @@ export class InternshipStreamService {
     return await this.internshipStreamRepository.find(filter);
   }
 
+  // Get stream by id
+  public async getInternshipStreamById(streamId: number, userId: number) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    const stream = await this.internshipStreamRepository.findOne({
+      where: { id: streamId },
+    });
+    const test = await this.testingRepository.findOne({
+      where: { streamId, owner: userId },
+    });
+    const techTestResult = await this.techTestRepository.findOne({
+      where: {
+        streamId,
+        userId,
+      },
+    });
+    return {
+      ...stream,
+      test: {
+        isSent: user.isSentTest,
+        isStartTest: user.isStartTest,
+        isSuccess: user.isPassedTest,
+        startDate: test ? test.startDate : null,
+        endDate: test ? test.endDate : null,
+        testResult: test ? JSON.parse(test.testResults) : [],
+      },
+      task: {
+        isSent: user.isSentTechnicalTask,
+        isSuccess: user.isPassedTechnicalTask,
+        deadlineDate: stream.endDateTechnicalTest
+          ? getDateDeadline(stream.endDateTechnicalTest)
+          : null,
+      },
+    };
+  }
+
   // update stream
   public async updateInternshipStreamFields(id: number, body: CreateStreamDto) {
     const stream = await this.internshipStreamRepository.findOne({
@@ -89,5 +127,18 @@ export class InternshipStreamService {
     Object.assign(stream, body);
 
     return await this.internshipStreamRepository.save(stream);
+  }
+
+  // Get direction for stream
+  private async getDirectionForStream(directionIds: number[]) {
+    if (directionIds.length === 0) {
+      return [];
+    }
+
+    return await this.directionRepository.find({
+      where: {
+        id: In(directionIds),
+      },
+    });
   }
 }

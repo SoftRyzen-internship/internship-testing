@@ -63,7 +63,7 @@ export class UserDto {
   public currentCity: string;
 
   @ApiProperty({
-    example: 'FrontEnd',
+    example: 'Frontend',
     description: 'Direction',
     required: true,
   })
@@ -167,8 +167,8 @@ export class UserDto {
   public isDataProcessingConsent: boolean;
 
   @ApiProperty({
-    example: 'documentation test url',
-    description: 'Documentation test url',
+    example: 'https://my-docs.herokuapp.com/api/docs',
+    description: 'Documentation url',
     required: true,
   })
   @ValidateIf((object, value) => value !== undefined)
@@ -178,5 +178,5 @@ export class UserDto {
   @Matches(regex.linkRegex, {
     message: 'This should have been a link',
   })
-  public documentationTestUrl?: string;
+  public documentationUrl?: string;
 }

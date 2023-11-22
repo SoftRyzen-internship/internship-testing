@@ -1,6 +1,16 @@
 import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
-import { Body, Controller, Get, Patch, Req, UseGuards } from '@nestjs/common';
 import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiHeader,
   ApiInternalServerErrorResponse,
@@ -62,6 +72,7 @@ export class UserController {
   })
   @ApiResponse({ status: 200, type: ResponseCurrentUserDto })
   @ApiNotFoundResponse({ description: 'Not found' })
+  @ApiBadRequestResponse({ description: "You can't choose this direction" })
   @ApiUnauthorizedResponse({
     description:
       'Not authorized jwt expired || Not authorized Invalid token type',
@@ -90,7 +101,7 @@ export class UserController {
       format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
     },
   })
-  @ApiResponse({ status: 200, type: UserDto })
+  @ApiResponse({ status: 200, type: ResponseCurrentUserDto })
   @ApiNotFoundResponse({ description: 'Not found' })
   @ApiUnauthorizedResponse({
     description:
@@ -104,5 +115,36 @@ export class UserController {
     @Req() req: MyRequest,
   ) {
     return await this.userService.updateUserDirection(req.user.email, body);
+  }
+
+  // Update stream
+  @ApiOperation({ summary: 'Update user`s stream' })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access token with type',
+    required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
+  })
+  @ApiResponse({ status: 200, type: ResponseCurrentUserDto })
+  @ApiNotFoundResponse({ description: 'Not found' })
+  @ApiBadRequestResponse({
+    description: 'The user is already registered for this stream',
+  })
+  @ApiUnauthorizedResponse({
+    description:
+      'Not authorized jwt expired || Not authorized Invalid token type',
+  })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @UseGuards(JwtAuthGuard)
+  @Patch(':streamId')
+  public async updateUserStream(
+    @Param('streamId', ParseIntPipe) streamId: number,
+    @Req() req: MyRequest,
+  ) {
+    return await this.userService.updateUserStream(req.user.email, streamId);
   }
 }

@@ -96,6 +96,28 @@ export class InternshipStreamEntity extends MyBaseEntity {
   })
   public endDateTechnicalTest: Date;
 
+  @ApiProperty({
+    example: '2023-11-01T00:00:00.000Z',
+    description: 'Start date of online interview',
+  })
+  @Column({
+    name: 'start_date_online_interview',
+    type: 'timestamp',
+    nullable: true,
+  })
+  public startDateOnlineInterview: Date;
+
+  @ApiProperty({
+    example: '2023-11-01T00:00:00.000Z',
+    description: 'End date of online interview',
+  })
+  @Column({
+    name: 'end_date_online_interview',
+    type: 'timestamp',
+    nullable: true,
+  })
+  public endDateOnlineInterview: Date;
+
   @ApiProperty({ example: 825, description: 'Average test score' })
   @Column({ name: 'average_test_score', type: 'integer', default: 0 })
   public averageTestScore: number;

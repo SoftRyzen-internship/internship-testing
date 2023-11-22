@@ -95,11 +95,11 @@ export class UserEntity extends MyBaseEntity {
     example: 'https://my-documentation.herokuapp.com/api/docs',
     description: 'Documentation tets url',
   })
-  @Column({ name: 'documentation_test_url', type: 'varchar', nullable: true })
+  @Column({ name: 'documentation_url', type: 'varchar', nullable: true })
   @Matches(regex.linkRegex, {
     message: 'This should have been a link',
   })
-  public documentationTestUrl: string;
+  public documentationUrl: string;
 
   @ApiProperty({
     example: "Because I'm the best",
@@ -169,6 +169,24 @@ export class UserEntity extends MyBaseEntity {
     nullable: true,
   })
   public streamId: number;
+
+  @ApiProperty({
+    example: [
+      {
+        streamId: 1,
+        internshipStreamName: 'Stream 1',
+        startDate: '2023-11-01T00:00:00.000Z',
+        direction: 'Frontend',
+      },
+    ],
+    description: 'Info streams',
+  })
+  @Column({
+    name: 'streams_info',
+    type: 'jsonb',
+    nullable: true,
+  })
+  public streamsInfo: string;
 
   @ApiProperty({ example: false, description: 'Is verified user' })
   @Column({ name: 'verified', type: 'boolean', default: false })
