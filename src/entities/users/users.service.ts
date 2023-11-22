@@ -1,9 +1,13 @@
+import { InternshipStreamEntity } from '@entities/internship-stream/internship-stream.entity';
 import { TechnicalTestEntity } from '@entities/technical-test/technical-test.entity';
 import { TestEntity } from '@entities/testing/tests.entity';
 import { TokensService } from '@entities/tokens/tokens.service';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getDateDeadline } from '@utils/format-deadline-tech-test';
 import { Repository } from 'typeorm';
 import { UpdateDirectionDto } from './dto/update-direction.dto';
 import { UserDto } from './dto/update-user.dto';
@@ -18,6 +22,8 @@ export class UserService {
     private readonly testsRepository: Repository<TestEntity>,
     @InjectRepository(TechnicalTestEntity)
     private readonly technicalTestRepository: Repository<TechnicalTestEntity>,
+    @InjectRepository(InternshipStreamEntity)
+    private readonly streamRepository: Repository<InternshipStreamEntity>,
     private readonly tokensService: TokensService,
   ) {}
 
@@ -25,30 +31,11 @@ export class UserService {
   public async currentUser(email: string) {
     const user: UserEntity = await this.getUser(email);
     const userWithoutPassword = this.deleteFieldsOfUser(user);
-    const test: TestEntity = await this.testsRepository.findOne({
-      where: { owner: user.id },
-    });
-    const techTest: TechnicalTestEntity =
-      await this.technicalTestRepository.findOne({
-        where: { direction: user.direction },
-      });
     const tokens = await this.tokensService.generateTokens(user);
 
-    const userData = {
+    const userData: Partial<Omit<UserEntity, 'roles'>> = {
       ...userWithoutPassword,
-      test: {
-        isSent: user.isSentTest,
-        isStartTest: user.isStartTest,
-        isSuccess: user.isPassedTest,
-        startDate: test ? test.startDate : null,
-        endDate: test ? test.endDate : null,
-        testResult: test ? JSON.parse(test.testResults) : [],
-      },
-      task: {
-        isSent: user.isSentTechnicalTask,
-        isSuccess: user.isPassedTechnicalTask,
-        deadlineDate: techTest ? getDateDeadline(techTest.deadline) : null,
-      },
+      streamsInfo: user.streamsInfo ? JSON.parse(user.streamsInfo) : null,
     };
     const responseData = {
       refreshToken: tokens.refreshToken,
@@ -85,13 +72,48 @@ export class UserService {
   }
 
   // Update direction
-  public async updateUserDirection(
-    email: string,
-    { direction }: UpdateDirectionDto,
-  ) {
+  public async updateUserDirection(email: string, body: UpdateDirectionDto) {
     const user = await this.getUser(email);
-    await this.userRepository.update(user.id, { direction });
-    return this.userRepository.findOne({ where: { id: user.id } });
+    const stream = await this.streamRepository.findOne({
+      where: { id: user.streamId },
+    });
+    const currentStreamInfo = {
+      direction: body.direction,
+      streamId: stream.id,
+      startDate: stream.startDate,
+      internshipStreamName: stream.internshipStreamName,
+    };
+    const a = JSON.parse(user.streamsInfo);
+    const streamsInfo = [a, currentStreamInfo];
+    const updateUser: Partial<UserEntity> = {
+      direction: body.direction,
+      streamsInfo: JSON.stringify(streamsInfo),
+    };
+    Object.assign(user, updateUser);
+    return await this.userRepository.save(user);
+  }
+
+  // Update stream
+  public async updateUserStream(email: string, streamId: number) {
+    const user = await this.getUser(email);
+    if (user.streamId === streamId) {
+      throw new BadRequestException(
+        'The user is already registered for this stream',
+      );
+    }
+
+    const updateUserStream: Partial<UserEntity> = {
+      streamId,
+      isPassedTest: false,
+      scoreTest: 0,
+      isSentTest: false,
+      isStartTest: false,
+      isPassedTechnicalTask: false,
+      isSentTechnicalTask: false,
+    };
+
+    Object.assign(user, updateUserStream);
+    return await this.userRepository.save(user);
   }
 
   private deleteFieldsOfUser(user: UserEntity) {

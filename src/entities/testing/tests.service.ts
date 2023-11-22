@@ -32,7 +32,7 @@ export class TestsService {
   ) {}
 
   // Create test or get test
-  public async createTest(userId: number) {
+  public async createOrGetTest(userId: number) {
     const currentDate = new Date();
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
@@ -64,6 +64,7 @@ export class TestsService {
 
     const newTest = this.testRepository.create({
       internshipStream: stream.internshipStreamName,
+      streamId: stream.id,
       direction: user.direction,
       streamNumber: stream.number,
       startDate: stream.startDateTesting,

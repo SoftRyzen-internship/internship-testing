@@ -127,6 +127,38 @@ export class InternshipStreamController {
     );
   }
 
+  // Get stream by id
+  @ApiOperation({
+    summary: 'Get stream by id',
+  })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access token with type',
+    required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
+  })
+  @ApiOkResponse({
+    description: 'OK',
+    type: [ResponseStreamDto],
+  })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @ApiQuery({ name: 'streamId', required: true })
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  public async getInternshipStreamById(
+    @Query('streamId') streamId: number,
+    @Req() req: MyRequest,
+  ) {
+    return await this.internshipStreamService.getInternshipStreamById(
+      streamId,
+      req.user.id,
+    );
+  }
+
   // Update stream
   @ApiOperation({ summary: 'Update internship stream' })
   @ApiBearerAuth()

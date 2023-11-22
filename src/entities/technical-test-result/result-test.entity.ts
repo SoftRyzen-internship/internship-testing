@@ -9,8 +9,15 @@ export class ResultTechnicalTestEntity extends MyBaseEntity {
     example: 1,
     description: 'User id',
   })
-  @Column({ name: 'user_id', type: 'int' })
+  @Column({ name: 'user_id', type: 'integer' })
   public userId: number;
+
+  @ApiProperty({
+    example: 1,
+    description: 'User id',
+  })
+  @Column({ name: 'stream_id', type: 'integer', nullable: true })
+  public streamId: number;
 
   @ApiProperty({
     example: 'https://livepage.com',
@@ -36,10 +43,14 @@ export class ResultTechnicalTestEntity extends MyBaseEntity {
   public difficulty: EDifficulty;
 
   @ApiProperty({ example: 'Some comments', description: 'Comments' })
-  @Column({ name: 'comments', type: 'text' })
+  @Column({ name: 'comments', type: 'varchar', nullable: true })
   public comments: string;
 
   @ApiProperty({ example: false, description: 'Is check test' })
   @Column({ name: 'is_checked', type: 'boolean', default: false })
   public isChecked: boolean;
+
+  @ApiProperty({ example: false, description: 'Is passed technical task' })
+  @Column({ name: 'is_passed_technical_task', type: 'boolean', default: false })
+  public isPassedTechnicalTask: boolean;
 }

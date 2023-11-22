@@ -72,4 +72,22 @@ export class CreateStreamDto {
   @IsNotEmpty()
   @Type(() => Date)
   public endDateTechnicalTest: Date;
+
+  @ApiProperty({
+    example: '2023-11-01T00:00:00.000Z',
+    description: 'Start date of technical test',
+  })
+  @IsDate()
+  @IsNotEmpty()
+  @Type(() => Date)
+  public startDateOnlineInterview: Date;
+
+  @ApiProperty({
+    example: '2023-11-01T00:00:00.000Z',
+    description: 'End date of internship stream',
+  })
+  @IsDate()
+  @IsNotEmpty()
+  @Type(() => Date)
+  public endDateOnlineInterview: Date;
 }

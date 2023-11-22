@@ -52,6 +52,29 @@ export class TaskResponseCurrentUserDto {
   public deadlineDate: Date;
 }
 
+export class StreamsInfoResponseDto {
+  @ApiProperty({ example: 1, description: 'Stream internship id' })
+  streamId: number;
+
+  @ApiProperty({
+    example: 'Stream Winter 2023',
+    description: 'Internship Stream',
+  })
+  internshipStreamName: string;
+
+  @ApiProperty({
+    example: '2023-11-01T00:00:00.000Z',
+    description: 'Start date of internship stream',
+  })
+  startDate: Date;
+
+  @ApiProperty({
+    example: 'Frontend',
+    description: 'Direction in which the user was trained',
+  })
+  direction: string;
+}
+
 export class ResponseCurrentUserDto {
   @ApiProperty({ example: 1, description: 'Unique id user`s' })
   public id: number;
@@ -117,7 +140,7 @@ export class ResponseCurrentUserDto {
     example: 'https://my-documentation.herokuapp.com/api/docs',
     description: 'Documentation tets url',
   })
-  public documentationTestUrl: string;
+  public documentationUrl: string;
 
   @ApiProperty({
     example: "Because I'm the best",
@@ -127,7 +150,7 @@ export class ResponseCurrentUserDto {
   public whyAreYou: string;
 
   @ApiProperty({
-    example: 'BackEnd, NestJS, Git',
+    example: 'Backend, NestJS, Git',
     description:
       'What projects/tasks/technologies/tools are you interested in and would like to learn during your internship?',
     required: true,
@@ -203,8 +226,13 @@ export class ResponseCurrentUserDto {
   public roles: string[];
 
   @ApiProperty({ type: () => TestResponseCurrentUserDto })
-  public test?: TestResponseCurrentUserDto;
+  public test: TestResponseCurrentUserDto;
 
   @ApiProperty({ type: () => TaskResponseCurrentUserDto })
-  public task?: TaskResponseCurrentUserDto;
+  public task: TaskResponseCurrentUserDto;
+
+  @ApiProperty({
+    type: () => StreamsInfoResponseDto,
+  })
+  public streamsInfo: StreamsInfoResponseDto;
 }

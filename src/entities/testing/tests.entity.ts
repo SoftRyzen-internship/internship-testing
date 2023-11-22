@@ -12,6 +12,10 @@ export class TestEntity extends MyBaseEntity {
   @Column({ name: 'internship_stream', type: 'varchar' })
   public internshipStream: string;
 
+  @ApiProperty({ example: 1, description: 'Stream id' })
+  @Column({ name: 'stream_id', type: 'integer', nullable: true })
+  public streamId: number;
+
   @ApiProperty({
     example: 'Frontend',
     description: 'Direction in which the user was trained',

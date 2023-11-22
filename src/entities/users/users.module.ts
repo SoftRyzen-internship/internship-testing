@@ -1,4 +1,5 @@
 import { AuthModule } from '@entities/auth/auth.module';
+import { InternshipStreamEntity } from '@entities/internship-stream/internship-stream.entity';
 import { TechnicalTestEntity } from '@entities/technical-test/technical-test.entity';
 import { TestEntity } from '@entities/testing/tests.entity';
 import { TokensModule } from '@entities/tokens/tokens.module';
@@ -13,7 +14,12 @@ import { UserService } from './users.service';
 @Module({
   imports: [
     AuthModule,
-    TypeOrmModule.forFeature([UserEntity, TestEntity, TechnicalTestEntity]),
+    TypeOrmModule.forFeature([
+      UserEntity,
+      TestEntity,
+      TechnicalTestEntity,
+      InternshipStreamEntity,
+    ]),
     JwtGuardsModule,
     TokensModule,
   ],

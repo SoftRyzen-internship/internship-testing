@@ -66,6 +66,7 @@ export class TechnicalTestResultService {
     });
     user.isPassedTechnicalTask = body.isPassedUserTechTest;
     testResult.isChecked = true;
+    testResult.isPassedTechnicalTask = body.isPassedUserTechTest;
     await this.resultRepository.save(testResult);
     await this.userRepository.save(user);
     return testResult;

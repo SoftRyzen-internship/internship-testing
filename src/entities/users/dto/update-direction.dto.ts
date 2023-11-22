@@ -4,7 +4,7 @@ import { IsNotEmpty, IsString } from 'class-validator';
 
 export class UpdateDirectionDto {
   @ApiProperty({
-    example: 'Full Stack',
+    example: 'Frontend',
     description: 'Direction in which the user was trained',
   })
   @IsString()

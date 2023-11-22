@@ -27,7 +27,7 @@ export class TechnicalTestService {
     if (!stream) {
       throw new BadRequestException('First, create a stream');
     }
-    const deadlineDate = getDateDeadline(stream.endDateTechnicalTest);
+    const deadline = getDateDeadline(stream.endDateTechnicalTest);
 
     const newTechTest = this.techTestRepository.create({
       ...body,
@@ -36,7 +36,7 @@ export class TechnicalTestService {
     });
     await this.techTestRepository.save(newTechTest);
 
-    return { ...newTechTest, deadline: deadlineDate };
+    return { ...newTechTest, deadline };
   }
 
   // Get technical task
@@ -49,8 +49,9 @@ export class TechnicalTestService {
     if (!techTest) {
       throw new NotFoundException('Test not found');
     }
-
-    return techTest;
+    await this.userRepository.update(userId, { isSentTechnicalTask: true });
+    const deadline = getDateDeadline(stream.endDateTechnicalTest);
+    return { ...techTest, deadline };
   }
 
   // Update an technical test
