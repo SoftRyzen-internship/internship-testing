@@ -6,7 +6,8 @@ import { QuestionsModule } from '@entities/questions/questions.module';
 import { TechnicalTestModule } from '@entities/technical-test/technical-test.module';
 import { TestsModule } from '@entities/testing/tests.module';
 import { UserModule } from '@entities/users/users.module';
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+// import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
@@ -22,12 +23,12 @@ import { TokensModule } from './entities/tokens/tokens.module';
 import { UploadModule } from './entities/upload/upload.module';
 import { GlobalExceptionFilter } from './logger/global-exception-filter';
 import { GlobalLoggerService } from './logger/global-logger.service';
-import { CorsMiddleware } from './middlewares/cors-middleware';
-import { TechnicalTestResultModule } from './entities/technical-test-result/technical-test-result.module';
-import { ParseXlsxModule } from './entities/parse-xlsx/parse-xlsx.module';
-import { DashboardModule } from './entities/dashboard/dashboard.module';
-import { TasksModule } from './entities/tasks/tasks.module';
+// import { CorsMiddleware } from './middlewares/cors-middleware';
 import { BaseModule } from './entities/base/base.module';
+import { DashboardModule } from './entities/dashboard/dashboard.module';
+import { ParseXlsxModule } from './entities/parse-xlsx/parse-xlsx.module';
+import { TasksModule } from './entities/tasks/tasks.module';
+import { TechnicalTestResultModule } from './entities/technical-test-result/technical-test-result.module';
 
 @Module({
   imports: [
@@ -68,8 +69,9 @@ import { BaseModule } from './entities/base/base.module';
     GlobalLoggerService,
   ],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(CorsMiddleware).forRoutes('*');
-  }
-}
+export class AppModule {}
+// export class AppModule implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer.apply(CorsMiddleware).forRoutes('*');
+//   }
+// }
