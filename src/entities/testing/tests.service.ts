@@ -52,7 +52,7 @@ export class TestsService {
         internshipStream: stream.internshipStreamName,
       },
     });
-    const testTimeOver = new Date(test.endDate);
+    const testTimeOver = new Date(stream.endDateTesting);
     if (currentDate > testTimeOver) {
       throw new BadRequestException('Test time is over');
     }
