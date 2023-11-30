@@ -26,14 +26,14 @@ export class MailController {
   @ApiConflictResponse({ description: 'Email already exists' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @Post('check-email')
-  async checkPhone(@Body() body: EmailDto) {
-    return this.mailService.checkEmail(body.email);
+  public async checkPhone(@Body() body: EmailDto) {
+    return await this.mailService.checkEmail(body.email);
   }
 
   // Verify email
   @Get('verify-email/:verificationToken')
   @ApiOperation({ summary: 'User email verification' })
-  async verifyEmail(
+  public async verifyEmail(
     @Param('verificationToken') verificationToken: string,
     @Res() res: Response,
   ) {
@@ -55,7 +55,7 @@ export class MailController {
   @ApiConflictResponse({ description: 'Email is already verified' })
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @Post('resend-email')
-  async resendingEmail(@Body() body: EmailDto) {
-    return this.mailService.resendEmail(body.email);
+  public async resendingEmail(@Body() body: EmailDto) {
+    return await this.mailService.resendEmail(body.email);
   }
 }
