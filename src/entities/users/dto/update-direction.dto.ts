@@ -1,14 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { EDirections } from '@src/enums/direction.enum';
 import { Transform } from 'class-transformer';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty } from 'class-validator';
 
 export class UpdateDirectionDto {
   @ApiProperty({
     example: 'Frontend',
     description: 'Direction in which the user was trained',
   })
-  @IsString()
   @Transform(({ value }) => value.trim())
   @IsNotEmpty()
-  public direction: string;
+  @IsEnum(EDirections, {
+    message:
+      'Direction must be a valid value: Frontend or Backend or UX/UI design or QA (Quality Assurance) or PM',
+  })
+  public direction: EDirections;
 }
