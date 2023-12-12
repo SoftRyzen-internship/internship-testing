@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray } from 'class-validator';
+import { IsArray, IsNumber } from 'class-validator';
 
 export class UpdateTestDto {
   @ApiProperty({
@@ -7,6 +7,10 @@ export class UpdateTestDto {
     description: 'Answers ids',
   })
   @IsArray()
+  @IsNumber(
+    {},
+    { each: true, message: 'All elements of answersIds must be numbers' },
+  )
   public answersIds: number[];
 }
 

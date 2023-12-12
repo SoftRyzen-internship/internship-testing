@@ -78,7 +78,7 @@ export class ResponseCurrentDto {
   public englishLevel: string;
 
   @ApiProperty({
-    example: 'resume url',
+    example: 'https://my-resume.com',
     description: 'Resume url',
     required: true,
   })
