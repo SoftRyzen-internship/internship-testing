@@ -55,7 +55,7 @@ export class ResponseCurrentDto {
   public phone: string;
 
   @ApiProperty({
-    example: 'Telegram contact',
+    example: 'https://t.me/name',
     description: 'User Telegram contact',
   })
   public telegramContact: string;
