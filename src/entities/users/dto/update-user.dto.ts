@@ -41,7 +41,7 @@ export class UserDto {
   public phone: string;
 
   @ApiProperty({
-    example: 'Telegram contact',
+    example: 'https://t.me/name',
     description: 'User Telegram contact',
     required: true,
   })
@@ -95,7 +95,7 @@ export class UserDto {
   public englishLevel: string;
 
   @ApiProperty({
-    example: 'resume url',
+    example: 'https://my-resume.com',
     description: 'Resume url',
     required: true,
   })
