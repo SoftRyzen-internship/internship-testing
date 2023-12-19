@@ -68,8 +68,9 @@ import { CorsMiddleware } from './middlewares/cors-middleware';
     GlobalLoggerService,
   ],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(CorsMiddleware).forRoutes('*');
-  }
-}
+export class AppModule {}
+// export class AppModule implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer.apply(CorsMiddleware).forRoutes('*');
+//   }
+// }
