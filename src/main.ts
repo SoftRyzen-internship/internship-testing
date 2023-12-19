@@ -22,6 +22,13 @@ async function bootstrap() {
   });
   SwaggerModule.setup('/api/docs', app, document);
 
+  // app.enableCors({
+  //   origin: process.env.BASE_INTERNSHIP_SITE_URL,
+  //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  //   credentials: true,
+  //   allowedHeaders: 'Content-Type, Accept, Authorization, token-type',
+  // });
+
   app.useGlobalPipes(new ValidationPipe());
 
   await app.listen(PORT, () => console.log(`Server started on port = ${PORT}`));
