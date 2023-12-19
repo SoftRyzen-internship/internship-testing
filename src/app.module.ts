@@ -6,7 +6,11 @@ import { QuestionsModule } from '@entities/questions/questions.module';
 import { TechnicalTestModule } from '@entities/technical-test/technical-test.module';
 import { TestsModule } from '@entities/testing/tests.module';
 import { UserModule } from '@entities/users/users.module';
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  // MiddlewareConsumer,
+  Module,
+  // NestModule
+} from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
@@ -27,7 +31,7 @@ import { TokensModule } from './entities/tokens/tokens.module';
 import { UploadModule } from './entities/upload/upload.module';
 import { GlobalExceptionFilter } from './logger/global-exception-filter';
 import { GlobalLoggerService } from './logger/global-logger.service';
-import { CorsMiddleware } from './middlewares/cors-middleware';
+// import { CorsMiddleware } from './middlewares/cors-middleware';
 
 @Module({
   imports: [
@@ -68,9 +72,9 @@ import { CorsMiddleware } from './middlewares/cors-middleware';
     GlobalLoggerService,
   ],
 })
-// export class AppModule {}
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(CorsMiddleware).forRoutes('*');
-  }
-}
+export class AppModule {}
+// export class AppModule implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer.apply(CorsMiddleware).forRoutes('*');
+//   }
+// }
