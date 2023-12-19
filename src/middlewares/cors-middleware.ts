@@ -5,10 +5,7 @@ import { NextFunction, Response } from 'express';
 @Injectable()
 export class CorsMiddleware implements NestMiddleware {
   use(req: MyRequest, res: Response, next: NextFunction) {
-    res.header(
-      'Access-Control-Allow-Origin',
-      process.env.BASE_INTERNSHIP_SITE_URL,
-    );
+    res.header('Access-Control-Allow-Origin', 'http://localhost:5173/');
     res.header(
       'Access-Control-Allow-Methods',
       'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
