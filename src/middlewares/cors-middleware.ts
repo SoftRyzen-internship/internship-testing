@@ -14,7 +14,6 @@ export class CorsMiddleware implements NestMiddleware {
       'Access-Control-Allow-Headers',
       'Content-Type, Accept, Authorization, token-type',
     );
-    res.header('Access-Control-Allow-Credentials', 'true');
 
     if (req.method === 'OPTIONS') {
       res.sendStatus(200);
