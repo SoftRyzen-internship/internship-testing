@@ -117,8 +117,8 @@ export class InternshipStreamService {
         isSent: user.isSentTest,
         isStartTest: user.isStartTest,
         isSuccess: user.isPassedTest,
-        startDate: test ? test.startDate : null,
-        endDate: test ? test.endDate : null,
+        startDate: test ? test.startDate : stream.startDateTesting,
+        endDate: test ? test.endDate : stream.endDateTesting,
         testResult: test ? JSON.parse(test.testResults) : [],
       },
       task: {
