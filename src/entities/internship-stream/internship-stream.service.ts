@@ -54,7 +54,23 @@ export class InternshipStreamService {
       stream.directionsIds,
     );
 
-    return { ...stream, directions };
+    const test = {
+      isSent: false,
+      isStartTest: false,
+      isSuccess: false,
+      startDate: stream.startDateTesting,
+      endDate: stream.endDateTesting,
+      testResult: [],
+    };
+    const task = {
+      isSent: false,
+      isSuccess: false,
+      deadlineDate: stream.endDateTechnicalTest
+        ? getDateDeadline(stream.endDateTechnicalTest)
+        : null,
+    };
+
+    return { ...stream, directions, test, task };
   }
 
   // Get streams with sorting and filtering
