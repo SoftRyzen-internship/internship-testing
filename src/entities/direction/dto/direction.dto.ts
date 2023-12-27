@@ -1,10 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
+import * as regex from '@src/constants/regex-expressions';
 import { Transform } from 'class-transformer';
 import {
   ArrayNotEmpty,
   ArrayUnique,
   IsNotEmpty,
   IsString,
+  Matches,
 } from 'class-validator';
 
 export class AddDirectionDto {
@@ -37,6 +39,16 @@ export class AddDirectionDto {
   @ArrayNotEmpty()
   @ArrayUnique()
   technologies: string[];
+
+  @ApiProperty({
+    example: 'https://www.description.com/direction',
+    description: 'Description of the direction',
+    required: true,
+  })
+  @Matches(regex.linkRegex, {
+    message: 'This should have been a link',
+  })
+  public descriptionDirectionUrl: string;
 }
 
 export class ResponseDirectionDto extends AddDirectionDto {
