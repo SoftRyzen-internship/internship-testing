@@ -205,6 +205,9 @@ export class ResponseStreamDto {
   })
   public isOpenRegister: boolean;
 
+  @ApiProperty({ example: false, description: 'Is complete data user' })
+  public isCompleteData: boolean;
+
   @ApiProperty({ example: 800, description: 'Average test score' })
   public averageTestScore: number;
 

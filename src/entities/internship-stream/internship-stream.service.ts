@@ -46,7 +46,7 @@ export class InternshipStreamService {
   }
 
   // Get active stream
-  public async getActiveInternshipStream() {
+  public async getActiveInternshipStream(userId?: number) {
     const stream = await this.internshipStreamRepository.findOne({
       where: { isActive: true },
     });
@@ -54,23 +54,9 @@ export class InternshipStreamService {
       stream.directionsIds,
     );
 
-    const test = {
-      isSent: false,
-      isStartTest: false,
-      isSuccess: false,
-      startDate: stream.startDateTesting,
-      endDate: stream.endDateTesting,
-      testResult: [],
-    };
-    const task = {
-      isSent: false,
-      isSuccess: false,
-      deadlineDate: stream.endDateTechnicalTest
-        ? getDateDeadline(stream.endDateTechnicalTest)
-        : null,
-    };
+    const streamInfo = await this.getInternshipStreamById(stream.id, userId);
 
-    return { ...stream, directions, test, task };
+    return { ...streamInfo, directions };
   }
 
   // Get streams with sorting and filtering
@@ -113,6 +99,7 @@ export class InternshipStreamService {
     });
     return {
       ...stream,
+      isCompleteData: user.isCompleteData,
       test: {
         isSent: user.isSentTest,
         isStartTest: user.isStartTest,

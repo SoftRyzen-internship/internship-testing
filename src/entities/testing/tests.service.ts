@@ -56,7 +56,7 @@ export class TestsService {
     if (currentDate > testTimeOver) {
       throw new BadRequestException('Test time is over');
     }
-    if (test) {
+    if (test && user.isSentTest) {
       return { ...test, questionBlocks: JSON.parse(test.questionBlocks) };
     }
 
@@ -76,6 +76,8 @@ export class TestsService {
       testTime,
     });
     await this.testRepository.save(newTest);
+    user.isSentTest = true;
+    await this.userRepository.save(user);
 
     return { ...newTest, questionBlocks: blockQuestions.directions };
   }

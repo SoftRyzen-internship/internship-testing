@@ -84,7 +84,9 @@ export class InternshipStreamController {
   @UseGuards(JwtAuthGuard)
   @Get('active')
   public async getActiveInternshipStream(@Req() req: MyRequest) {
-    return await this.internshipStreamService.getActiveInternshipStream();
+    return await this.internshipStreamService.getActiveInternshipStream(
+      req.user.id,
+    );
   }
 
   // Get stream by id
