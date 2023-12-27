@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { MyBaseEntity } from '@src/base/base.entity';
+import * as regex from '@src/constants/regex-expressions';
+import { Matches } from 'class-validator';
 import { Column, Entity, Unique } from 'typeorm';
 
 @Entity('direction')
@@ -33,4 +35,19 @@ export class DirectionEntity extends MyBaseEntity {
   @ApiProperty({ example: 'admin', description: 'Role user`s' })
   @Column({ name: 'owner_role', type: 'varchar' })
   owner: string;
+
+  @ApiProperty({
+    example: 'https://www.description.com/direction',
+    description: 'Description of the direction',
+    required: true,
+  })
+  @Column({
+    name: 'description_direction_url',
+    type: 'varchar',
+    nullable: true,
+  })
+  @Matches(regex.linkRegex, {
+    message: 'This should have been a link',
+  })
+  public descriptionDirectionUrl: string;
 }

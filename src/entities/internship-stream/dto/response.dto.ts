@@ -46,6 +46,13 @@ export class ResponseDirectionsOfStreamDto {
 
   @ApiProperty({ example: 'admin', description: 'Role' })
   public owner: string;
+
+  @ApiProperty({
+    example: 'https://www.description.com/direction',
+    description: 'Description of the direction',
+    required: true,
+  })
+  public descriptionDirectionUrl: string;
 }
 
 export class TestResponseCurrentUserDto {
