@@ -232,6 +232,10 @@ export class UserEntity extends MyBaseEntity {
   @Column({ name: 'is_have_internship', type: 'boolean', default: false })
   public isHaveInternship: boolean;
 
+  @ApiProperty({ example: false, description: 'Is complete data user' })
+  @Column({ name: 'is_complect_data', type: 'boolean', default: false })
+  public isCompleteData: boolean;
+
   @ApiProperty({ example: 'Refresh token', description: ' Refresh  token' })
   @Column({ name: 'refresh_token', type: 'varchar', nullable: true })
   public refreshToken: string;

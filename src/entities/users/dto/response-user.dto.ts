@@ -170,6 +170,9 @@ export class ResponseCurrentDto {
   @ApiProperty({ example: false, description: 'Did you have an internship?' })
   public isHaveInternship: boolean;
 
+  @ApiProperty({ example: false, description: 'Is complete data user' })
+  public isCompleteData: boolean;
+
   @ApiProperty({ example: ['user', 'admin'], description: 'User roles' })
   public roles: string[];
 

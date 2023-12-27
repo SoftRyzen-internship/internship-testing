@@ -46,10 +46,6 @@ export class UserService {
       user: userData,
     };
 
-    if (!user.firstName || !user.phone) {
-      return responseData;
-    }
-
     return responseData;
   }
 
@@ -69,7 +65,10 @@ export class UserService {
   public async updateUser(email: string, body: UserDto) {
     const user = await this.getUser(email);
     if (user) {
-      await this.userRepository.update(user.id, body);
+      await this.userRepository.update(user.id, {
+        ...body,
+        isCompleteData: true,
+      });
     }
     return await this.currentUser(email);
   }
