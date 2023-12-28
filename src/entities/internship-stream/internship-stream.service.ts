@@ -107,6 +107,7 @@ export class InternshipStreamService {
         startDate: test ? test.startDate : stream.startDateTesting,
         endDate: test ? test.endDate : stream.endDateTesting,
         testResult: test ? JSON.parse(test.testResults) : [],
+        duration: test.testTime,
       },
       task: {
         isSent: user.isSentTechnicalTask,
