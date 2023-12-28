@@ -115,6 +115,15 @@ export class InternshipStreamService {
           ? getDateDeadline(stream.endDateTechnicalTest)
           : null,
       },
+      interview: {
+        isSend: user.isSendInterview,
+        isFailed: user.isFailedInterview,
+        startDate: user.startDateInterview,
+        meetingInterviewUrl: user.meetingInterviewUrl,
+      },
+      offer: {
+        isOffer: user.isOffer,
+      },
     };
   }
 

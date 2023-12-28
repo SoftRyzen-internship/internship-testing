@@ -173,6 +173,36 @@ export class ResponseCurrentDto {
   @ApiProperty({ example: false, description: 'Is complete data user' })
   public isCompleteData: boolean;
 
+  @ApiProperty({
+    example: false,
+    description: 'You have received an invitation to an interview',
+  })
+  public isSendInterview: boolean;
+
+  @ApiProperty({
+    example: false,
+    description: 'Interview failed',
+  })
+  public isFailedInterview: boolean;
+
+  @ApiProperty({
+    example: '2023-11-01T00:00:00.000Z',
+    description: 'Interview start date ',
+  })
+  public startDateInterview: Date;
+
+  @ApiProperty({
+    example: 'https://google-meet.com/',
+    description: 'Meeting interview',
+  })
+  public meetingInterviewUrl: string;
+
+  @ApiProperty({
+    example: false,
+    description: 'Received the offer',
+  })
+  public isOffer: boolean;
+
   @ApiProperty({ example: ['user', 'admin'], description: 'User roles' })
   public roles: string[];
 

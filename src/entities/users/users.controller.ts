@@ -1,4 +1,6 @@
 import { JwtAuthGuard } from '@guards/jwtGuard/jwt-auth.guard';
+import { Roles } from '@guards/roleGuard/decorators/role.decorator';
+import { RoleGuard } from '@guards/roleGuard/role.guard';
 import {
   Body,
   Controller,
@@ -20,10 +22,11 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { ERole } from '@src/enums/role.enum';
 import { MyRequest } from '@src/types/request.interface';
 import { ResponseCurrentUserDto } from './dto/response-user.dto';
 import { UpdateDirectionDto } from './dto/update-direction.dto';
-import { UserDto } from './dto/update-user.dto';
+import { CandidateProgressUpdatesDto, UserDto } from './dto/update-user.dto';
 import { UserService } from './users.service';
 
 @ApiTags('User')
@@ -146,5 +149,40 @@ export class UserController {
     @Req() req: MyRequest,
   ) {
     return await this.userService.updateUserStream(req.user.email, streamId);
+  }
+
+  // Update isSendInterview, isFailedInterview, startDateInterview, isOffer
+  @ApiOperation({
+    summary:
+      'Only admin can update. Update isSendInterview, isFailedInterview, startDateInterview, isOffer.',
+  })
+  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access token with type',
+    required: true,
+    schema: {
+      type: 'string',
+      format: 'Bearer YOUR_TOKEN_HERE, token-type=access_token',
+    },
+  })
+  @ApiResponse({ status: 200, type: ResponseCurrentUserDto })
+  @ApiNotFoundResponse({ description: 'Not found' })
+  @ApiBadRequestResponse({
+    description: 'The user is already registered for this stream',
+  })
+  @ApiUnauthorizedResponse({
+    description:
+      'Not authorized jwt expired || Not authorized Invalid token type',
+  })
+  @ApiInternalServerErrorResponse({ description: 'Server error' })
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(ERole.ADMIN)
+  @Patch('progress/:userId')
+  public async candidateProgressUpdates(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Body() body: CandidateProgressUpdatesDto,
+  ) {
+    return await this.userService.candidateProgressUpdates(userId, body);
   }
 }
