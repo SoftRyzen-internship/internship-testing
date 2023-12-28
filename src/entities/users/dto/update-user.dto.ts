@@ -1,9 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import * as regex from '@src/constants/regex-expressions';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
+  IsDate,
   IsNotEmpty,
+  IsOptional,
   IsPhoneNumber,
   IsString,
   Matches,
@@ -179,4 +181,58 @@ export class UserDto {
     message: 'This should have been a link',
   })
   public documentationUrl?: string;
+}
+
+export class CandidateProgressUpdatesDto {
+  @ApiProperty({
+    example: false,
+    description: 'You have received an invitation to an interview',
+  })
+  @IsOptional()
+  @ValidateIf((object, value) => value !== undefined && value !== null)
+  @IsBoolean()
+  @IsNotEmpty()
+  public isSendInterview?: boolean;
+
+  @ApiProperty({
+    example: false,
+    description: 'Interview failed',
+  })
+  @IsOptional()
+  @ValidateIf((object, value) => value !== undefined && value !== null)
+  @IsBoolean()
+  @IsNotEmpty()
+  public isFailedInterview?: boolean;
+
+  @ApiProperty({
+    example: '2023-11-01T00:00:00.000Z',
+    description: 'Interview start date ',
+  })
+  @IsOptional()
+  @ValidateIf((object, value) => value !== undefined && value !== null)
+  @IsDate()
+  @IsNotEmpty()
+  @Type(() => Date)
+  public startDateInterview?: Date;
+
+  @ApiProperty({
+    example: false,
+    description: 'Received the offer',
+  })
+  @IsOptional()
+  @ValidateIf((object, value) => value !== undefined && value !== null)
+  @IsBoolean()
+  @IsNotEmpty()
+  public isOffer?: boolean;
+
+  @ApiProperty({
+    example: 'https://google-meet.com/',
+    description: 'Meeting interview',
+  })
+  @IsOptional()
+  @ValidateIf((object, value) => value !== undefined && value !== null)
+  @Matches(regex.linkRegex, {
+    message: 'This should have been a link',
+  })
+  public meetingInterviewUrl: string;
 }

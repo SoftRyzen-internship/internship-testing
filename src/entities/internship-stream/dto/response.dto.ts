@@ -106,6 +106,40 @@ export class TaskResponseCurrentUserDto {
   })
   public deadlineDate: Date;
 }
+
+export class InterviewResponseCurrentUserDto {
+  @ApiProperty({
+    example: false,
+    description: 'You have received an invitation to an interview',
+  })
+  public isSend: boolean;
+
+  @ApiProperty({
+    example: false,
+    description: 'Interview failed',
+  })
+  public isFailed: boolean;
+
+  @ApiProperty({
+    example: '2023-11-01T00:00:00.000Z',
+    description: 'Interview start date ',
+  })
+  public startDate: Date;
+
+  @ApiProperty({
+    example: 'https://google-meet.com/',
+    description: 'Meeting interview',
+  })
+  public meetingInterviewUrl: string;
+}
+
+export class OfferResponseCurrentUserDto {
+  @ApiProperty({
+    example: false,
+    description: 'Received the offer',
+  })
+  public isOffer: boolean;
+}
 export class ResponseStreamDto {
   @ApiProperty({
     example: 1,
@@ -229,6 +263,12 @@ export class ResponseStreamDto {
 
   @ApiProperty({ type: () => TaskResponseCurrentUserDto })
   public task: TaskResponseCurrentUserDto;
+
+  @ApiProperty({ type: () => InterviewResponseCurrentUserDto })
+  public interview: InterviewResponseCurrentUserDto;
+
+  @ApiProperty({ type: () => OfferResponseCurrentUserDto })
+  public isOffer: OfferResponseCurrentUserDto;
 }
 
 export class ResponseActiveStreamDto extends ResponseStreamDto {

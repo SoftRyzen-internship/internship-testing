@@ -41,7 +41,6 @@ export class UserEntity extends MyBaseEntity {
 
   @ApiProperty({ example: 'contactPhone', description: 'User contact phone' })
   @Column({ name: 'phone', type: 'varchar', nullable: true })
-  @Unique(['phone'])
   @Matches(regex.phoneRegex, {
     message: 'Contact phone must be in the format "+380XXXXXXXXX"',
   })
@@ -100,6 +99,16 @@ export class UserEntity extends MyBaseEntity {
     message: 'This should have been a link',
   })
   public documentationUrl: string;
+
+  @ApiProperty({
+    example: 'https://google-meet.com/',
+    description: 'Meeting interview',
+  })
+  @Column({ name: 'meeting_interview_url', type: 'varchar', nullable: true })
+  @Matches(regex.linkRegex, {
+    message: 'This should have been a link',
+  })
+  public meetingInterviewUrl: string;
 
   @ApiProperty({
     example: "Because I'm the best",
@@ -219,6 +228,46 @@ export class UserEntity extends MyBaseEntity {
     default: false,
   })
   public isSentTechnicalTask: boolean;
+
+  @ApiProperty({
+    example: false,
+    description: 'You have received an invitation to an interview',
+  })
+  @Column({
+    name: 'is_send_interview',
+    type: 'boolean',
+    default: false,
+  })
+  public isSendInterview: boolean;
+
+  @ApiProperty({
+    example: false,
+    description: 'Interview failed',
+  })
+  @Column({
+    name: 'is_failed_interview',
+    type: 'boolean',
+    default: false,
+  })
+  public isFailedInterview: boolean;
+
+  @ApiProperty({
+    example: '2023-11-01T00:00:00.000Z',
+    description: 'Interview start date ',
+  })
+  @Column({ name: 'start_date_interview', type: 'timestamp', nullable: true })
+  public startDateInterview: Date;
+
+  @ApiProperty({
+    example: false,
+    description: 'Received the offer',
+  })
+  @Column({
+    name: 'is_offer',
+    type: 'boolean',
+    default: false,
+  })
+  public isOffer: boolean;
 
   @ApiProperty({ example: 'Verify token', description: 'Verify token' })
   @Column({ name: 'verify_token', type: 'varchar', default: null })

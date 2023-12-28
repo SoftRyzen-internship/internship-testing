@@ -10,7 +10,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateDirectionDto } from './dto/update-direction.dto';
-import { UserDto } from './dto/update-user.dto';
+import { CandidateProgressUpdatesDto, UserDto } from './dto/update-user.dto';
 import { IStreamInfo } from './types/interfaces';
 import { UserEntity } from './users.entity';
 
@@ -76,14 +76,14 @@ export class UserService {
   // Update direction
   public async updateUserDirection(email: string, body: UpdateDirectionDto) {
     const user = await this.getUser(email);
+    if (user.isOffer) {
+      throw new BadRequestException(
+        'You have already attended a training session at SoftRyzen.',
+      );
+    }
     const streamInfoParse: IStreamInfo[] = user.streamsHistory
       ? JSON.parse(user.streamsHistory)
       : [];
-    for (const info of streamInfoParse) {
-      if (info.direction === body.direction) {
-        throw new BadRequestException("You can't choose this direction");
-      }
-    }
     const stream = await this.streamRepository.findOne({
       where: { id: user.streamId },
     });
@@ -120,9 +120,28 @@ export class UserService {
       isStartTest: false,
       isPassedTechnicalTask: false,
       isSentTechnicalTask: false,
+      isSendInterview: false,
+      isFailedInterview: false,
+      startDateInterview: null,
+      isOffer: false,
     };
 
     Object.assign(user, updateUserStream);
+    await this.userRepository.save(user);
+    return await this.currentUser(user.email);
+  }
+
+  // Update isSendInterview, isFailedInterview, startDateInterview, isOffer
+  public async candidateProgressUpdates(
+    userId: number,
+    body: CandidateProgressUpdatesDto,
+  ) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    Object.assign(user, body);
     await this.userRepository.save(user);
     return await this.currentUser(user.email);
   }
