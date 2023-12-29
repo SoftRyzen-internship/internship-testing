@@ -121,6 +121,8 @@ export class InternshipStreamService {
         isFailed: user.isFailedInterview,
         startDate: user.startDateInterview,
         meetingInterviewUrl: user.meetingInterviewUrl,
+        startDateOnlineInterview: stream.startDateOnlineInterview,
+        endDateOnlineInterview: stream.endDateOnlineInterview,
       },
       offer: {
         isOffer:
