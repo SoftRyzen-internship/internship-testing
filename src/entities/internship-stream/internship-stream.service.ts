@@ -107,7 +107,7 @@ export class InternshipStreamService {
         startDate: test ? test.startDate : stream.startDateTesting,
         endDate: test ? test.endDate : stream.endDateTesting,
         testResult: test ? JSON.parse(test.testResults) : [],
-        duration: test.testTime,
+        duration: test ? test.testTime : null,
       },
       task: {
         isSent: user.isSentTechnicalTask,
@@ -123,7 +123,8 @@ export class InternshipStreamService {
         meetingInterviewUrl: user.meetingInterviewUrl,
       },
       offer: {
-        isOffer: user.isOffer,
+        isOffer:
+          user.isPassedTechnicalTask && !user.isFailedInterview && user.isOffer,
       },
     };
   }

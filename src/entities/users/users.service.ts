@@ -123,6 +123,7 @@ export class UserService {
       isSendInterview: false,
       isFailedInterview: false,
       startDateInterview: null,
+      meetingInterviewUrl: null,
       isOffer: false,
     };
 
