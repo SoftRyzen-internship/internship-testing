@@ -121,6 +121,12 @@ export class InterviewResponseCurrentUserDto {
   public isFailed: boolean;
 
   @ApiProperty({
+    example: false,
+    description: 'Interview success',
+  })
+  public isSuccess: boolean;
+
+  @ApiProperty({
     example: '2023-11-01T00:00:00.000Z',
     description: 'Interview start date ',
   })

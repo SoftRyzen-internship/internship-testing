@@ -205,6 +205,16 @@ export class CandidateProgressUpdatesDto {
   public isFailedInterview?: boolean;
 
   @ApiProperty({
+    example: false,
+    description: 'Interview success',
+  })
+  @IsOptional()
+  @ValidateIf((object, value) => value !== undefined && value !== null)
+  @IsBoolean()
+  @IsNotEmpty()
+  public isSuccessInterview?: boolean;
+
+  @ApiProperty({
     example: '2023-11-01T00:00:00.000Z',
     description: 'Interview start date ',
   })

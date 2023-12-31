@@ -252,6 +252,17 @@ export class UserEntity extends MyBaseEntity {
   public isFailedInterview: boolean;
 
   @ApiProperty({
+    example: false,
+    description: 'Interview failed',
+  })
+  @Column({
+    name: 'is_success_interview',
+    type: 'boolean',
+    default: false,
+  })
+  public isSuccessInterview: boolean;
+
+  @ApiProperty({
     example: '2023-11-01T00:00:00.000Z',
     description: 'Interview start date ',
   })
