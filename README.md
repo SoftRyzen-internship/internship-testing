@@ -8,7 +8,8 @@ This is the backend for the SoftRyzen project, built using the NestJS framework.
 2. [Required Versions](#required-versions)
 3. [Database](#database)
 4. [Environment variables](#environment-variables)
-5. [Migrations data base](#migration)
+5. [Migrations data base](#migration-data-base)
+6. [Change direction name](#change-directions-name)
 
 ## Building
 
@@ -45,4 +46,12 @@ npm run migrations:generate -- src/migrations/<name>
 npm run migrations:create -- src/migrations/<name>
 npm run migrations:run
 npm run migrations:down
+```
+
+## Change directions name
+
+```
+When changing the name of the frontend directions,
+they also need to be changed in the file:
+\src\enums\direction.enum.ts
 ```

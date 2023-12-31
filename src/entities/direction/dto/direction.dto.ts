@@ -1,9 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import * as regex from '@src/constants/regex-expressions';
+import { EDirections } from '@src/enums/direction.enum';
 import { Transform } from 'class-transformer';
 import {
   ArrayNotEmpty,
   ArrayUnique,
+  IsEnum,
   IsNotEmpty,
   IsString,
   Matches,
@@ -12,13 +14,15 @@ import {
 export class AddDirectionDto {
   @ApiProperty({
     example: 'Frontend',
-    description: 'Internship direction',
-    required: true,
+    description: 'Direction in which the user was trained',
   })
-  @IsString()
   @Transform(({ value }) => value.trim())
   @IsNotEmpty()
-  direction: string;
+  @IsEnum(EDirections, {
+    message:
+      'Direction must be a valid value: Frontend or Backend or UX/UI design or QA (Quality Assurance) or PM',
+  })
+  public direction: EDirections;
 
   @ApiProperty({
     example:
