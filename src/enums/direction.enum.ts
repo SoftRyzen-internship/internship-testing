@@ -1,3 +1,7 @@
+/*
+If the names of the directions change, they will need to be replaced here too.
+*/
+
 export enum EDirections {
   FRONTEND = 'Frontend',
   BACKEND = 'Backend',
