@@ -122,6 +122,7 @@ export class UserService {
       isSentTechnicalTask: false,
       isSendInterview: false,
       isFailedInterview: false,
+      isSuccessInterview: false,
       startDateInterview: null,
       meetingInterviewUrl: null,
       isOffer: false,
@@ -132,7 +133,7 @@ export class UserService {
     return await this.currentUser(user.email);
   }
 
-  // Update isSendInterview, isFailedInterview, startDateInterview, isOffer
+  // Update isSendInterview, isFailedInterview, startDateInterview, isOffer, isSuccessInterview
   public async candidateProgressUpdates(
     userId: number,
     body: CandidateProgressUpdatesDto,

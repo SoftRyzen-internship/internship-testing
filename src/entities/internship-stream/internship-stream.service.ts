@@ -119,6 +119,7 @@ export class InternshipStreamService {
       interview: {
         isSend: user.isSendInterview,
         isFailed: user.isFailedInterview,
+        isSuccess: user.isSuccessInterview,
         startDate: user.startDateInterview,
         meetingInterviewUrl: user.meetingInterviewUrl,
         startDateOnlineInterview: stream.startDateOnlineInterview,
