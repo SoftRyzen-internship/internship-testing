@@ -69,6 +69,8 @@ export class UserDto {
     description: 'Direction',
     required: true,
   })
+  @IsOptional()
+  @ValidateIf((object, value) => value !== undefined && value !== null)
   @IsString()
   @Transform(({ value }) => value.trim())
   @IsNotEmpty()
