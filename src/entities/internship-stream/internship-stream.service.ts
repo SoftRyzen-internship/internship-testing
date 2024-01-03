@@ -1,10 +1,8 @@
 import { DirectionEntity } from '@entities/direction/direction.entity';
-import { ResultTechnicalTestEntity } from '@entities/technical-test-result/result-test.entity';
 import { TestEntity } from '@entities/testing/tests.entity';
 import { UserEntity } from '@entities/users/users.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getDateDeadline } from '@utils/format-deadline-tech-test';
 import { FindManyOptions, In, Repository } from 'typeorm';
 import { CreateStreamDto } from './dto/create-stream.dto';
 import { InternshipStreamEntity } from './internship-stream.entity';
@@ -20,8 +18,6 @@ export class InternshipStreamService {
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(TestEntity)
     private readonly testingRepository: Repository<TestEntity>,
-    @InjectRepository(ResultTechnicalTestEntity)
-    private readonly techTestRepository: Repository<ResultTechnicalTestEntity>,
   ) {}
 
   // Create new stream
@@ -91,12 +87,6 @@ export class InternshipStreamService {
     const test = await this.testingRepository.findOne({
       where: { streamId, owner: userId },
     });
-    const techTestResult = await this.techTestRepository.findOne({
-      where: {
-        streamId,
-        userId,
-      },
-    });
     return {
       ...stream,
       isCompleteData: user.isCompleteData,
@@ -112,9 +102,7 @@ export class InternshipStreamService {
       task: {
         isSent: user.isSentTechnicalTask,
         isSuccess: user.isPassedTechnicalTask,
-        deadlineDate: stream.endDateTechnicalTest
-          ? getDateDeadline(stream.endDateTechnicalTest)
-          : null,
+        deadlineDate: stream.endDateTechnicalTest,
       },
       interview: {
         isSend: user.isSendInterview,
