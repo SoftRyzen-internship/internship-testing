@@ -65,18 +65,6 @@ export class UserDto {
   public currentCity: string;
 
   @ApiProperty({
-    example: 'Frontend',
-    description: 'Direction',
-    required: true,
-  })
-  @IsOptional()
-  @ValidateIf((object, value) => value !== undefined && value !== null)
-  @IsString()
-  @Transform(({ value }) => value.trim())
-  @IsNotEmpty()
-  public direction: string;
-
-  @ApiProperty({
     example: 'https://www.linkedin.com/in/user/',
     description: 'User linkedin url',
     required: true,
