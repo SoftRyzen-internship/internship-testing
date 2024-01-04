@@ -28,6 +28,7 @@ import { UploadModule } from './entities/upload/upload.module';
 import { GlobalExceptionFilter } from './logger/global-exception-filter';
 import { GlobalLoggerService } from './logger/global-logger.service';
 import { CorsMiddleware } from './middlewares/cors-middleware';
+import { GoogleDriveModule } from './entities/google-drive/google-drive.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { CorsMiddleware } from './middlewares/cors-middleware';
     DashboardModule,
     TasksModule,
     BaseModule,
+    GoogleDriveModule,
   ],
   controllers: [],
   providers: [
