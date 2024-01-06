@@ -1,3 +1,5 @@
+import { GoogleDriveService } from '@entities/google-drive/google-drive.service';
+import { InternshipStreamEntity } from '@entities/internship-stream/internship-stream.entity';
 import { TechnicalTestService } from '@entities/technical-test/technical-test.service';
 import { UserEntity } from '@entities/users/users.entity';
 import { BadRequestException, Injectable } from '@nestjs/common';
@@ -16,7 +18,10 @@ export class TechnicalTestResultService {
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(ResultTechnicalTestEntity)
     private readonly resultRepository: Repository<ResultTechnicalTestEntity>,
+    @InjectRepository(InternshipStreamEntity)
+    private readonly streamRepository: Repository<InternshipStreamEntity>,
     private readonly techTestService: TechnicalTestService,
+    private readonly googleDriveService: GoogleDriveService,
   ) {}
 
   // Add result for a technical test
@@ -33,7 +38,9 @@ export class TechnicalTestResultService {
       );
     }
     const newTechResult = this.resultRepository.create({ ...body, userId });
+
     await this.resultRepository.save(newTechResult);
+    await this.updateUserDataSpreadsheet(userId, newTechResult);
     return newTechResult;
   }
 
@@ -70,5 +77,21 @@ export class TechnicalTestResultService {
     await this.resultRepository.save(testResult);
     await this.userRepository.save(user);
     return testResult;
+  }
+
+  private async updateUserDataSpreadsheet(
+    userId: number,
+    resultTechnicalTest: ResultTechnicalTestEntity,
+  ) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    const stream = await this.streamRepository.findOne({
+      where: { id: user.streamId },
+    });
+    await this.googleDriveService.updateInfoUserToSpreadsheet(
+      stream.spreadsheetId,
+      resultTechnicalTest,
+      user.direction,
+    );
+    return true;
   }
 }

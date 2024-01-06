@@ -10,6 +10,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserController } from './users.controller';
 import { UserEntity } from './users.entity';
 import { UserService } from './users.service';
+import { GoogleDriveModule } from '@entities/google-drive/google-drive.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { UserService } from './users.service';
     ]),
     JwtGuardsModule,
     TokensModule,
+    GoogleDriveModule,
   ],
   controllers: [UserController],
   providers: [UserService, ConfigService],

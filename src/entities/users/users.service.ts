@@ -1,3 +1,4 @@
+import { GoogleDriveService } from '@entities/google-drive/google-drive.service';
 import { InternshipStreamEntity } from '@entities/internship-stream/internship-stream.entity';
 import { TechnicalTestEntity } from '@entities/technical-test/technical-test.entity';
 import { TestEntity } from '@entities/testing/tests.entity';
@@ -26,6 +27,7 @@ export class UserService {
     @InjectRepository(InternshipStreamEntity)
     private readonly streamRepository: Repository<InternshipStreamEntity>,
     private readonly tokensService: TokensService,
+    private readonly googleService: GoogleDriveService,
   ) {}
 
   // Current user
@@ -64,12 +66,14 @@ export class UserService {
   // Update user
   public async updateUser(email: string, body: UserDto) {
     const user = await this.getUser(email);
-    if (user) {
-      await this.userRepository.update(user.id, {
-        ...body,
-        isCompleteData: true,
-      });
+    if (!user) {
+      throw new NotFoundException(`User with ${email} not found`);
     }
+
+    Object.assign(user, { ...body, isCompleteData: true });
+    await this.userRepository.save(user);
+
+    await this.saveUserDataSpreadsheet(user.id);
     return await this.currentUser(email);
   }
 
@@ -156,5 +160,17 @@ export class UserService {
     delete user.refreshToken;
 
     return { ...user, roles };
+  }
+
+  private async saveUserDataSpreadsheet(userId: number) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    const stream = await this.streamRepository.findOne({
+      where: { id: user.streamId },
+    });
+    await this.googleService.addInfoUserToSpreadsheet(
+      stream.spreadsheetId,
+      user,
+    );
+    return true;
   }
 }
