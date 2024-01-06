@@ -36,21 +36,6 @@ export class UserService {
     const userWithoutPassword = this.deleteFieldsOfUser(user);
     const tokens = await this.tokensService.generateTokens(user);
 
-    // await this.googleService.createSpreadsheetInFolder(
-    //   process.env.TARGET_FOLDER_SPREADSHEET_ID,
-    //   'UpdateUser v2',
-    //   ['test1', 'test2', 'test3'],
-    // );
-
-    // await this.googleService.addInfoUserToSpreadsheet(
-    //   '1GWrRVYabkDIrJYnOJjNZRHyP2R2IPDbeV1TWrMedYzQ',
-    //   user,
-    // );
-
-    await this.googleService.updateInfoUserToSpreadsheet(
-      '1GWrRVYabkDIrJYnOJjNZRHyP2R2IPDbeV1TWrMedYzQ',
-    );
-
     const userData: Partial<Omit<UserEntity, 'roles'>> = {
       ...userWithoutPassword,
       streamsHistory: user.streamsHistory
@@ -81,12 +66,14 @@ export class UserService {
   // Update user
   public async updateUser(email: string, body: UserDto) {
     const user = await this.getUser(email);
-    if (user) {
-      await this.userRepository.update(user.id, {
-        ...body,
-        isCompleteData: true,
-      });
+    if (!user) {
+      throw new NotFoundException(`User with ${email} not found`);
     }
+
+    Object.assign(user, { ...body, isCompleteData: true });
+    await this.userRepository.save(user);
+
+    await this.saveUserDataSpreadsheet(user.id);
     return await this.currentUser(email);
   }
 
@@ -173,5 +160,17 @@ export class UserService {
     delete user.refreshToken;
 
     return { ...user, roles };
+  }
+
+  private async saveUserDataSpreadsheet(userId: number) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    const stream = await this.streamRepository.findOne({
+      where: { id: user.streamId },
+    });
+    await this.googleService.addInfoUserToSpreadsheet(
+      stream.spreadsheetId,
+      user,
+    );
+    return true;
   }
 }

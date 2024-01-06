@@ -198,36 +198,51 @@ export class GoogleDriveService {
 
   public async updateInfoUserToSpreadsheet(
     spreadsheetId: string,
-    body?: ResultTechnicalTestEntity,
+    body: ResultTechnicalTestEntity,
+    range: string,
   ) {
-    const response = await this.sheets.spreadsheets.values.get({
+    const rowResponse = await this.sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: 'test1!A:A',
+      range: `${range}!1:1`,
     });
+
+    const columnResponse = await this.sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${range}!A:A`,
+    });
+
+    const columnValues = columnResponse.data.values;
+    const rowValues = rowResponse.data.values[0];
 
     const key = Object.keys(technicalTestCellData);
 
-    const userIds = response.data.values?.flat();
+    const userIds = columnValues.flat();
     const userID = userIds.map(Number);
-    console.log('userIds', userIds);
-    if (userIds && userID.includes(44)) {
-      const userRowIndex = userID.indexOf(44) + 1;
+    if (userIds && userID.includes(body.userId)) {
+      const valueUpdate = [];
+      const userRowIndex = userID.indexOf(body.userId) + 1;
 
-      const userRange = `test1!${key
-        .map((col) => `${col}${userRowIndex}`)
-        .join(',')}`;
+      const columnIndexArray = key.map((columnName) => {
+        valueUpdate.push(body[technicalTestCellData[columnName]]);
+        return rowValues.indexOf(columnName) + 1;
+      });
+
+      const columnRange = columnIndexArray.map((columnIndex) =>
+        String.fromCharCode(64 + columnIndex),
+      );
+
+      const userRange = `${range}!${columnRange[0]}${userRowIndex}:${
+        columnRange[columnRange.length - 1]
+      }${userRowIndex}`;
+
       await this.sheets.spreadsheets.values.update({
         spreadsheetId,
         range: userRange,
         valueInputOption: 'RAW',
         requestBody: {
-          values: [['aaa', 'bbb', 'ccc', 'ddd']],
+          values: [valueUpdate],
         },
       });
-
-      console.log(`Значения для пользователя с ID ${44} успешно обновлены.`);
-    } else {
-      console.log(`Пользователь с ID ${44} не найден в таблице.`);
     }
   }
 

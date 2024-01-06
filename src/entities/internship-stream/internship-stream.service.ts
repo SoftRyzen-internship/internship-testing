@@ -39,17 +39,14 @@ export class InternshipStreamService {
       number: lastActiveStream ? lastActiveStream.number + 1 : 1,
     });
 
-    const directionsNames = (
+    const titles = (
       await this.getDirectionForStream(newStream.directionsIds)
     ).map((direction) => direction.direction);
 
-    const spreadsheetId =
-      await this.googleDriveService.createSpreadsheetInFolder(
-        process.env.TARGET_FOLDER_SPREADSHEET_ID,
-        body.internshipStreamName,
-        directionsNames,
-      );
-    newStream.spreadsheetId = spreadsheetId;
+    newStream.spreadsheetId = await this.createSpreadsheetInFolder(
+      newStream.internshipStreamName,
+      titles,
+    );
 
     const createdStream = await this.internshipStreamRepository.save(newStream);
     return createdStream;
@@ -159,5 +156,19 @@ export class InternshipStreamService {
         id: In(directionIds),
       },
     });
+  }
+
+  private async createSpreadsheetInFolder(
+    spreadsheetName: string,
+    titles: string[],
+  ) {
+    const spreadsheetId =
+      await this.googleDriveService.createSpreadsheetInFolder(
+        process.env.TARGET_FOLDER_ID_SPREADSHEET,
+        spreadsheetName,
+        titles,
+      );
+
+    return spreadsheetId;
   }
 }
