@@ -134,6 +134,7 @@ export class UserService {
 
     Object.assign(user, updateUserStream);
     await this.userRepository.save(user);
+    await this.saveUserDataSpreadsheet(user.id);
     return await this.currentUser(user.email);
   }
 
