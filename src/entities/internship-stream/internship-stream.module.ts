@@ -9,6 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { InternshipStreamController } from './internship-stream.controller';
 import { InternshipStreamEntity } from './internship-stream.entity';
 import { InternshipStreamService } from './internship-stream.service';
+import { GoogleDriveModule } from '@entities/google-drive/google-drive.module'
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { InternshipStreamService } from './internship-stream.service';
       ResultTechnicalTestEntity,
     ]),
     JwtGuardsModule,
+    GoogleDriveModule
   ],
   providers: [InternshipStreamService, ConfigService],
   controllers: [InternshipStreamController],

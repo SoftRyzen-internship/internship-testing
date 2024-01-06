@@ -24,6 +24,7 @@ export class TechnicalTestResultService {
     userId: number,
     body: CreateResultTechnicalDto,
   ) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
     const currentDate = new Date();
     const techTest = await this.techTestService.getTechnicalTest(userId);
     const deadline = new Date(techTest.deadline);

@@ -118,6 +118,17 @@ export class InternshipStreamEntity extends MyBaseEntity {
   })
   public endDateOnlineInterview: Date;
 
+  @ApiProperty({
+    example: '1Y-WfnsMV_RU6BFjEV5zu-OYk0vOVPtuW',
+    description: 'Spreadsheet id',
+  })
+  @Column({
+    name: 'spreadsheet_id',
+    type: 'varchar',
+    nullable: true,
+  })
+  public spreadsheetId: string;
+
   @ApiProperty({ example: 825, description: 'Average test score' })
   @Column({ name: 'average_test_score', type: 'integer', default: 0 })
   public averageTestScore: number;

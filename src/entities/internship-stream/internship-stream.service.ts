@@ -1,4 +1,5 @@
 import { DirectionEntity } from '@entities/direction/direction.entity';
+import { GoogleDriveService } from '@entities/google-drive/google-drive.service';
 import { TestEntity } from '@entities/testing/tests.entity';
 import { UserEntity } from '@entities/users/users.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
@@ -18,6 +19,7 @@ export class InternshipStreamService {
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(TestEntity)
     private readonly testingRepository: Repository<TestEntity>,
+    private readonly googleDriveService: GoogleDriveService,
   ) {}
 
   // Create new stream
@@ -36,6 +38,18 @@ export class InternshipStreamService {
       ownerId: adminId,
       number: lastActiveStream ? lastActiveStream.number + 1 : 1,
     });
+
+    const directionsNames = (
+      await this.getDirectionForStream(newStream.directionsIds)
+    ).map((direction) => direction.direction);
+
+    const spreadsheetId =
+      await this.googleDriveService.createSpreadsheetInFolder(
+        process.env.TARGET_FOLDER_SPREADSHEET_ID,
+        body.internshipStreamName,
+        directionsNames,
+      );
+    newStream.spreadsheetId = spreadsheetId;
 
     const createdStream = await this.internshipStreamRepository.save(newStream);
     return createdStream;

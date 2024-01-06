@@ -1,3 +1,4 @@
+import { GoogleDriveService } from '@entities/google-drive/google-drive.service';
 import { InternshipStreamEntity } from '@entities/internship-stream/internship-stream.entity';
 import { TechnicalTestEntity } from '@entities/technical-test/technical-test.entity';
 import { TestEntity } from '@entities/testing/tests.entity';
@@ -26,6 +27,7 @@ export class UserService {
     @InjectRepository(InternshipStreamEntity)
     private readonly streamRepository: Repository<InternshipStreamEntity>,
     private readonly tokensService: TokensService,
+    private readonly googleService: GoogleDriveService,
   ) {}
 
   // Current user
@@ -33,6 +35,21 @@ export class UserService {
     const user: UserEntity = await this.getUser(email);
     const userWithoutPassword = this.deleteFieldsOfUser(user);
     const tokens = await this.tokensService.generateTokens(user);
+
+    // await this.googleService.createSpreadsheetInFolder(
+    //   process.env.TARGET_FOLDER_SPREADSHEET_ID,
+    //   'UpdateUser v2',
+    //   ['test1', 'test2', 'test3'],
+    // );
+
+    // await this.googleService.addInfoUserToSpreadsheet(
+    //   '1GWrRVYabkDIrJYnOJjNZRHyP2R2IPDbeV1TWrMedYzQ',
+    //   user,
+    // );
+
+    await this.googleService.updateInfoUserToSpreadsheet(
+      '1GWrRVYabkDIrJYnOJjNZRHyP2R2IPDbeV1TWrMedYzQ',
+    );
 
     const userData: Partial<Omit<UserEntity, 'roles'>> = {
       ...userWithoutPassword,
