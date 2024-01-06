@@ -96,7 +96,7 @@ export class InternshipStreamService {
       where: { id: streamId },
     });
     const test = await this.testingRepository.findOne({
-      where: { streamId, owner: userId },
+      where: { streamId, userId: userId },
     });
     return {
       ...stream,

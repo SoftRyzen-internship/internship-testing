@@ -1,5 +1,6 @@
 import { AnswersEntity } from '@entities/answers/answers.entity';
 import { AnswersService } from '@entities/answers/answers.service';
+import { GoogleDriveService } from '@entities/google-drive/google-drive.service';
 import { InternshipStreamEntity } from '@entities/internship-stream/internship-stream.entity';
 import { QuestionsBlockService } from '@entities/questions-block/questions-block.service';
 import { QuestionsService } from '@entities/questions/questions.service';
@@ -29,6 +30,7 @@ export class TestsService {
     private readonly questionBlockService: QuestionsBlockService,
     private readonly answersService: AnswersService,
     private readonly questionsService: QuestionsService,
+    private readonly googleDriveService: GoogleDriveService,
   ) {}
 
   // Create test or get test
@@ -48,7 +50,7 @@ export class TestsService {
 
     const test = await this.testRepository.findOne({
       where: {
-        owner: user.id,
+        userId: user.id,
         internshipStream: stream.internshipStreamName,
       },
     });
@@ -69,7 +71,7 @@ export class TestsService {
       streamNumber: stream.number,
       startDate: stream.startDateTesting,
       endDate: stream.endDateTesting,
-      owner: user.id,
+      userId: user.id,
       questionBlocks: JSON.stringify(blockQuestions.directions),
       numberOfQuestions: blockQuestions.numberOfQuestions,
       correctAnswers: blockQuestions.numberOfCorrectAnswers,
@@ -127,7 +129,7 @@ export class TestsService {
       throw new NotFoundException('Test not found');
     }
     const user = await this.userRepository.findOne({
-      where: { id: test.owner },
+      where: { id: test.userId },
     });
     const answers = await this.answersRepository.find({
       where: {
@@ -165,7 +167,7 @@ export class TestsService {
     }
 
     test.testResults = JSON.stringify(answersResult);
-
+    await this.updateUserDataSpreadsheet(user.id, test);
     await this.testRepository.save(test);
     await this.userRepository.save(user);
 
@@ -234,5 +236,18 @@ export class TestsService {
     return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds
       .toString()
       .padStart(2, '0')}`;
+  }
+
+  private async updateUserDataSpreadsheet(userId: number, test: TestEntity) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    const stream = await this.streamRepository.findOne({
+      where: { id: user.streamId },
+    });
+    await this.googleDriveService.updateInfoTestingSpreadsheet(
+      stream.spreadsheetId,
+      test,
+      user.direction,
+    );
+    return true;
   }
 }

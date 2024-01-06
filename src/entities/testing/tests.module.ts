@@ -1,5 +1,6 @@
 import { AnswersEntity } from '@entities/answers/answers.entity';
 import { AnswersModule } from '@entities/answers/answers.module';
+import { GoogleDriveModule } from '@entities/google-drive/google-drive.module';
 import { InternshipStreamEntity } from '@entities/internship-stream/internship-stream.entity';
 import { QuestionsBlockModule } from '@entities/questions-block/questions-block.module';
 import { QuestionsModule } from '@entities/questions/questions.module';
@@ -24,6 +25,7 @@ import { TestsService } from './tests.service';
     QuestionsBlockModule,
     AnswersModule,
     QuestionsModule,
+    GoogleDriveModule,
   ],
   providers: [TestsService, ConfigService],
   controllers: [TestController],

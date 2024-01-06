@@ -107,7 +107,7 @@ export class ResponseTestDto {
   public isPassTest: boolean;
 
   @ApiProperty({ example: 1, description: 'Owner id' })
-  public owner: number;
+  public userId: number;
 }
 
 export class ResponseUpdateTestDto {
