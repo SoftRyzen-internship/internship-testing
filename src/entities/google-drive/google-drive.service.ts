@@ -14,6 +14,7 @@ export class GoogleDriveService {
   private readonly sheets: sheets_v4.Sheets;
   private readonly countColumns: number;
   private readonly countRows: number;
+  private readonly folderId: string;
   constructor() {
     const auth = new google.auth.GoogleAuth({
       credentials: {
@@ -35,10 +36,10 @@ export class GoogleDriveService {
     });
     this.countColumns = 50;
     this.countRows = 1000;
+    this.folderId = process.env.TARGET_FOLDER_ID_SPREADSHEET;
   }
 
   public async createSpreadsheetInFolder(
-    folderId: string,
     spreadsheetName: string,
     titles: string[],
   ) {
@@ -114,7 +115,7 @@ export class GoogleDriveService {
                   },
                   cell: {
                     userEnteredFormat: {
-                      backgroundColor: { red: 1, green: 1, blue: 1 },
+                      backgroundColor: { red: 0.9, green: 0.9, blue: 0.9 },
                     },
                   },
                   fields: 'userEnteredFormat.backgroundColor',
@@ -157,7 +158,7 @@ export class GoogleDriveService {
 
     await this.drive.files.update({
       fileId: spreadsheetId,
-      addParents: folderId,
+      addParents: this.folderId,
       removeParents: 'root',
       requestBody: {},
     });
