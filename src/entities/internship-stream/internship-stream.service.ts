@@ -164,7 +164,6 @@ export class InternshipStreamService {
   ) {
     const spreadsheetId =
       await this.googleDriveService.createSpreadsheetInFolder(
-        process.env.TARGET_FOLDER_ID_SPREADSHEET,
         spreadsheetName,
         titles,
       );
