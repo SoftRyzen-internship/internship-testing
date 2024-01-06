@@ -1,10 +1,12 @@
 import { ResultTechnicalTestEntity } from '@entities/technical-test-result/result-test.entity';
+import { TestEntity } from '@entities/testing/tests.entity';
 import { UserEntity } from '@entities/users/users.entity';
 import { Injectable } from '@nestjs/common';
 import { drive_v3, google, sheets_v4 } from 'googleapis';
 import {
   columnNames,
   technicalTestCellData,
+  testingCellData,
   userCellData,
 } from './utils/column-name';
 
@@ -15,6 +17,10 @@ export class GoogleDriveService {
   private readonly countColumns: number;
   private readonly countRows: number;
   private readonly folderId: string;
+  private readonly columnNames: string[];
+  private readonly userCellData: { [key: string]: string | string[] };
+  private readonly technicalTestCellData: { [key: string]: string };
+  private readonly testingCellData: { [key: string]: string };
   constructor() {
     const auth = new google.auth.GoogleAuth({
       credentials: {
@@ -37,6 +43,10 @@ export class GoogleDriveService {
     this.countColumns = 50;
     this.countRows = 1000;
     this.folderId = process.env.TARGET_FOLDER_ID_SPREADSHEET;
+    this.columnNames = columnNames;
+    this.userCellData = userCellData;
+    this.technicalTestCellData = technicalTestCellData;
+    this.testingCellData = testingCellData;
   }
 
   public async createSpreadsheetInFolder(
@@ -75,7 +85,7 @@ export class GoogleDriveService {
           range: `${sheet.properties?.title}!A1`,
           valueInputOption: 'RAW',
           requestBody: {
-            values: [columnNames],
+            values: [this.columnNames],
           },
         });
 
@@ -108,14 +118,14 @@ export class GoogleDriveService {
                 repeatCell: {
                   range: {
                     sheetId: sheetId,
-                    startRowIndex: 1,
+                    startRowIndex: 0,
                     endRowIndex: this.countRows,
                     startColumnIndex: 0,
                     endColumnIndex: this.countColumns,
                   },
                   cell: {
                     userEnteredFormat: {
-                      backgroundColor: { red: 0.9, green: 0.9, blue: 0.9 },
+                      backgroundColor: { red: 0.85, green: 0.85, blue: 0.85 },
                     },
                   },
                   fields: 'userEnteredFormat.backgroundColor',
@@ -170,7 +180,7 @@ export class GoogleDriveService {
     spreadsheetId: string,
     body: UserEntity,
   ) {
-    const keys = Object.keys(userCellData);
+    const keys = Object.keys(this.userCellData);
     const response = await this.getSpreadsheetsInfo(spreadsheetId, [
       body.direction,
     ]);
@@ -181,7 +191,7 @@ export class GoogleDriveService {
     const cellData = [];
 
     keys.forEach((cell) => {
-      const cellValue = this.extractData(body, userCellData[cell]);
+      const cellValue = this.extractData(body, this.userCellData[cell]);
       cellData.push(cellValue);
     });
 
@@ -197,10 +207,37 @@ export class GoogleDriveService {
     await this.columnSizeByValue(spreadsheetId, sheetId);
   }
 
-  public async updateInfoUserToSpreadsheet(
+  public async updateInfoTestingSpreadsheet(
+    spreadsheetId: string,
+    body: TestEntity,
+    range: string,
+  ) {
+    await this.updateInfoUserToSpreadsheet(
+      spreadsheetId,
+      body,
+      range,
+      this.testingCellData,
+    );
+  }
+
+  public async updateInfoTechnicalTestSpreadsheet(
     spreadsheetId: string,
     body: ResultTechnicalTestEntity,
     range: string,
+  ) {
+    await this.updateInfoUserToSpreadsheet(
+      spreadsheetId,
+      body,
+      range,
+      this.technicalTestCellData,
+    );
+  }
+
+  private async updateInfoUserToSpreadsheet(
+    spreadsheetId: string,
+    body: any,
+    range: string,
+    obj: { [key: string]: string },
   ) {
     const rowResponse = await this.sheets.spreadsheets.values.get({
       spreadsheetId,
@@ -214,17 +251,16 @@ export class GoogleDriveService {
 
     const columnValues = columnResponse.data.values;
     const rowValues = rowResponse.data.values[0];
-
-    const key = Object.keys(technicalTestCellData);
+    const keys = Object.keys(obj);
 
     const userIds = columnValues.flat();
     const userID = userIds.map(Number);
-    if (userIds && userID.includes(body.userId)) {
+    if (userIds && userID.includes(body?.userId)) {
       const valueUpdate = [];
-      const userRowIndex = userID.indexOf(body.userId) + 1;
+      const userRowIndex = userID.indexOf(body?.userId) + 1;
 
-      const columnIndexArray = key.map((columnName) => {
-        valueUpdate.push(body[technicalTestCellData[columnName]]);
+      const columnIndexArray = keys.map((columnName) => {
+        valueUpdate.push(body[obj[columnName]]);
         return rowValues.indexOf(columnName) + 1;
       });
 
@@ -272,6 +308,9 @@ export class GoogleDriveService {
       }
       return null;
     }
+    if (typeof body[value] === 'boolean') {
+      return body[value] ? 'Так' : 'Ні';
+    }
     return body[value] !== undefined ? body[value] : '';
   }
 
@@ -279,7 +318,7 @@ export class GoogleDriveService {
     return await this.sheets.spreadsheets.batchUpdate({
       spreadsheetId,
       requestBody: {
-        requests: columnNames.map((_, index) => ({
+        requests: this.columnNames.map((_, index) => ({
           autoResizeDimensions: {
             dimensions: {
               sheetId: sheetId,

@@ -98,7 +98,7 @@ export class TestEntity extends MyBaseEntity {
   @Column({ name: 'is_pass_test', type: 'boolean', default: false })
   public isPassTest: boolean;
 
-  @ApiProperty({ example: 1, description: 'Owner id' })
+  @ApiProperty({ example: 1, description: 'User id' })
   @Column({ name: 'owner', type: 'integer' })
-  public owner: number;
+  public userId: number;
 }

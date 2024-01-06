@@ -87,7 +87,7 @@ export class TechnicalTestResultService {
     const stream = await this.streamRepository.findOne({
       where: { id: user.streamId },
     });
-    await this.googleDriveService.updateInfoUserToSpreadsheet(
+    await this.googleDriveService.updateInfoTechnicalTestSpreadsheet(
       stream.spreadsheetId,
       resultTechnicalTest,
       user.direction,
