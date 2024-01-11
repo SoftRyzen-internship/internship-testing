@@ -11,5 +11,6 @@ interface IAnswers {
 
 export interface ITestQuestions {
   question: string;
+  code: string;
   answers: IAnswers[];
 }
