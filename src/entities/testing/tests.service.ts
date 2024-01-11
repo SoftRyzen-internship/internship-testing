@@ -189,6 +189,7 @@ export class TestsService {
       const answers = await this.answersService.getAnswers(question.id);
       testQuestions.push({
         question: question.questionText,
+        code: question.code,
         answers,
       });
     }

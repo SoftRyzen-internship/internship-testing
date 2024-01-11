@@ -200,6 +200,9 @@ export class ResponseStartTestDto {
   @ApiProperty({ example: 'Question 1' })
   public question: string;
 
+  @ApiProperty({ example: '<div class=”box”></div>' })
+  public code: string;
+
   @ApiProperty({ type: [ResponseAnswersTestDto] })
   public answers: ResponseAnswersTestDto[];
 }
