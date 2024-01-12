@@ -36,24 +36,9 @@ export class TestsService {
   // Create test or get test
   public async createOrGetTest(userId: number) {
     const currentDate = new Date();
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    const stream = await this.streamRepository.findOne({
-      where: { id: user.streamId },
-    });
-    if (!stream) {
-      throw new NotFoundException('Stream not found');
-    }
-    const blockQuestions = await this.getBlockQuestions(user.direction);
+    const { user, stream, test } = await this.getUserAndStreamAndTest(userId);
 
-    const test = await this.testRepository.findOne({
-      where: {
-        userId: user.id,
-        internshipStream: stream.internshipStreamName,
-      },
-    });
+    const blockQuestions = await this.getBlockQuestions(user.direction);
     const testTimeOver = new Date(stream.endDateTesting);
     if (currentDate > testTimeOver) {
       throw new BadRequestException('Test time is over');
@@ -104,9 +89,9 @@ export class TestsService {
   }
 
   // Start of the test
-  public async startTest(id: number) {
+  public async startTest(userId: number) {
     let testQuestions: ITestQuestions[] = [];
-    const user = await this.userRepository.findOne({ where: { id } });
+    const { user, test } = await this.getUserAndStreamAndTest(userId);
     const questionBlocks = await this.questionBlockService.getBlock(
       user.direction,
     );
@@ -119,7 +104,7 @@ export class TestsService {
     await this.userRepository.save(user);
 
     testQuestions = testQuestions.sort(() => Math.random() - 0.5);
-    return testQuestions;
+    return { testId: test.id, testQuestions };
   }
 
   // Update test
@@ -176,6 +161,29 @@ export class TestsService {
       questionBlocks: JSON.parse(test.questionBlocks),
       testResults: JSON.parse(test.testResults),
     };
+  }
+
+  // Get user, stream, test
+  private async getUserAndStreamAndTest(userId: number) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const stream = await this.streamRepository.findOne({
+      where: { id: user.streamId },
+    });
+    if (!stream) {
+      throw new NotFoundException('Stream not found');
+    }
+
+    const test = await this.testRepository.findOne({
+      where: {
+        userId: user.id,
+        internshipStream: stream.internshipStreamName,
+      },
+    });
+
+    return { user, stream, test };
   }
 
   // Get array questions with answers
