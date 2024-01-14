@@ -122,35 +122,37 @@ export class TestsService {
       },
     });
 
-    let totalCorrectAnswers = 0;
+    let numberOfCorrectAnswers = 0;
 
     const answersResult = answers.reduce((acc, item) => {
       if (item.isRight) {
-        totalCorrectAnswers = totalCorrectAnswers + 1;
+        numberOfCorrectAnswers = numberOfCorrectAnswers + 1;
       }
       const existingItem = acc.find(
         (resultItem) => resultItem.blockName === item.blockName,
       );
       if (existingItem) {
-        existingItem.totalAnswer = existingItem.totalAnswer + 1;
+        existingItem.numberOfQuestions = existingItem.numberOfQuestions + 1;
         if (item.isRight) {
-          existingItem.correctAnswer = existingItem.correctAnswer + 1;
+          existingItem.numberOfCorrectAnswers =
+            existingItem.numberOfCorrectAnswers + 1;
         }
       } else {
         acc.push({
           blockName: item.blockName,
-          correctAnswer: item.isRight ? 1 : 0,
-          totalAnswer: 1,
+          numberOfCorrectAnswers: item.isRight ? 1 : 0,
+          numberOfQuestions: 1,
         });
       }
       return acc;
     }, []);
 
-    if (totalCorrectAnswers >= test.correctAnswers) {
+    if (numberOfCorrectAnswers >= test.correctAnswers) {
       test.isPassTest = true;
       user.isPassedTest = true;
     }
 
+    test.correctAnswers = numberOfCorrectAnswers;
     test.testResults = JSON.stringify(answersResult);
     await this.updateUserDataSpreadsheet(user.id, test);
     await this.testRepository.save(test);
