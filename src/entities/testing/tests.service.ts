@@ -11,6 +11,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { calcAnswers } from '@utils/number-correct-answers';
 import { In, Repository } from 'typeorm';
 import { UpdateTestDto } from './dto/test.dto';
 import { TestEntity } from './tests.entity';
@@ -147,7 +148,7 @@ export class TestsService {
       return acc;
     }, []);
 
-    if (numberOfCorrectAnswers >= test.correctAnswers) {
+    if (numberOfCorrectAnswers >= calcAnswers(test.numberOfQuestions)) {
       test.isPassTest = true;
       user.isPassedTest = true;
     }
