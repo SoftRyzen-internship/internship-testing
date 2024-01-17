@@ -85,6 +85,23 @@ export class TestResponseCurrentUserDto {
     description: 'End date of internship stream',
   })
   public endDate?: Date;
+
+  @ApiProperty({
+    example: [
+      { blockQuestion: 'HTML/CSS', totalQuestions: 15, correctQuestions: 10 },
+    ],
+    description: 'Test results',
+  })
+  public testResults: string;
+
+  @ApiProperty({ example: '60', description: 'Test time' })
+  public duration: string;
+
+  @ApiProperty({ example: 100, description: 'Number of questions in the test' })
+  public numberOfQuestions: number;
+
+  @ApiProperty({ example: 85, description: 'Result of correct answers' })
+  public correctAnswers: number;
 }
 
 export class TaskResponseCurrentUserDto {
