@@ -41,7 +41,7 @@ export class TestEntity extends MyBaseEntity {
   @Column({ name: 'end_date', type: 'timestamp' })
   public endDate: Date;
 
-  @ApiProperty({ example: 60, description: 'Test time' })
+  @ApiProperty({ example: '60', description: 'Test time' })
   @Column({ name: 'test_time', type: 'varchar' })
   public testTime: string;
 
