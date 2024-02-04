@@ -45,9 +45,15 @@ export class MailService {
     verifyToken: string,
     path: string,
     firstName?: string,
+    isChangePassword?: boolean,
   ) {
     const name = firstName ? firstName : email;
-    const linkForEmail = this.generateUrlForEmailSend(email, verifyToken, path);
+    const linkForEmail = this.generateUrlForEmailSend(
+      email,
+      verifyToken,
+      path,
+      isChangePassword,
+    );
     await this.sendEmail(email, linkForEmail, name);
 
     return true;
@@ -70,7 +76,11 @@ export class MailService {
   }
 
   // Resend email
-  public async resendEmail(email: string, path = VERIFY_EMAIL) {
+  public async resendEmail(
+    email: string,
+    path = VERIFY_EMAIL,
+    isChangePassword?: boolean,
+  ) {
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user) {
       throw new NotFoundException('User not found');
@@ -82,6 +92,7 @@ export class MailService {
       email,
       user.verifyToken,
       path,
+      isChangePassword,
     );
     const name = user.firstName ? user.firstName : email;
     await this.sendEmail(email, linkForEmail, name);
@@ -94,8 +105,13 @@ export class MailService {
     name: string,
     verifyToken: string,
     path: string,
+    isChangePassword: boolean | undefined,
   ) {
-    return `<p>Hi ${name}, please confirm that this is your email address</p><a href="${process.env.BASE_URL}/api/${path}/${verifyToken}">Confirm email</a>`;
+    if (!isChangePassword) {
+      return `<p>Hi ${name}, please confirm that this is your email address</p><a href="${process.env.BASE_URL}/api/${path}/${verifyToken}">Confirm email</a>`;
+    }
+
+    return `<p>Hi ${name}, to change your password, confirm your email</p><a href="${process.env.BASE_URL}/api/${path}/${verifyToken}">Confirm email</a>`;
   }
 
   // Send email
