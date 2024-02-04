@@ -35,6 +35,7 @@ export class PasswordService {
       verifyToken,
       VERIFY_EMAIL_PASS,
       user.firstName,
+      true,
     );
     return { message: 'Email send' };
   }
@@ -72,6 +73,6 @@ export class PasswordService {
 
   // Resend email
   public async resendEmail(email: string) {
-    return await this.mailService.resendEmail(email, VERIFY_EMAIL_PASS);
+    return await this.mailService.resendEmail(email, VERIFY_EMAIL_PASS, true);
   }
 }
