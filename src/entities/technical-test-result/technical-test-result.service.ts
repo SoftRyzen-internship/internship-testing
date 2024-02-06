@@ -40,6 +40,7 @@ export class TechnicalTestResultService {
     const newTechResult = this.resultRepository.create({ ...body, userId });
 
     await this.resultRepository.save(newTechResult);
+    await this.userRepository.update(userId, { isSentTechnicalTask: true });
     await this.updateUserDataSpreadsheet(userId, newTechResult);
     return newTechResult;
   }

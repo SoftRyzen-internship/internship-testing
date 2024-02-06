@@ -49,7 +49,7 @@ export class TechnicalTestService {
     if (!techTest) {
       throw new NotFoundException('Test not found');
     }
-    await this.userRepository.update(userId, { isSentTechnicalTask: true });
+
     const deadline = getDateDeadline(stream.endDateTechnicalTest);
     return { ...techTest, deadline };
   }
