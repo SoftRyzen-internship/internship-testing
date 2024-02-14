@@ -33,7 +33,7 @@ import { CorsMiddleware } from './middlewares/cors-middleware';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'),
+      rootPath: join(__dirname, '..', '../public'),
       serveRoot: '/public',
     }),
     ConfigModule,
