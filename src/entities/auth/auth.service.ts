@@ -52,6 +52,7 @@ export class AuthService {
       verifyToken,
       VERIFY_EMAIL,
       null,
+      false,
     );
 
     const role = this.roleRepository.create({

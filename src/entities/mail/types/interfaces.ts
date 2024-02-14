@@ -4,6 +4,7 @@ export interface ITemplateEmail {
   baseUrl: string;
   path: string;
   verifyToken: string;
+  message: string;
   confirmationMessage: string;
   confirmationLink: string;
 }

@@ -12,7 +12,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { VERIFY_EMAIL } from '@src/constants/mail-path.constants';
 import * as fs from 'fs/promises';
 import * as mustache from 'mustache';
 import { Repository } from 'typeorm';
@@ -48,17 +47,17 @@ export class MailService {
     email: string,
     verifyToken: string,
     path: string,
-    firstName?: string,
-    isChangePassword?: boolean,
+    firstName: string,
+    isChangePassword: boolean,
   ) {
     const name = firstName ? firstName : email;
-    const linkForEmail = await this.generateUrlForEmailSend(
+    const template = await this.generateTemplateHtmlMail(
       email,
       verifyToken,
       path,
       isChangePassword,
     );
-    await this.sendEmail(email, linkForEmail, name);
+    await this.sendEmail(email, template, name);
 
     return true;
   }
@@ -82,8 +81,8 @@ export class MailService {
   // Resend email
   public async resendEmail(
     email: string,
-    path = VERIFY_EMAIL,
-    isChangePassword?: boolean,
+    path: string,
+    isChangePassword: boolean,
   ) {
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user) {
@@ -92,20 +91,20 @@ export class MailService {
     if (!user.verifyToken) {
       throw new BadRequestException('Email is verified');
     }
-    const linkForEmail = await this.generateUrlForEmailSend(
+    const template = await this.generateTemplateHtmlMail(
       email,
       user.verifyToken,
       path,
       isChangePassword,
     );
     const name = user.firstName ? user.firstName : email;
-    await this.sendEmail(email, linkForEmail, name);
+    await this.sendEmail(email, template, name);
 
     return { message: 'Email resend' };
   }
 
   // Generate url for email send
-  private async generateUrlForEmailSend(
+  private async generateTemplateHtmlMail(
     name: string,
     verifyToken: string,
     path: string,
@@ -122,25 +121,25 @@ export class MailService {
       baseUrl: process.env.BASE_URL,
       path,
       verifyToken,
+      message: '',
       confirmationMessage: '',
-      confirmationLink: 'Confirm email',
+      confirmationLink: '',
     };
 
-    if (isChangePassword) {
+    if (!isChangePassword) {
+      template.message =
+        'You register for an internship at a company SoftRyzen.';
       template.confirmationMessage =
         'To continue registration, confirm your email.';
+      template.confirmationLink = 'Confirm email';
     }
 
-    if (!isChangePassword) {
+    if (isChangePassword) {
+      template.message = 'Request to change password.';
       template.confirmationMessage =
-        'to change your password, confirm your email';
+        'To change your password, confirm your email';
+      template.confirmationLink = 'Change password';
     }
-
-    // if (!isChangePassword) {
-    //   return `<p>Hi ${name}, please confirm that this is your email address</p><a href="${process.env.BASE_URL}/api/${path}/${verifyToken}">Confirm email</a>`;
-    // }
-
-    // return `<p>Hi ${name}, to change your password, confirm your email</p><a href="${process.env.BASE_URL}/api/${path}/${verifyToken}">Confirm email</a>`;
 
     const htmlTemplate = mustache.render(html, template);
     return htmlTemplate;
@@ -149,7 +148,7 @@ export class MailService {
   // Send email
   private async sendEmail(
     emailTo: string,
-    verifyLink: string,
+    template: string,
     firstName = 'Dear User',
   ) {
     try {
@@ -167,7 +166,7 @@ export class MailService {
             {
               ContentType: 'HTML',
               Charset: 'utf-8',
-              Content: verifyLink,
+              Content: template,
             },
             {
               ContentType: 'PlainText',
@@ -176,7 +175,7 @@ export class MailService {
             },
           ],
           From: process.env.EMAIL_TO_SEND_FROM,
-          Subject: 'Example verify email',
+          Subject: 'Verify email',
         },
       };
 
