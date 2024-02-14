@@ -13,11 +13,15 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { VERIFY_EMAIL } from '@src/constants/mail-path.constants';
+import * as fs from 'fs/promises';
+import * as mustache from 'mustache';
 import { Repository } from 'typeorm';
+import { ITemplateEmail } from './types/interfaces';
 
 @Injectable()
 export class MailService {
   private readonly elasticEmailService: EmailsApi;
+
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
@@ -48,7 +52,7 @@ export class MailService {
     isChangePassword?: boolean,
   ) {
     const name = firstName ? firstName : email;
-    const linkForEmail = this.generateUrlForEmailSend(
+    const linkForEmail = await this.generateUrlForEmailSend(
       email,
       verifyToken,
       path,
@@ -88,7 +92,7 @@ export class MailService {
     if (!user.verifyToken) {
       throw new BadRequestException('Email is verified');
     }
-    const linkForEmail = this.generateUrlForEmailSend(
+    const linkForEmail = await this.generateUrlForEmailSend(
       email,
       user.verifyToken,
       path,
@@ -101,17 +105,45 @@ export class MailService {
   }
 
   // Generate url for email send
-  private generateUrlForEmailSend(
+  private async generateUrlForEmailSend(
     name: string,
     verifyToken: string,
     path: string,
     isChangePassword: boolean | undefined,
   ) {
-    if (!isChangePassword) {
-      return `<p>Hi ${name}, please confirm that this is your email address</p><a href="${process.env.BASE_URL}/api/${path}/${verifyToken}">Confirm email</a>`;
+    const html = await fs.readFile(
+      './src/entities/mail/template/index.html',
+      'utf8',
+    );
+
+    const template: ITemplateEmail = {
+      title: 'SoftRyzen',
+      name,
+      baseUrl: process.env.BASE_URL,
+      path,
+      verifyToken,
+      confirmationMessage: '',
+      confirmationLink: 'Confirm email',
+    };
+
+    if (isChangePassword) {
+      template.confirmationMessage =
+        'To continue registration, confirm your email.';
     }
 
-    return `<p>Hi ${name}, to change your password, confirm your email</p><a href="${process.env.BASE_URL}/api/${path}/${verifyToken}">Confirm email</a>`;
+    if (!isChangePassword) {
+      template.confirmationMessage =
+        'to change your password, confirm your email';
+    }
+
+    // if (!isChangePassword) {
+    //   return `<p>Hi ${name}, please confirm that this is your email address</p><a href="${process.env.BASE_URL}/api/${path}/${verifyToken}">Confirm email</a>`;
+    // }
+
+    // return `<p>Hi ${name}, to change your password, confirm your email</p><a href="${process.env.BASE_URL}/api/${path}/${verifyToken}">Confirm email</a>`;
+
+    const htmlTemplate = mustache.render(html, template);
+    return htmlTemplate;
   }
 
   // Send email

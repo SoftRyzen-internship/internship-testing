@@ -16,6 +16,7 @@ import { AttemptsModule } from './entities/attempts/attempts.module';
 import { BaseModule } from './entities/base/base.module';
 import { DashboardModule } from './entities/dashboard/dashboard.module';
 import { DirectionModule } from './entities/direction/direction.module';
+import { GoogleDriveModule } from './entities/google-drive/google-drive.module';
 import { GoogleModule } from './entities/google/google.module';
 import { MaterialsModule } from './entities/materials/materials.module';
 import { ParseXlsxModule } from './entities/parse-xlsx/parse-xlsx.module';
@@ -28,7 +29,6 @@ import { UploadModule } from './entities/upload/upload.module';
 import { GlobalExceptionFilter } from './logger/global-exception-filter';
 import { GlobalLoggerService } from './logger/global-logger.service';
 import { CorsMiddleware } from './middlewares/cors-middleware';
-import { GoogleDriveModule } from './entities/google-drive/google-drive.module';
 
 @Module({
   imports: [
