@@ -7,6 +7,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { VERIFY_EMAIL } from '@src/constants/mail-path.constants';
 import { Response } from 'express';
 import {
   CheckEmailResponseDto,
@@ -56,6 +57,6 @@ export class MailController {
   @ApiInternalServerErrorResponse({ description: 'Server error' })
   @Post('resend-email')
   public async resendingEmail(@Body() body: EmailDto) {
-    return await this.mailService.resendEmail(body.email);
+    return await this.mailService.resendEmail(body.email, VERIFY_EMAIL, false);
   }
 }
