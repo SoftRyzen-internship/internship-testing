@@ -154,6 +154,7 @@ export class TestsService {
     }
 
     test.correctAnswers = numberOfCorrectAnswers;
+    test.numberOfQuestions = body.answersIds.length;
     test.testResults = JSON.stringify(answersResult);
     await this.updateUserDataSpreadsheet(user.id, test);
     await this.testRepository.save(test);
