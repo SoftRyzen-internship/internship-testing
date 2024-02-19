@@ -292,24 +292,11 @@ export class GoogleDriveService {
     });
   }
 
-  private extractData(body: any, value: string | string[]) {
-    const dateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
-
+  private extractData(body: UserEntity, value: string | string[]) {
     if (Array.isArray(value)) {
       return `${body[value[0]]} ${body[value[1]]}`;
     }
-    if (body[value] !== undefined && typeof body[value] === 'object') {
-      const data = new Date(body[value]);
-      if (dateRegex.test(data.toISOString())) {
-        const day = data.getDay();
-        const month = data.getMonth() + 1;
-        const year = data.getFullYear();
-        return `${day.toString().padStart(2, '0')}.${month
-          .toString()
-          .padStart(2, '0')}.${year}`;
-      }
-      return null;
-    }
+
     if (typeof body[value] === 'boolean') {
       return body[value] ? 'Так' : 'Ні';
     }

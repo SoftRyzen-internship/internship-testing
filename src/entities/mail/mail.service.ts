@@ -135,8 +135,7 @@ export class MailService {
 
     if (isChangePassword) {
       template.message = 'Request to change password.';
-      template.confirmationMessage =
-        'To change your password, confirm your email';
+      template.confirmationMessage = 'To change your password, follow the link';
       template.confirmationLink = 'Change password';
     }
 
