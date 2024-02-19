@@ -14,6 +14,7 @@ import { UpdateDirectionDto } from './dto/update-direction.dto';
 import { CandidateProgressUpdatesDto, UserDto } from './dto/update-user.dto';
 import { IStreamInfo } from './types/interfaces';
 import { UserEntity } from './users.entity';
+import { registrationDateFormat } from '@utils/format-deadline-tech-test';
 
 @Injectable()
 export class UserService {
@@ -70,7 +71,12 @@ export class UserService {
       throw new NotFoundException(`User with ${email} not found`);
     }
 
-    Object.assign(user, { ...body, isCompleteData: true });
+    const currentDate = new Date();
+    const registrationDate = registrationDateFormat(
+      currentDate.toLocaleString('uk-UA'),
+    );
+
+    Object.assign(user, { ...body, isCompleteData: true, registrationDate });
     await this.userRepository.save(user);
 
     await this.saveUserDataSpreadsheet(user.id);

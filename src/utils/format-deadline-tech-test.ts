@@ -14,3 +14,16 @@ export const getDateDeadline = (date: Date) => {
     .toString()
     .padStart(2, '0')}`;
 };
+
+export const registrationDateFormat = (date: string) => {
+  const currentDate = new Date(date);
+  currentDate.setHours(12);
+  currentDate.setMinutes(0);
+  const day = currentDate.getDate();
+  const month = currentDate.getMonth() + 1;
+  const year = currentDate.getFullYear();
+
+  return `${day.toString().padStart(2, '0')}.${month
+    .toString()
+    .padStart(2, '0')}.${year}`;
+};

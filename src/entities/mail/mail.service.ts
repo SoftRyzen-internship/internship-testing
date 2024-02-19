@@ -127,8 +127,7 @@ export class MailService {
     };
 
     if (!isChangePassword) {
-      template.message =
-        'You register for an internship at a company SoftRyzen.';
+      template.message = 'You are registering for an internship at SoftRyzen.';
       template.confirmationMessage =
         'To continue registration, confirm your email.';
       template.confirmationLink = 'Confirm email';
