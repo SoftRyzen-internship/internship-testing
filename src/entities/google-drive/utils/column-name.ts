@@ -31,7 +31,7 @@ export const columnNames = [
 
 export const userCellData = {
   id: 'id',
-  Дата: 'createAt',
+  Дата: 'registrationDate',
   "Прізвище та ім'я": ['lastName', 'firstName'],
   Email: 'email',
   'Контактний телефон': 'phone',

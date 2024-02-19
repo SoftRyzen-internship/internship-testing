@@ -45,6 +45,9 @@ export class AuthService {
       throw new ConflictException('User is already exists');
     }
 
+    const currentDate = new Date();
+    const registrationDate = currentDate.toLocaleString('uk-UA').split(',')[0];
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const verifyToken = v4();
     await this.mailService.sendEmailHandler(
@@ -64,6 +67,7 @@ export class AuthService {
       password: hashedPassword,
       verifyToken,
       streamId: stream.id,
+      registrationDate,
     });
     newUser.roles = [role];
 

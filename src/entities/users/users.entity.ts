@@ -300,6 +300,10 @@ export class UserEntity extends MyBaseEntity {
   @Column({ name: 'refresh_token', type: 'varchar', nullable: true })
   public refreshToken: string;
 
+  @ApiProperty({ example: '01.01.2024', description: 'Registration date' })
+  @Column({ name: 'registration_date', type: 'varchar', nullable: true })
+  public registrationDate: string;
+
   @ManyToMany(() => RoleEntity, (roles) => roles.users, { onDelete: 'CASCADE' })
   @JoinTable()
   public roles: RoleEntity[];
