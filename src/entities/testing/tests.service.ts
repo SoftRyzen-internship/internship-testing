@@ -124,6 +124,9 @@ export class TestsService {
     });
 
     let numberOfCorrectAnswers = 0;
+    const questionBlocks: IDirectionsForTests[] = JSON.parse(
+      test.questionBlocks,
+    );
 
     const answersResult = answers.reduce((acc, item) => {
       if (item.isRight) {
@@ -133,7 +136,6 @@ export class TestsService {
         (resultItem) => resultItem.blockName === item.blockName,
       );
       if (existingItem) {
-        existingItem.numberOfQuestions = existingItem.numberOfQuestions + 1;
         if (item.isRight) {
           existingItem.numberOfCorrectAnswers =
             existingItem.numberOfCorrectAnswers + 1;
@@ -142,7 +144,9 @@ export class TestsService {
         acc.push({
           blockName: item.blockName,
           numberOfCorrectAnswers: item.isRight ? 1 : 0,
-          numberOfQuestions: 1,
+          numberOfQuestions: questionBlocks.find(
+            (obj) => obj.blockName === item.blockName,
+          ).numberOfQuestions,
         });
       }
       return acc;
@@ -154,7 +158,6 @@ export class TestsService {
     }
 
     test.correctAnswers = numberOfCorrectAnswers;
-    test.numberOfQuestions = body.answersIds.length;
     test.testResults = JSON.stringify(answersResult);
     await this.updateUserDataSpreadsheet(user.id, test);
     await this.testRepository.save(test);
