@@ -3,7 +3,7 @@ export const linkRegex =
 
 export const telegramRegex = /^https:\/\/t.me\/\w+$/;
 
-export const phoneRegex = /^\+[1-9]\d{0,3}-\d{1,14}$/i;
+export const phoneRegex = /^\+\d{10,12}$/;
 
 export const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{6,32}$/;
 
