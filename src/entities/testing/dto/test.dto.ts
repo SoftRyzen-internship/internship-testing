@@ -103,6 +103,9 @@ export class ResponseTestDto {
   @ApiProperty({ example: 85, description: 'Result of correct answers' })
   public correctAnswers: number;
 
+  @ApiProperty({ example: 85, description: 'Minimum correct answers' })
+  public minimumCorrectAnswers: number;
+
   @ApiProperty({ example: false, description: 'Did you pass the test?' })
   public isPassTest: boolean;
 
