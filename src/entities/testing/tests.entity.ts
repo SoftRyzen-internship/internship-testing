@@ -94,6 +94,15 @@ export class TestEntity extends MyBaseEntity {
   @Column({ name: 'correct_answers', type: 'integer', default: 0 })
   public correctAnswers: number;
 
+  @ApiProperty({ example: 85, description: 'Minimum correct answers' })
+  @Column({
+    name: 'minimum_correct_answers',
+    type: 'integer',
+    default: 0,
+    nullable: true,
+  })
+  public minimumCorrectAnswers: number;
+
   @ApiProperty({ example: true, description: 'Did you pass the test?' })
   @Column({ name: 'is_pass_test', type: 'boolean', default: false })
   public isPassTest: boolean;

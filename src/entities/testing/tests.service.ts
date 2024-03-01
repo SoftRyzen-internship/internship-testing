@@ -60,7 +60,7 @@ export class TestsService {
       userId: user.id,
       questionBlocks: JSON.stringify(blockQuestions.directions),
       numberOfQuestions: blockQuestions.numberOfQuestions,
-      correctAnswers: blockQuestions.numberOfCorrectAnswers,
+      minimumCorrectAnswers: blockQuestions.numberOfCorrectAnswers,
       testTime,
     });
     await this.testRepository.save(newTest);
