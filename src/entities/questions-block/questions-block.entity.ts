@@ -1,5 +1,5 @@
+import { MyBaseEntity } from '@entities/base.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { MyBaseEntity } from '@src/base/base.entity';
 import { Column, Entity } from 'typeorm';
 
 @Entity({ name: 'block_questions' })

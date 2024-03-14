@@ -1,9 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { MyBaseEntity } from '@src/base/base.entity';
-import * as regex from '@src/constants/regex-expressions';
 import { Matches, MinLength } from 'class-validator';
 import { Column, Entity, JoinTable, ManyToMany, Unique } from 'typeorm';
-import { RoleEntity } from './role.entity';
+
+import { MyBaseEntity } from '@entities/base.entity';
+import { RoleEntity } from '@entities/roles/role.entity';
+import {
+  LINK_REGEX,
+  PASSWORDS_REGEX,
+  PHONE_REGEX,
+  TELEGRAM_REGEX,
+} from '@src/constants/constants';
 
 @Entity('users')
 export class UserEntity extends MyBaseEntity {
@@ -15,7 +21,7 @@ export class UserEntity extends MyBaseEntity {
   @ApiProperty({ example: 'User password', description: 'User  password' })
   @Column({ name: 'password', type: 'varchar', nullable: true })
   @MinLength(6, { message: 'Password must be at least 6 characters long' })
-  @Matches(regex.passwordRegex, {
+  @Matches(PASSWORDS_REGEX, {
     message: 'Password must contain letters and numbers',
   })
   public password: string;
@@ -41,7 +47,7 @@ export class UserEntity extends MyBaseEntity {
 
   @ApiProperty({ example: 'contactPhone', description: 'User contact phone' })
   @Column({ name: 'phone', type: 'varchar', nullable: true })
-  @Matches(regex.phoneRegex, {
+  @Matches(PHONE_REGEX, {
     message: 'Contact phone must be in the format "+380XXXXXXXXX"',
   })
   public phone: string;
@@ -51,7 +57,7 @@ export class UserEntity extends MyBaseEntity {
     description: 'User Telegram contact',
   })
   @Column({ name: 'telegram_contact', type: 'varchar', nullable: true })
-  @Matches(regex.telegramRegex, {
+  @Matches(TELEGRAM_REGEX, {
     message: 'Telegram contact must be in the format "t.me/name"',
   })
   public telegramContact: string;
@@ -66,7 +72,7 @@ export class UserEntity extends MyBaseEntity {
     required: true,
   })
   @Column({ name: 'linkedin_url', type: 'varchar', nullable: true })
-  @Matches(regex.linkRegex, {
+  @Matches(LINK_REGEX, {
     message: 'This should have been a link',
   })
   public linkedinUrl: string;
@@ -85,7 +91,7 @@ export class UserEntity extends MyBaseEntity {
     required: true,
   })
   @Column({ name: 'resume_url', type: 'varchar', nullable: true })
-  @Matches(regex.linkRegex, {
+  @Matches(LINK_REGEX, {
     message: 'This should have been a link',
   })
   public resumeUrl: string;
@@ -95,7 +101,7 @@ export class UserEntity extends MyBaseEntity {
     description: 'Documentation tets url',
   })
   @Column({ name: 'documentation_url', type: 'varchar', nullable: true })
-  @Matches(regex.linkRegex, {
+  @Matches(LINK_REGEX, {
     message: 'This should have been a link',
   })
   public documentationUrl: string;
@@ -105,7 +111,7 @@ export class UserEntity extends MyBaseEntity {
     description: 'Meeting interview',
   })
   @Column({ name: 'meeting_interview_url', type: 'varchar', nullable: true })
-  @Matches(regex.linkRegex, {
+  @Matches(LINK_REGEX, {
     message: 'This should have been a link',
   })
   public meetingInterviewUrl: string;

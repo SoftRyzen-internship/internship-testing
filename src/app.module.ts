@@ -1,34 +1,39 @@
-import { TypeOrmModule } from '@db/typeorm.config';
-import { AuthModule } from '@entities/auth/auth.module';
-import { InternshipStreamModule } from '@entities/internship-stream/internship-stream.module';
-import { MailModule } from '@entities/mail/mail.module';
-import { QuestionsModule } from '@entities/questions/questions.module';
-import { TechnicalTestModule } from '@entities/technical-test/technical-test.module';
-import { TestsModule } from '@entities/testing/tests.module';
-import { UserModule } from '@entities/users/users.module';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { ConfigModule } from './config.module';
-import { AnswersModule } from './entities/answers/answers.module';
-import { AttemptsModule } from './entities/attempts/attempts.module';
-import { BaseModule } from './entities/base/base.module';
-import { DashboardModule } from './entities/dashboard/dashboard.module';
-import { DirectionModule } from './entities/direction/direction.module';
-import { GoogleDriveModule } from './entities/google-drive/google-drive.module';
-import { GoogleModule } from './entities/google/google.module';
-import { MaterialsModule } from './entities/materials/materials.module';
-import { ParseXlsxModule } from './entities/parse-xlsx/parse-xlsx.module';
-import { PasswordModule } from './entities/passwords/passwords.module';
-import { QuestionsBlockModule } from './entities/questions-block/questions-block.module';
-import { TasksModule } from './entities/tasks/tasks.module';
-import { TechnicalTestResultModule } from './entities/technical-test-result/technical-test-result.module';
-import { TokensModule } from './entities/tokens/tokens.module';
-import { UploadModule } from './entities/upload/upload.module';
+
+import { TypeOrmModule } from '@db/typeorm.config';
+
 import { GlobalExceptionFilter } from './logger/global-exception-filter';
+
 import { GlobalLoggerService } from './logger/global-logger.service';
+
 import { CorsMiddleware } from './middlewares/cors-middleware';
+
+import { ConfigModule } from './config.module';
+import { AnswersModule } from './modules/answers/answers.module';
+import { AttemptsModule } from './modules/attempts/attempts.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { BaseModule } from './modules/base/base.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { DirectionModule } from './modules/direction/direction.module';
+import { GoogleDriveModule } from './modules/google-drive/google-drive.module';
+import { GoogleModule } from './modules/google/google.module';
+import { MailModule } from './modules/mail/mail.module';
+import { MaterialsModule } from './modules/materials/materials.module';
+import { ParseXlsxModule } from './modules/parse-xlsx/parse-xlsx.module';
+import { PasswordModule } from './modules/passwords/passwords.module';
+import { QuestionsBlockModule } from './modules/questions-block/questions-block.module';
+import { QuestionsModule } from './modules/questions/questions.module';
+import { StreamModule } from './modules/stream/stream.module';
+import { TasksModule } from './modules/tasks/tasks.module';
+import { TechnicalTestResultModule } from './modules/technical-test-result/technical-test-result.module';
+import { TechnicalTestModule } from './modules/technical-test/technical-test.module';
+import { TestsModule } from './modules/testing/tests.module';
+import { TokensModule } from './modules/tokens/tokens.module';
+import { UploadModule } from './modules/upload/upload.module';
+import { UserModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -44,7 +49,7 @@ import { CorsMiddleware } from './middlewares/cors-middleware';
     QuestionsModule,
     GoogleModule,
     UploadModule,
-    InternshipStreamModule,
+    StreamModule,
     MaterialsModule,
     QuestionsBlockModule,
     DirectionModule,

@@ -15,7 +15,8 @@
       "@entities/*": ["src/entities/*"],
       "@guards/*": ["src/guards/*"],
       "@utils/*": ["src/utils/*"],
-      "@src/*": ["src/*"]
+      "@src/*": ["src/*"],
+      "@enums/*": ["src/enums"]
     },
     "incremental": true,
     "skipLibCheck": true,
