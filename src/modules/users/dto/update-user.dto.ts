@@ -1,12 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { LINK_REGEX, TELEGRAM_REGEX } from '@src/constants/constants';
+import {
+  LINK_REGEX,
+  PHONE_REGEX,
+  TELEGRAM_REGEX,
+} from '@src/constants/constants';
 import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
   IsDate,
   IsNotEmpty,
   IsOptional,
-  IsPhoneNumber,
   IsString,
   Matches,
   ValidateIf,
@@ -38,7 +41,9 @@ export class UserDto {
     description: 'User contact phone',
     required: true,
   })
-  @IsPhoneNumber()
+  @Matches(PHONE_REGEX, {
+    message: 'Contact phone must be in the format "+380XXXXXXXXX"',
+  })
   @IsNotEmpty()
   public phone: string;
 
