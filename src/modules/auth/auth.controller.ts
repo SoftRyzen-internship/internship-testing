@@ -40,9 +40,9 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   // Register
-  @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({ status: 201, type: AuthResponseDto })
+  @Post('register')
   public async registerUser(@Body(ValidationPipe) body: AuthDto) {
     return await this.authService.registerUser(body);
   }

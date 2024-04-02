@@ -16,7 +16,8 @@
       "@guards/*": ["src/guards/*"],
       "@utils/*": ["src/utils/*"],
       "@src/*": ["src/*"],
-      "@enums/*": ["src/enums"]
+      "@enums/*": ["src/enums"],
+      "@modules/*": ["src/modules"]
     },
     "incremental": true,
     "skipLibCheck": true,
