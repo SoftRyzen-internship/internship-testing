@@ -1,5 +1,6 @@
 import { AttemptsModule } from '@entities/attempts/attempts.module';
 import { BlockIpMiddleware } from '@entities/attempts/middleware/attempts.middleware';
+import { GoogleDriveModule } from '@entities/google-drive/google-drive.module';
 import { InternshipStreamModule } from '@entities/internship-stream/internship-stream.module';
 import { MailModule } from '@entities/mail/mail.module';
 import { MailService } from '@entities/mail/mail.service';
@@ -27,6 +28,7 @@ import { AuthService } from './auth.service';
     AttemptsModule,
     TokensModule,
     InternshipStreamModule,
+    GoogleDriveModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, MailService, ConfigService],

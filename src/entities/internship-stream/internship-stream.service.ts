@@ -45,7 +45,7 @@ export class InternshipStreamService {
 
     newStream.spreadsheetId = await this.createSpreadsheetInFolder(
       newStream.internshipStreamName,
-      titles,
+      ['All', ...titles],
     );
 
     const createdStream = await this.internshipStreamRepository.save(newStream);

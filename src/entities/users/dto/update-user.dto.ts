@@ -6,7 +6,6 @@ import {
   IsDate,
   IsNotEmpty,
   IsOptional,
-  IsPhoneNumber,
   IsString,
   Matches,
   ValidateIf,
@@ -38,8 +37,9 @@ export class UserDto {
     description: 'User contact phone',
     required: true,
   })
-  @IsPhoneNumber()
-  @IsNotEmpty()
+  @Matches(regex.phoneRegex, {
+    message: 'Contact phone must be in the format "+380XXXXXXXXX"',
+  })
   public phone: string;
 
   @ApiProperty({
