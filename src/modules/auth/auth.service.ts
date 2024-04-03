@@ -25,11 +25,11 @@ import {
 } from '@src/constants/constants';
 
 import { AttemptsService } from '../attempts/attempts.service';
+import { GoogleDriveService } from '../google-drive/google-drive.service';
 import { MailService } from '../mail/mail.service';
 import { StreamService } from '../stream/stream.service';
 import { TokensService } from '../tokens/tokens.service';
 
-import { GoogleDriveService } from '../google-drive/google-drive.service';
 import { AuthDto } from './dto/auth.dto';
 
 @Injectable()
