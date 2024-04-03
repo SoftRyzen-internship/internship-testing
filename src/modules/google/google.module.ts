@@ -18,6 +18,7 @@ import { RoleEntity } from '@entities/roles/role.entity';
 import { UserEntity } from '@entities/users/users.entity';
 
 import { AuthService } from '../auth/auth.service';
+import { GoogleDriveModule } from '../google-drive/google-drive.module';
 import { MailService } from '../mail/mail.service';
 import { GoogleService } from './google.service';
 
@@ -34,6 +35,7 @@ import { GoogleService } from './google.service';
     AttemptsModule,
     TokensModule,
     StreamModule,
+    GoogleDriveModule,
   ],
   controllers: [GoogleController],
   providers: [GoogleService, GoogleStrategy, AuthService, MailService],

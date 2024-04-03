@@ -7,6 +7,7 @@ import { UserEntity } from '@entities/users/users.entity';
 
 import { ERole } from '@src/enums/role.enum';
 
+import { GoogleDriveService } from '../google-drive/google-drive.service';
 import { StreamService } from '../stream/stream.service';
 import { TokensService } from '../tokens/tokens.service';
 
@@ -19,6 +20,7 @@ export class GoogleService {
     private readonly roleRepository: Repository<RoleEntity>,
     private readonly tokensService: TokensService,
     private readonly streamService: StreamService,
+    private readonly googleDriveService: GoogleDriveService,
   ) {}
 
   public async auth(email: string) {
@@ -51,6 +53,11 @@ export class GoogleService {
     newUser.roles = [role];
     await this.roleRepository.save(role);
     await this.userRepository.save(newUser);
+
+    await this.googleDriveService.addInfoUserToAllAndDirectionSheets(
+      stream.spreadsheetId,
+      newUser,
+    );
 
     return await this.tokensService.generateTokens(newUser);
   }
