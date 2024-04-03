@@ -1,7 +1,7 @@
 export const getDateDeadline = (date: Date) => {
   const deadlineDate = new Date(date);
-  deadlineDate.setHours(12);
-  deadlineDate.setMinutes(0);
+  deadlineDate.setHours(23);
+  deadlineDate.setMinutes(59);
   const day = deadlineDate.getDate();
   const month = deadlineDate.getMonth() + 1;
   const year = deadlineDate.getFullYear();
