@@ -29,8 +29,8 @@ import { MailService } from '../mail/mail.service';
 import { StreamService } from '../stream/stream.service';
 import { TokensService } from '../tokens/tokens.service';
 
-import { AuthDto } from './dto/auth.dto';
 import { GoogleDriveService } from '../google-drive/google-drive.service';
+import { AuthDto } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
