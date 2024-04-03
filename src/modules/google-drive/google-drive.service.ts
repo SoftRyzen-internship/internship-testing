@@ -185,14 +185,32 @@ export class GoogleDriveService {
     spreadsheetId: string,
     body: UserEntity,
   ) {
-    await this.addInfoUserToSpreadsheet(
-      spreadsheetId,
-      SHEET_DEFAULT_NAME,
-      body,
-    );
+    if (!body.direction) {
+      await this.addInfoUserToSpreadsheet(
+        spreadsheetId,
+        SHEET_DEFAULT_NAME,
+        body,
+      );
+    }
 
     if (body.direction) {
-      await this.addInfoUserToSpreadsheet(spreadsheetId, body.direction, body);
+      const { userID } = await this.getIdsColumn(spreadsheetId, body.direction);
+      const isExistUser = userID.includes(body.id);
+
+      if (!isExistUser) {
+        await this.addInfoUserToSpreadsheet(
+          spreadsheetId,
+          body.direction,
+          body,
+        );
+      }
+
+      await this.updateInfoUserToSpreadsheet(
+        spreadsheetId,
+        body,
+        SHEET_DEFAULT_NAME,
+        this.userCellData as { [key: string]: string },
+      );
     }
   }
 
@@ -277,22 +295,20 @@ export class GoogleDriveService {
       range: `${range}!1:1`,
     });
 
-    const columnResponse = await this.sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: `${range}!A:A`,
-    });
-
-    const columnValues = columnResponse.data.values;
     const rowValues = rowResponse.data.values[0];
     const keys = Object.keys(obj);
 
-    const userIds = columnValues.flat();
-    const userID = userIds.map(Number);
-    if (userIds && userID.includes(body?.userId)) {
+    const { userIds, userID } = await this.getIdsColumn(spreadsheetId, range);
+
+    if (userIds && userID.includes(body?.id)) {
       const valueUpdate = [];
-      const userRowIndex = userID.indexOf(body?.userId) + 1;
+      const userRowIndex = userID.indexOf(body?.id) + 1;
 
       const columnIndexArray = keys.map((columnName) => {
+        if (Array.isArray(obj[columnName])) {
+          valueUpdate.push(this.extractData(body, obj[columnName]));
+          return;
+        }
         valueUpdate.push(body[obj[columnName]]);
         return rowValues.indexOf(columnName) + 1;
       });
@@ -350,5 +366,18 @@ export class GoogleDriveService {
         })),
       },
     });
+  }
+
+  private async getIdsColumn(spreadsheetId: string, range: string) {
+    const columnResponse = await this.sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${range}!A:A`,
+    });
+
+    const columnValues = columnResponse.data.values;
+    const userIds = columnValues.flat();
+    const userID = userIds.map(Number);
+
+    return { userIds, userID };
   }
 }

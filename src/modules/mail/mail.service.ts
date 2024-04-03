@@ -114,7 +114,7 @@ export class MailService {
     isChangePassword: boolean | undefined,
   ) {
     const html = await fs.readFile(
-      './src/entities/mail/template/index.html',
+      './src/modules/mail/template/index.html',
       'utf8',
     );
 
