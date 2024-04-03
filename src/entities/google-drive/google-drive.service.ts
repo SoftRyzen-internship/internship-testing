@@ -21,6 +21,7 @@ export class GoogleDriveService {
   private readonly userCellData: { [key: string]: string | string[] };
   private readonly technicalTestCellData: { [key: string]: string };
   private readonly testingCellData: { [key: string]: string };
+  private readonly SHEET_DEFAULT_NAME = 'All';
   constructor() {
     const auth = new google.auth.GoogleAuth({
       credentials: {
@@ -178,35 +179,18 @@ export class GoogleDriveService {
     return spreadsheetId;
   }
 
-  public async addInfoUserToSpreadsheet(
+  public async addInfoUserToAllAndDirectionSheets(
     spreadsheetId: string,
     body: UserEntity,
   ) {
-    const keys = Object.keys(this.userCellData);
-    const response = await this.getSpreadsheetsInfo(spreadsheetId, [
-      body.direction,
-    ]);
-
-    const sheet = response.data.sheets[0];
-    const sheetId = sheet.properties?.sheetId;
-
-    const cellData = [];
-
-    keys.forEach((cell) => {
-      const cellValue = this.extractData(body, this.userCellData[cell]);
-      cellData.push(cellValue);
-    });
-
-    await this.sheets.spreadsheets.values.append({
+    await this.addInfoUserToSpreadsheet(
       spreadsheetId,
-      range: body.direction,
-      valueInputOption: 'RAW',
-      requestBody: {
-        values: [cellData],
-      },
-    });
-
-    await this.columnSizeByValue(spreadsheetId, sheetId);
+      this.SHEET_DEFAULT_NAME,
+      body,
+    );
+    if (body.direction) {
+      await this.addInfoUserToSpreadsheet(spreadsheetId, body.direction, body);
+    }
   }
 
   public async updateInfoTestingSpreadsheet(
@@ -214,6 +198,13 @@ export class GoogleDriveService {
     body: TestEntity,
     range: string,
   ) {
+    await this.updateInfoUserToSpreadsheet(
+      spreadsheetId,
+      body,
+      this.SHEET_DEFAULT_NAME,
+      this.testingCellData,
+    );
+
     await this.updateInfoUserToSpreadsheet(
       spreadsheetId,
       body,
@@ -227,6 +218,13 @@ export class GoogleDriveService {
     body: ResultTechnicalTestEntity,
     range: string,
   ) {
+    await this.updateInfoUserToSpreadsheet(
+      spreadsheetId,
+      body,
+      this.SHEET_DEFAULT_NAME,
+      this.technicalTestCellData,
+    );
+
     await this.updateInfoUserToSpreadsheet(
       spreadsheetId,
       body,
@@ -283,6 +281,36 @@ export class GoogleDriveService {
         },
       });
     }
+  }
+
+  private async addInfoUserToSpreadsheet(
+    spreadsheetId: string,
+    sheetName: string,
+    body: UserEntity,
+  ) {
+    const keys = Object.keys(this.userCellData);
+    const response = await this.getSpreadsheetsInfo(spreadsheetId, [sheetName]);
+
+    const sheet = response.data.sheets[0];
+    const sheetId = sheet.properties?.sheetId;
+
+    const cellData = [];
+
+    keys.forEach((cell) => {
+      const cellValue = this.extractData(body, this.userCellData[cell]);
+      cellData.push(cellValue);
+    });
+
+    await this.sheets.spreadsheets.values.append({
+      spreadsheetId,
+      range: sheetName,
+      valueInputOption: 'RAW',
+      requestBody: {
+        values: [cellData],
+      },
+    });
+
+    await this.columnSizeByValue(spreadsheetId, sheetId);
   }
 
   private async getSpreadsheetsInfo(spreadsheetId: string, titles: string[]) {

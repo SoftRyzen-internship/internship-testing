@@ -1,4 +1,5 @@
 import { AttemptsService } from '@entities/attempts/attempts.service';
+import { GoogleDriveService } from '@entities/google-drive/google-drive.service';
 import { InternshipStreamService } from '@entities/internship-stream/internship-stream.service';
 import { MailService } from '@entities/mail/mail.service';
 import { TokensService } from '@entities/tokens/tokens.service';
@@ -31,6 +32,7 @@ export class AuthService {
     private readonly mailService: MailService,
     private readonly tokensService: TokensService,
     private readonly streamService: InternshipStreamService,
+    private readonly googleService: GoogleDriveService,
   ) {}
 
   // Register
@@ -73,6 +75,11 @@ export class AuthService {
 
     await this.roleRepository.save(role);
     await this.userRepository.save(newUser);
+
+    await this.googleService.addInfoUserToAllAndDirectionSheets(
+      stream.spreadsheetId,
+      newUser,
+    );
 
     return await this.tokensService.generateTokens(newUser);
   }
