@@ -290,6 +290,8 @@ export class GoogleDriveService {
     range: string,
     obj: { [key: string]: string },
   ) {
+    const userIdBody = body?.userId ? body.userId : body.id;
+
     const rowResponse = await this.sheets.spreadsheets.values.get({
       spreadsheetId,
       range: `${range}!1:1`,
@@ -300,9 +302,9 @@ export class GoogleDriveService {
 
     const { userIds, userID } = await this.getIdsColumn(spreadsheetId, range);
 
-    if (userIds && userID.includes(body?.id)) {
+    if (userIds && userID.includes(userIdBody)) {
       const valueUpdate = [];
-      const userRowIndex = userID.indexOf(body?.id) + 1;
+      const userRowIndex = userID.indexOf(userIdBody) + 1;
 
       const columnIndexArray = keys.map((columnName) => {
         if (Array.isArray(obj[columnName])) {
