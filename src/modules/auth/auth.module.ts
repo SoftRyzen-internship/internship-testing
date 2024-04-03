@@ -9,6 +9,7 @@ import { UserEntity } from '@entities/users/users.entity';
 
 import { JwtGuardsModule } from '@guards/jwtGuard/jwt-guard.module';
 import { AttemptsModule } from '../attempts/attempts.module';
+import { GoogleModule } from '../google/google.module';
 import { MailModule } from '../mail/mail.module';
 import { StreamModule } from '../stream/stream.module';
 import { TokensModule } from '../tokens/tokens.module';
@@ -32,6 +33,7 @@ import { BlockIpMiddleware } from '../attempts/middleware/attempts.middleware';
     AttemptsModule,
     TokensModule,
     StreamModule,
+    GoogleModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, MailService, ConfigService],

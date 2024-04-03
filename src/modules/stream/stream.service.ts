@@ -9,6 +9,8 @@ import { StreamEntity } from '@entities/streams/streams.entity';
 import { TestEntity } from '@entities/testing/testing.entity';
 import { UserEntity } from '@entities/users/users.entity';
 
+import { SHEET_DEFAULT_NAME } from '@src/constants/constants';
+
 import { GoogleDriveService } from '../google-drive/google-drive.service';
 
 @Injectable()
@@ -48,7 +50,7 @@ export class StreamService {
 
     newStream.spreadsheetId = await this.createSpreadsheetInFolder(
       newStream.internshipStreamName,
-      titles,
+      [SHEET_DEFAULT_NAME, ...titles],
     );
 
     const createdStream = await this.internshipStreamRepository.save(newStream);

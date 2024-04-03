@@ -30,6 +30,7 @@ import { StreamService } from '../stream/stream.service';
 import { TokensService } from '../tokens/tokens.service';
 
 import { AuthDto } from './dto/auth.dto';
+import { GoogleDriveService } from '../google-drive/google-drive.service';
 
 @Injectable()
 export class AuthService {
@@ -42,6 +43,7 @@ export class AuthService {
     private readonly mailService: MailService,
     private readonly tokensService: TokensService,
     private readonly streamService: StreamService,
+    private readonly googleService: GoogleDriveService,
   ) {}
 
   // Register
@@ -84,6 +86,11 @@ export class AuthService {
 
     await this.roleRepository.save(role);
     await this.userRepository.save(newUser);
+
+    await this.googleService.addInfoUserToAllAndDirectionSheets(
+      stream.spreadsheetId,
+      newUser,
+    );
 
     return await this.tokensService.generateTokens(newUser);
   }

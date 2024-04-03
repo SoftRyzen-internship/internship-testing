@@ -172,7 +172,7 @@ export class UserService {
     const stream = await this.streamRepository.findOne({
       where: { id: user.streamId },
     });
-    await this.googleService.addInfoUserToSpreadsheet(
+    await this.googleService.addInfoUserToAllAndDirectionSheets(
       stream.spreadsheetId,
       user,
     );

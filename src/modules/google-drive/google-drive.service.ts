@@ -11,6 +11,8 @@ import { ResultTechnicalTestEntity } from '@entities/tech-test-results/tech-test
 import { TestEntity } from '@entities/testing/testing.entity';
 import { UserEntity } from '@entities/users/users.entity';
 
+import { SHEET_DEFAULT_NAME } from '@src/constants/constants';
+
 @Injectable()
 export class GoogleDriveService {
   private readonly drive: drive_v3.Drive;
@@ -179,35 +181,19 @@ export class GoogleDriveService {
     return spreadsheetId;
   }
 
-  public async addInfoUserToSpreadsheet(
+  public async addInfoUserToAllAndDirectionSheets(
     spreadsheetId: string,
     body: UserEntity,
   ) {
-    const keys = Object.keys(this.userCellData);
-    const response = await this.getSpreadsheetsInfo(spreadsheetId, [
-      body.direction,
-    ]);
-
-    const sheet = response.data.sheets[0];
-    const sheetId = sheet.properties?.sheetId;
-
-    const cellData = [];
-
-    keys.forEach((cell) => {
-      const cellValue = this.extractData(body, this.userCellData[cell]);
-      cellData.push(cellValue);
-    });
-
-    await this.sheets.spreadsheets.values.append({
+    await this.addInfoUserToSpreadsheet(
       spreadsheetId,
-      range: body.direction,
-      valueInputOption: 'RAW',
-      requestBody: {
-        values: [cellData],
-      },
-    });
+      SHEET_DEFAULT_NAME,
+      body,
+    );
 
-    await this.columnSizeByValue(spreadsheetId, sheetId);
+    if (body.direction) {
+      await this.addInfoUserToSpreadsheet(spreadsheetId, body.direction, body);
+    }
   }
 
   public async updateInfoTestingSpreadsheet(
@@ -215,6 +201,13 @@ export class GoogleDriveService {
     body: TestEntity,
     range: string,
   ) {
+    await this.updateInfoUserToSpreadsheet(
+      spreadsheetId,
+      body,
+      SHEET_DEFAULT_NAME,
+      this.testingCellData,
+    );
+
     await this.updateInfoUserToSpreadsheet(
       spreadsheetId,
       body,
@@ -231,9 +224,46 @@ export class GoogleDriveService {
     await this.updateInfoUserToSpreadsheet(
       spreadsheetId,
       body,
+      SHEET_DEFAULT_NAME,
+      this.testingCellData,
+    );
+
+    await this.updateInfoUserToSpreadsheet(
+      spreadsheetId,
+      body,
       range,
       this.technicalTestCellData,
     );
+  }
+
+  private async addInfoUserToSpreadsheet(
+    spreadsheetId: string,
+    sheetName: string,
+    body: UserEntity,
+  ) {
+    const keys = Object.keys(this.userCellData);
+    const response = await this.getSpreadsheetsInfo(spreadsheetId, [sheetName]);
+
+    const sheet = response.data.sheets[0];
+    const sheetId = sheet.properties?.sheetId;
+
+    const cellData = [];
+
+    keys.forEach((cell) => {
+      const cellValue = this.extractData(body, this.userCellData[cell]);
+      cellData.push(cellValue);
+    });
+
+    await this.sheets.spreadsheets.values.append({
+      spreadsheetId,
+      range: sheetName,
+      valueInputOption: 'RAW',
+      requestBody: {
+        values: [cellData],
+      },
+    });
+
+    await this.columnSizeByValue(spreadsheetId, sheetId);
   }
 
   private async updateInfoUserToSpreadsheet(
